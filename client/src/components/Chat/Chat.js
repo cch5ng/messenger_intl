@@ -3,12 +3,12 @@ import { useParams, Link } from "react-router-dom";
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import io from 'socket.io-client';
 
 import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
 import MessageInput from './MessageInput';
 import {useAuth} from '../../context/auth-context';
-import {useSocket} from '../../context/socket-context';
 
 const MAX_MESSAGE_LENGTHS = {
   'english': 200,
@@ -18,12 +18,13 @@ const MAX_MESSAGE_LENGTHS = {
   'hindi': 66
 };
 
+let socket;
+
 const Chat = props => {
   let { conversationId } = useParams();
   const {user} = useAuth();
   const {language} = user;
   const userEmail = user.email;
-  const {socket, sendChatMessage, getMessage, setChatRoom} = useSocket();
 
   const [curMessage, setCurMessage] = useState('');
   const [postedMessages, setPostedMessages] = useState([]);
@@ -33,15 +34,21 @@ const Chat = props => {
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
 
-  const handleLanguageToggle = () => {
-    setShowMsgInOriginalLanguage(!showMsgInOriginalLanguage);
-  }
-
-  //socket client listener for server broadcasts
+  //socket listener for incoming messages
   if (socket && conversationId) {
     socket.on(conversationId, (data) => {
       setPostedMessages(postedMessages.concat([data.message]));
-    })
+    });
+  }
+
+  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguage}) => {
+    if (socket) {
+      socket.send({message, conversationId, userEmails, friendLanguage});
+    }
+  }
+
+  const handleLanguageToggle = () => {
+    setShowMsgInOriginalLanguage(!showMsgInOriginalLanguage);
   }
 
   const messageInputOnChangeHandler = e => {
@@ -67,6 +74,7 @@ const Chat = props => {
         created_on: Date.now(),
         translations: {}
       };
+      console.log('message', message)
       sendChatMessage({from_email: user.email,
         message,
         conversationId,
@@ -87,6 +95,17 @@ const Chat = props => {
   const switchTranslations = isChecked => {
     setShowMsgInOriginalLanguage(isChecked);
   }
+
+  useEffect(() => {
+    //connect to socket
+    socket = io.connect('http://localhost:3001/chat');
+    if (conversationId) {
+      socket.on('connect', function(){
+        //maybe this should include conversationId + user email
+        socket.emit('room', conversationId);
+      });
+    }
+  }, [])
 
   useEffect(() => {
     setPostedMessages([]);

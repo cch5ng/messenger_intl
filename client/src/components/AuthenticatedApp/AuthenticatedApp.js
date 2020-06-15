@@ -15,7 +15,6 @@ import {theme} from "../../themes/theme";
 import Sidebar from '../Sidebar/Sidebar';
 import Chat from '../Chat/Chat';
 import { useAuth } from '../../context/auth-context';
-//import {SocketProvider} from '../../context/socket-context';
 
 const appStyle = {
   backgroundColor: 'rgba(0, 0, 0, 0.04)'
@@ -106,21 +105,19 @@ const AppContainer = () => {
 const AuthenticatedApp = () => {
   return (
     <MuiThemeProvider theme={theme}>
-      {/* <SocketProvider> */}
-        <Router>
-          <Switch>
-            <Route exact path="/">
-              <AppContainer />
-            </Route>
-            <Route exact path="/conversations/:conversationId">
-              <AppContainer />
-            </Route>
-            <Route exact path="/login">
-              <Redirect to="/" />
-            </Route>
-          </Switch>
-        </Router>
-      {/* </SocketProvider> */}
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <AppContainer />
+          </Route>
+          <Route exact path="/conversations/:conversationId">
+            <AppContainer />
+          </Route>
+          <Route exact path="/login">
+            <Redirect to="/" />
+          </Route>
+        </Switch>
+      </Router>
     </MuiThemeProvider>
   )
 }

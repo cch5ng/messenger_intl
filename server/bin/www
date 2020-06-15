@@ -37,8 +37,7 @@ server.on("listening", onListening);
 
 const nsp = io.of('/chat');
 nsp.on('connection', function(socket){
-  console.log('someone connected on /chat', Date.now());
-  //console.log('socket', socket)
+  console.log('someone connected on /chat');
 
   socket.on('room', (data) => {
     console.log('room data', data);

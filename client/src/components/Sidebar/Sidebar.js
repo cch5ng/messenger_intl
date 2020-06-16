@@ -12,6 +12,7 @@ import PersonPinIcon from '@material-ui/icons/PersonPin';
 import axios from 'axios';
 
 import SidebarHeader from './SidebarHeader';
+import ChatSummary from './ChatSummary';
 //import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
@@ -146,7 +147,7 @@ const Sidebar = props => {
         </Paper>
 
         {value === 0 && (
-          <h1>Chats display</h1>
+          <ChatSummary />
         )}
         {value === 1 && (
           <h1>Friends display</h1>

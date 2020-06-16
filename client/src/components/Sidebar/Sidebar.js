@@ -129,7 +129,6 @@ const Sidebar = props => {
     <div>
       <SidebarHeader />
 
-
       <div className={classes.sidebarContainer}>
         <Paper square className={classes.root}>
           <Tabs
@@ -145,6 +144,16 @@ const Sidebar = props => {
             <Tab icon={<MailOutlineIcon />} label="INVITES" />
           </Tabs>
         </Paper>
+
+        {value === 0 && (
+          <h1>Chats display</h1>
+        )}
+        {value === 1 && (
+          <h1>Friends display</h1>
+        )}
+        {value === 2 && (
+          <h1>Invitations display</h1>
+        )}
 
         <Contacts 
           friends={friends}

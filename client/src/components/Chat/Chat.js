@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useHistory } from "react-router-dom";
 import io from 'socket.io-client';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -11,6 +11,7 @@ import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
 import MessageInput from './MessageInput';
 import {useAuth} from '../../context/auth-context';
+import {getEmailAr} from '../../util/helpers';
 
 const MAX_MESSAGE_LENGTHS = {
   'english': 200,
@@ -37,6 +38,7 @@ const Chat = props => {
   const {language} = user;
   const userEmail = user.email;
   const classes = useStyles();
+  let history = useHistory();
 
   const [toEmailAddresses, setToEmailAddresses] = useState('');
   const [curMessage, setCurMessage] = useState('');
@@ -65,28 +67,63 @@ const Chat = props => {
   }
 
   const emailInpChangeHandler = ev => {
-    console.log('email Add', ev.target.value);
-    setToEmailAddresses(ev.target.value);
+    let {value} = ev.target;
+    setToEmailAddresses(value);
   }
 
-  const messageInputOnChangeHandler = e => {
-    let {value} = e.target;
+  const messageInputOnChangeHandler = ev => {
+    let {value} = ev.target;
     let maxLength = MAX_MESSAGE_LENGTHS[language];
     if (value.length <= maxLength) {
-      setCurMessage(e.target.value);
+      setCurMessage(value);
+      setMessageInputError('');
     } else {
-      setCurMessage(e.target.value.slice(0, maxLength - 1))
+      setCurMessage(value.slice(0, maxLength))
       let error = `The max message length is ${maxLength}.`;
       setMessageInputError(error);
     }
   };
 
-  const messageInputSubmitHandler = e => {
-    //TODO the logic needs to branch based on chatType
-      //if 'new' need to post new conversation and redirect
-        //refactor existing route to accept init message
-      //if 'existing' do the original
+  const newMessageInputSubmitHandler = ev => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      let emailsAr = getEmailAr(toEmailAddresses);
+      emailsAr.push(userEmail);
+      //validate emails?
+      let message = {
+        author_id: user.id,
+        author_email: user.email,
+        original_message: curMessage,
+        language,
+        created_on: Date.now(),
+        translations: {}
+      };
+      //3 make post request for new conversation (get back id)
+        //TODO BE should also translate the first message to friend languages
+      let jwtToken = localStorage.getItem('authToken');
+      let body = { emailsAr, message };
+      fetch('http://localhost:3001/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${jwtToken}`
+        },
+        body: JSON.stringify(body)
+      })
+        .then(resp => resp.json())
+        .then(json => {
+          if (json.conversationId) {
+            setToEmailAddresses('');
+            setCurMessage('');
+        //5 somehow indicate to contacts that new group conversation is available
+            history.push(`/conversations/${json.conversationId}`);
+          }
+        })
+        .catch(err => console.error('error with group convo', err))
+    }
+  }
 
+  const messageInputSubmitHandler = e => {
     if (e.key === 'Enter') {
       e.preventDefault();
       let message = {
@@ -97,7 +134,6 @@ const Chat = props => {
         created_on: Date.now(),
         translations: {}
       };
-      console.log('message', message)
       sendChatMessage({from_email: user.email,
         message,
         conversationId,
@@ -197,7 +233,7 @@ const Chat = props => {
         <MessageInput
           userEmail={user}
           messageInputOnChangeHandler={messageInputOnChangeHandler}
-          messageInputSubmitHandler={messageInputSubmitHandler}
+          messageInputSubmitHandler={newMessageInputSubmitHandler}
           curMessage={curMessage}
           error={messageInputError}
         />
@@ -240,7 +276,7 @@ const Chat = props => {
           error={messageInputError}
         />
       </div>
-    );
+    )
   }
 }
 

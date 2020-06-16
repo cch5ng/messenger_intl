@@ -15,3 +15,9 @@ export const getPrettyTime = (dateMs) => {
 
   return `${hours}:${minutes}`;
 }
+
+export const getEmailAr = (emailStr) => {
+  let emailAr = emailStr.split(',');
+  emailAr = emailAr.map(email => email.trim());
+  return emailAr;
+}

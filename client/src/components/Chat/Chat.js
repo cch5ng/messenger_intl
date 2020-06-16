@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import { useParams, Link } from "react-router-dom";
+import io from 'socket.io-client';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import io from 'socket.io-client';
+import TextField from '@material-ui/core/TextField';
+import { makeStyles } from '@material-ui/core/styles';
 
 import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
@@ -20,13 +22,23 @@ const MAX_MESSAGE_LENGTHS = {
 
 let socket;
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .MuiTextField-root': {
+      //margin: theme.spacing(1),
+    },
+  },
+}));
+
 const Chat = props => {
   let { conversationId } = useParams();
   const {chatType} = props;
   const {user} = useAuth();
   const {language} = user;
   const userEmail = user.email;
+  const classes = useStyles();
 
+  const [toEmailAddresses, setToEmailAddresses] = useState('');
   const [curMessage, setCurMessage] = useState('');
   const [postedMessages, setPostedMessages] = useState([]);
   const [chatUserEmails, setChatUserEmails] = useState([]);
@@ -50,6 +62,11 @@ const Chat = props => {
 
   const handleLanguageToggle = () => {
     setShowMsgInOriginalLanguage(!showMsgInOriginalLanguage);
+  }
+
+  const emailInpChangeHandler = ev => {
+    console.log('email Add', ev.target.value);
+    setToEmailAddresses(ev.target.value);
   }
 
   const messageInputOnChangeHandler = e => {
@@ -163,7 +180,19 @@ const Chat = props => {
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <div>TODO friend email input</div>
+        <div className="spacer">
+          <form className={classes.root} noValidate autoComplete="off" >
+            <TextField
+              id="inp_to_emails"
+              label="To: (emails separated by comma)"
+              value={toEmailAddresses}
+              placeholder="To: email addresses"
+              variant="outlined"
+              onChange={emailInpChangeHandler}
+              fullWidth
+            />
+          </form>
+        </div>
         <div className="spacer" />
         <MessageInput
           userEmail={user}

@@ -135,9 +135,11 @@ const Sidebar = props => {
           <Tabs
             value={value}
             onChange={handleChange}
-            variant="fullWidth"
-            indicatorColor="secondary"
-            textColor="secondary"
+            //variant="fullWidth"
+            variant="scrollable"
+            scrollButtons="on"
+            indicatorColor="primary"
+            textColor="primary"
             aria-label="icon label tabs example"
           >
             <Tab icon={<ForumIcon />} label="CHATS" />

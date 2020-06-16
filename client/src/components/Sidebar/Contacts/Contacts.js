@@ -37,7 +37,6 @@ const Contacts = props => {
           variant='scrollable' 
           scrollButtons='auto' 
           indicatorColor='primary'
-          centered
         >
           <Tab 
             value='friends' 

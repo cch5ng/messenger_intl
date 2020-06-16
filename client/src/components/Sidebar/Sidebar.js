@@ -2,12 +2,23 @@ import React, { useState, useEffect } from 'react';
 import Contacts from './Contacts/Contacts';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core/styles';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import ForumIcon from '@material-ui/icons/Forum';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import PersonPinIcon from '@material-ui/icons/PersonPin';
 import axios from 'axios';
 
 import SidebarHeader from './SidebarHeader';
-import { makeStyles } from '@material-ui/core';
+//import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
+  root: {
+    flexGrow: 1,
+    maxWidth: 500,
+  },
   sidebarContainer : {
     '&:hover': {
       maxHeight: '85vh',
@@ -25,18 +36,22 @@ const Sidebar = props => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pendingInvites, setPendingInvites] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [value, setValue] = useState(0);
+  const classes = useStyles();
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
   function closeAlertHandler() {
     setApproveInvite('');
   }
-  const classes = useStyles();
 
   function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   }
 
-
   const updateContact = async(fromEmail, action) => {
-
     if(action === 'approve') {
       const approvedRes = await axios.put(`http://localhost:3001/invitations/user/${email}/approve`, 
                                       {  'from_email': fromEmail }, {headers: { Authorization: authToken}});
@@ -113,7 +128,24 @@ const Sidebar = props => {
   return (
     <div>
       <SidebarHeader />
+
+
       <div className={classes.sidebarContainer}>
+        <Paper square className={classes.root}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            variant="fullWidth"
+            indicatorColor="secondary"
+            textColor="secondary"
+            aria-label="icon label tabs example"
+          >
+            <Tab icon={<ForumIcon />} label="CHATS" />
+            <Tab icon={<PersonPinIcon />} label="FRIENDS" />
+            <Tab icon={<MailOutlineIcon />} label="INVITES" />
+          </Tabs>
+        </Paper>
+
         <Contacts 
           friends={friends}
           loadPendingInvites = {loadPendingInvites}
@@ -126,10 +158,10 @@ const Sidebar = props => {
           search = {searchContacts}
         />
         <Snackbar open = {approveInvite.length !== 0} autoHideDuration={3000} onClose = { closeAlertHandler }>
-                            <Alert onClose={closeAlertHandler} severity="success">
-                              {approveInvite} 
-                            </Alert>
-          </Snackbar>
+          <Alert onClose={closeAlertHandler} severity="success">
+            {approveInvite} 
+          </Alert>
+        </Snackbar>
       </div>
     </div>
   );

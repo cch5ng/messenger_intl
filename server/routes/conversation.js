@@ -10,6 +10,7 @@ router.post("/",
   passport.authenticate('jwt', {session: false}),
   function(req, res, next) {
     const {emailsAr} = req.body;
+    const message = req.body.message ? req.body.message : null;
     Conversation.find({ 
       $and: [{
         user_emails: { $all: emailsAr }
@@ -22,7 +23,9 @@ router.post("/",
         res.status(200).json({type: "success", conversationId: conversations[0]._id.toString(), message: "An existing conversation was found."});
       } else {
       //else create converation, returning _id
-        let newChat = new Conversation({user_emails: emailsAr});
+        let newChat = message ?
+          new Conversation({user_emails: emailsAr, messages: [message]}) :
+          new Conversation({user_emails: emailsAr});
         newChat.save(function(err, conversation) {
           if (err) console.error('Conversation could not be created', err);
           if (conversation) {

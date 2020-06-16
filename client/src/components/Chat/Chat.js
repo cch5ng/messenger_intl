@@ -22,6 +22,7 @@ let socket;
 
 const Chat = props => {
   let { conversationId } = useParams();
+  const {chatType} = props;
   const {user} = useAuth();
   const {language} = user;
   const userEmail = user.email;
@@ -64,6 +65,11 @@ const Chat = props => {
   };
 
   const messageInputSubmitHandler = e => {
+    //TODO the logic needs to branch based on chatType
+      //if 'new' need to post new conversation and redirect
+        //refactor existing route to accept init message
+      //if 'existing' do the original
+
     if (e.key === 'Enter') {
       e.preventDefault();
       let message = {
@@ -149,7 +155,28 @@ const Chat = props => {
     }
   }, [conversationId]);
 
-  if (!conversationId) {
+  //TODO handle chatType = 'new', 'existing', 'empty'
+  if (chatType === 'new') {
+    return (
+      <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
+        <ChatHeader 
+          switchTranslations={switchTranslations}
+          friendEmails={[]}
+        />
+        <div>TODO friend email input</div>
+        <div className="spacer" />
+        <MessageInput
+          userEmail={user}
+          messageInputOnChangeHandler={messageInputOnChangeHandler}
+          messageInputSubmitHandler={messageInputSubmitHandler}
+          curMessage={curMessage}
+          error={messageInputError}
+        />
+      </div>
+    )
+  }
+
+  if (chatType === 'empty') {
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
         <ChatHeader 
@@ -163,27 +190,29 @@ const Chat = props => {
     )
   }
 
-  return (
-    <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
-      <ChatHeader 
-        handleLanguageToggle = {handleLanguageToggle}
-        showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
-        friendEmails={getFriendEmail()}
-      />
-      <MessageDisplay
-        showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
-        userEmail={user.email} 
-        messages={postedMessages}
-      />
-      <MessageInput
-        userEmail={user}
-        messageInputOnChangeHandler={messageInputOnChangeHandler}
-        messageInputSubmitHandler={messageInputSubmitHandler}
-        curMessage={curMessage}
-        error={messageInputError}
-      />
-    </div>
-  );
+  if (chatType === 'existing') {
+    return (
+      <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
+        <ChatHeader 
+          handleLanguageToggle = {handleLanguageToggle}
+          showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
+          friendEmails={getFriendEmail()}
+        />
+        <MessageDisplay
+          showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
+          userEmail={user.email} 
+          messages={postedMessages}
+        />
+        <MessageInput
+          userEmail={user}
+          messageInputOnChangeHandler={messageInputOnChangeHandler}
+          messageInputSubmitHandler={messageInputSubmitHandler}
+          curMessage={curMessage}
+          error={messageInputError}
+        />
+      </div>
+    );
+  }
 }
 
 export default Chat;

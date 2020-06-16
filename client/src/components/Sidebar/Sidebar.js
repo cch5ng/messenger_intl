@@ -40,6 +40,7 @@ const Sidebar = props => {
   const [value, setValue] = useState(0);
   const classes = useStyles();
 
+  //tab click handler
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -135,7 +136,6 @@ const Sidebar = props => {
           <Tabs
             value={value}
             onChange={handleChange}
-            //variant="fullWidth"
             variant="scrollable"
             scrollButtons="on"
             indicatorColor="primary"

@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ChatSummaryItem = (props) => {
-  const {conversation, idx} = props;
+  const {conversation, idx, handleChatClick} = props;
   const {user} = useAuth();
   const classes = useStyles();
   let color = avatarColors[idx % 6];
@@ -82,7 +82,8 @@ const ChatSummaryItem = (props) => {
   }
 
   return (
-    <div className="chat_summary_item_container">
+    <div className="chat_summary_item_container"
+      onClick={(ev) => handleChatClick(conversation._id.toString())}>
       <Avatar className={classes[color]}>{getFriendInitial()}</Avatar>
       <div className="chat_summary_detail_container">
         <div className="friends_name_text">

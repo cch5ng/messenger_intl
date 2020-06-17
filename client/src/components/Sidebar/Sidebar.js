@@ -12,7 +12,7 @@ import PersonPinIcon from '@material-ui/icons/PersonPin';
 import axios from 'axios';
 
 import SidebarHeader from './SidebarHeader';
-import ChatSummary from './ChatSummary';
+import ChatSummary from './ChatSummary/ChatSummary';
 //import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({

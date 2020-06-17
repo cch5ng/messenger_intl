@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {useAuth} from '../../../context/auth-context';
+import './style.css';
 
 const ChatSummaryItem = (props) => {
   const {conversation} = props;
@@ -24,11 +25,12 @@ const ChatSummaryItem = (props) => {
   }
 
   return (
-    <div>
+    <div className="chat_summary_item_container">
       <p>avatar</p>
-      <p>{filterSelfEmail(conversation.user_emails)}</p>
-      <p>{getLastMessageTranslated()}</p>
-      <p>unread messages count</p>
+      <div className="chat_summary_detail_container">
+        <div>{filterSelfEmail(conversation.user_emails)}</div>
+        <div>{getLastMessageTranslated()}</div>
+      </div>
     </div>
   )
 }

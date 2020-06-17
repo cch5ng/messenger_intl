@@ -1,0 +1,32 @@
+/* ChatSummary */
+
+.chat_summary_container {
+  padding: 18px;
+}
+
+.scrollable {
+  overflow-y: scroll;
+}
+
+/* ChatSummaryItem */
+
+.chat_summary_item_container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 18px;
+  height: 60px;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.chat_summary_detail_container {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  padding-left: 12px;
+  /* align-items: center; */
+}
+

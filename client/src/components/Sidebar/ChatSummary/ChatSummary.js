@@ -4,6 +4,7 @@ import CreateOutlinedIcon from '@material-ui/icons/CreateOutlined';
 
 import {useAuth} from '../../../context/auth-context';
 import ChatSummaryItem from './ChatSummaryItem';
+import './style.css';
 
 const ChatSummary = () => {
   let history = useHistory();
@@ -26,7 +27,6 @@ const ChatSummary = () => {
       .then(resp => resp.json())
       .then(json => {
         if (json && json.conversations.length) {
-          console.log('json', json)
           setConversationList(json.conversations);
           let conversationId = json.conversations[0]._id.toString();
           history.push(`/conversations/${conversationId}`);
@@ -36,16 +36,19 @@ const ChatSummary = () => {
   }, []);
 
   return (
-    <div>
+    <div className="chat_summary_container">
       <CreateOutlinedIcon onClick={clickIconHandler} />
-      {conversationList.map(convo => {
-        return (
-          <ChatSummaryItem conversation={convo} />
-        )
-      })}
-      {conversationList.length === 0 && (
-        <p>No conversations were found.</p>
-      )}
+      <div className="scrollable">
+        {conversationList.map(convo => {
+          return (
+            <ChatSummaryItem conversation={convo} />
+          )
+        })}
+        {conversationList.length === 0 && (
+          <p>No conversations were found.</p>
+        )}
+
+      </div>
     </div>
   )
 }

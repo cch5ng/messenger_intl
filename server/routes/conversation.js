@@ -49,7 +49,7 @@ router.get("/user/:email",
     function(req, res, next) {
         const {email} = req.params;
         let objId = mongoose.Types.ObjectId;
-        Conversation.find({user_emails:{ "$in" : [email]} })
+        Conversation.find({user_emails:{ "$in" : [email]} }, '_id user_emails created_on updated_on messages')
             .sort({updated_on: -1})
             .exec(function(err, conversations) {
                 if (err) {
@@ -58,6 +58,7 @@ router.get("/user/:email",
                 if (conversations && conversations.length) {
                   let dictEmailToLang = {};
                   conversations.forEach((conversation, idx) => {
+                    conversation.messages = conversation.messages[conversation.messages.length - 1];
                     conversation.user_emails.forEach((em, idx2) => {
                       let innerIdx = idx2;
                       if (!dictEmailToLang[em]) {
@@ -66,7 +67,6 @@ router.get("/user/:email",
                             return handleError(err)
                           }
                           if (user && user.length) {
-                            console.log('user', user)
                             dictEmailToLang[em] = user[0].language;
                             if (idx === conversations.length - 1 && innerIdx === conversation.user_emails.length - 1) {
                               res.json({ type: "success", conversations, dictEmailToLang})

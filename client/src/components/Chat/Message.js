@@ -24,6 +24,7 @@ const Message = props => {
     }
     return '';
   }
+
   if (!props.isAuthorUser) {
     const translation = message.translations && !props.showMsgInOriginalLanguage ? message.translations[language] : message.original_message;
     return (

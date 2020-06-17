@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import CreateOutlinedIcon from '@material-ui/icons/CreateOutlined';
 
 import {useAuth} from '../../../context/auth-context';
+import ChatSummaryItem from './ChatSummaryItem';
 
 const ChatSummary = () => {
   let history = useHistory();
@@ -25,8 +26,10 @@ const ChatSummary = () => {
       .then(resp => resp.json())
       .then(json => {
         if (json && json.conversations.length) {
-          console.log('convos', json.conversations)
+          console.log('json', json)
           setConversationList(json.conversations);
+          let conversationId = json.conversations[0]._id.toString();
+          history.push(`/conversations/${conversationId}`);
         }
       })
       .catch(err => console.error('get convos summary err', err))
@@ -37,7 +40,7 @@ const ChatSummary = () => {
       <CreateOutlinedIcon onClick={clickIconHandler} />
       {conversationList.map(convo => {
         return (
-          <div>{convo.user_emails}</div>
+          <ChatSummaryItem conversation={convo} />
         )
       })}
       {conversationList.length === 0 && (

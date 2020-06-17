@@ -11,7 +11,7 @@ import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
 import MessageInput from './MessageInput';
 import {useAuth} from '../../context/auth-context';
-import {getEmailAr} from '../../util/helpers';
+import {getEmailAr, isEmailValid} from '../../util/helpers';
 
 const MAX_MESSAGE_LENGTHS = {
   'english': 200,
@@ -89,7 +89,7 @@ const Chat = props => {
       ev.preventDefault();
       let emailsAr = getEmailAr(toEmailAddresses);
       emailsAr.push(userEmail);
-      //validate emails?
+      emailsAr = emailsAr.filter(em => isEmailValid(em));
       let message = {
         author_id: user.id,
         author_email: user.email,

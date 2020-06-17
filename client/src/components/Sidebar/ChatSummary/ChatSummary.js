@@ -12,8 +12,11 @@ const ChatSummary = () => {
   const {user} = useAuth();
 
   const clickIconHandler = () => {
-    console.log('clicked icon')
     history.push('/conversations/new');
+  }
+
+  const handleChatClick = (conversationId) => {
+    history.push(`/conversations/${conversationId}`);
   }
 
   useEffect(() => {
@@ -41,7 +44,7 @@ const ChatSummary = () => {
       <div className="scrollable">
         {conversationList.map((convo, idx) => {
           return (
-            <ChatSummaryItem conversation={convo} idx={idx} />
+            <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} />
           )
         })}
         {conversationList.length === 0 && (

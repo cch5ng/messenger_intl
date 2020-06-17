@@ -27,6 +27,12 @@
   flex-flow: column nowrap;
   justify-content: center;
   padding-left: 12px;
-  /* align-items: center; */
 }
 
+.friends_name_text {
+  font-weight: bold;
+}
+
+.message_text {
+  color: #ccc;
+}

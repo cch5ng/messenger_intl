@@ -28,8 +28,8 @@ const ChatSummaryItem = (props) => {
     <div className="chat_summary_item_container">
       <p>avatar</p>
       <div className="chat_summary_detail_container">
-        <div>{filterSelfEmail(conversation.user_emails)}</div>
-        <div>{getLastMessageTranslated()}</div>
+        <div className="friends_name_text">{filterSelfEmail(conversation.user_emails)}</div>
+        <div className="message_text">{getLastMessageTranslated()}</div>
       </div>
     </div>
   )

@@ -39,9 +39,9 @@ router.post("/",
   }
 );
 
-/*  gets conversations for a given user id
-    on successful return, json includes this object, dictUidToObj
-    {uid_as_string: {email, language}}
+/*  gets conversations for a given user email
+    on successful return, json includes this object, dictEmailToLang
+    {email as string: language as string} for all conversation participants
     as well as the conversations
 */
 router.get("/user/:email",
@@ -56,29 +56,26 @@ router.get("/user/:email",
                     return handleError(err);
                 }
                 if (conversations && conversations.length) {
-                    //let dictUidToObj = {};
-                    res.json({ type: "success", conversations})
-                    // conversations.forEach((conversation, idx) => {
-                    //     conversation.users.forEach((uid, idx2) => {
-                    //         let innerIdx = idx2;
-                    //         if (!dictUidToObj[uid.toString()]) {
-                    //             User.findById(uid.toString(), function(err, user) {
-                    //                 if (err) {
-                    //                     return handleError(err)
-                    //                 }
-                    //                 if (user) {
-                    //                     let userObj = {};
-                    //                     userObj.email = user.email;
-                    //                     userObj.language = user.language;
-                    //                     dictUidToObj[uid.toString()] = userObj;
-                    //                     if (idx === conversations.length - 1 && innerIdx === conversation.users.length - 1) {
-                    //                         res.json({ type: "success", conversations, dictUidToObj})
-                    //                     }                
-                    //                 }
-                    //             })
-                    //         }
-                    //     })
-                    // })
+                  let dictEmailToLang = {};
+                  conversations.forEach((conversation, idx) => {
+                    conversation.user_emails.forEach((em, idx2) => {
+                      let innerIdx = idx2;
+                      if (!dictEmailToLang[em]) {
+                        User.find({email: em}, function(err, user) {
+                          if (err) {
+                            return handleError(err)
+                          }
+                          if (user && user.length) {
+                            console.log('user', user)
+                            dictEmailToLang[em] = user[0].language;
+                            if (idx === conversations.length - 1 && innerIdx === conversation.user_emails.length - 1) {
+                              res.json({ type: "success", conversations, dictEmailToLang})
+                            }
+                          }
+                        })
+                      }
+                    })
+                  })
                 } else {
                     res.json({ type: "success", conversations: [], message: "There are no current conversations"})
                 }

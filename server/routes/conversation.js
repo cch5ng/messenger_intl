@@ -5,11 +5,14 @@ const Conversation = require("../models/conversation");
 const User = require("../models/user");
 const router = express.Router();
 
+const {getTranslation} = require("../util/translate_helpers");
+const {language_codes} = require("../util/languages");
+
 //post new conversation (given list of users) returning id
 router.post("/",
   passport.authenticate('jwt', {session: false}),
   function(req, res, next) {
-    const {emailsAr} = req.body;
+    const {emailsAr, friendLanguages} = req.body;
     const message = req.body.message ? req.body.message : null;
     Conversation.find({ 
       $and: [{
@@ -22,18 +25,42 @@ router.post("/",
       if (conversations && conversations.length) {
         res.status(200).json({type: "success", conversationId: conversations[0]._id.toString(), message: "An existing conversation was found."});
       } else {
-      //else create converation, returning _id
-        let newChat = message ?
-          new Conversation({user_emails: emailsAr, messages: [message]}) :
-          new Conversation({user_emails: emailsAr});
-        newChat.save(function(err, conversation) {
-          if (err) console.error('Conversation could not be created', err);
-          if (conversation) {
-            res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString()});
-          } else {
-            res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
-          }
-        })
+        let newChat;
+        //case1 new conversation between 2 people, no message
+        if (!message) {
+          newChat = new Conversation({user_emails: emailsAr});
+          newChat.save(function(err, conversation) {
+            if (err) console.error('Conversation could not be created', err);
+            if (conversation) {
+              res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString()});
+            } else {
+              res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
+            }
+          })
+        } else {
+          //case2 new conversation between >2 people, initial message (needs translation first)
+          let translations = {};
+          friendLanguages.forEach((lang, idx) => {
+            let target = language_codes[lang];
+            getTranslation(message.original_message, target)
+              .then(translation => {
+                console.log('translation', translation)
+                translations[lang] = translation[0];
+                if (idx === friendLanguages.length - 1) {
+                  newChat = new Conversation({user_emails: emailsAr, messages: [message], translations});
+                  newChat.save(function(err, conversation) {
+                    if (err) console.error('Conversation could not be created', err);
+                    if (conversation) {
+                      res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString()});
+                    } else {
+                      res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
+                    }
+                  })  
+                }
+              })
+              .catch(err => console.error('Translation err', err))
+          })
+        }
       }
     })
   }

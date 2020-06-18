@@ -6,7 +6,8 @@ function AuthProvider({children}) {
   const [state, setState] = React.useState({
     status: 'logged out',
     error: null,
-    user: null
+    user: null,
+    emailToLangDict: {}
   });
 
   const [token, setToken] = useState(localStorage.getItem('authToken') ? localStorage.getItem('authToken') : null);
@@ -60,11 +61,15 @@ function AuthProvider({children}) {
     }
   }
 
+  const updateEmailToLangDict = (dict) => {
+    setState({...state, emailToLangDict: dict});
+  }
+
   React.useEffect(() => {
     getUser();
   }, [token, email, user]);
   
-  let authState = {...state, logout, login}
+  let authState = {...state, logout, login, updateEmailToLangDict}
 
   /**
    * Provider component is the place where you'd pass a prop called value to, 

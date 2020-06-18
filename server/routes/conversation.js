@@ -56,26 +56,7 @@ router.get("/user/:email",
                     return handleError(err);
                 }
                 if (conversations && conversations.length) {
-                  let dictEmailToLang = {};
-                  conversations.forEach((conversation, idx) => {
-                    conversation.messages = conversation.messages[conversation.messages.length - 1];
-                    conversation.user_emails.forEach((em, idx2) => {
-                      let innerIdx = idx2;
-                      if (!dictEmailToLang[em]) {
-                        User.find({email: em}, function(err, user) {
-                          if (err) {
-                            return handleError(err)
-                          }
-                          if (user && user.length) {
-                            dictEmailToLang[em] = user[0].language;
-                            if (idx === conversations.length - 1 && innerIdx === conversation.user_emails.length - 1) {
-                              res.json({ type: "success", conversations, dictEmailToLang})
-                            }
-                          }
-                        })
-                      }
-                    })
-                  })
+                  res.json({ type: "success", conversations})
                 } else {
                     res.json({ type: "success", conversations: [], message: "There are no current conversations"})
                 }

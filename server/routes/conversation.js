@@ -40,26 +40,26 @@ router.post("/",
         } else {
           //case2 new conversation between >2 people, initial message (needs translation first)
           let translations = {};
-          friendLanguages.forEach((lang, idx) => {
+          Promise.all(friendLanguages.map(lang => {
             let target = language_codes[lang];
-            getTranslation(message.original_message, target)
-              .then(translation => {
-                console.log('translation', translation)
-                translations[lang] = translation[0];
-                if (idx === friendLanguages.length - 1) {
-                  newChat = new Conversation({user_emails: emailsAr, messages: [message], translations});
-                  newChat.save(function(err, conversation) {
-                    if (err) console.error('Conversation could not be created', err);
-                    if (conversation) {
-                      res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString()});
-                    } else {
-                      res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
-                    }
-                  })  
+            return getTranslation(message.original_message, target);
+          }))
+            .then(translated => {
+              translated.forEach((trans, idx) => {
+                translations[friendLanguages[idx]] = trans[0];
+              });
+              message.translations = translations;
+              newChat = new Conversation({user_emails: emailsAr, messages: [message]});
+              newChat.save(function(err, conversation) {
+                if (err) console.error('Conversation could not be created', err);
+                if (conversation) {
+                  res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString()});
+                } else {
+                  res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
                 }
-              })
-              .catch(err => console.error('Translation err', err))
-          })
+              });
+            })
+            .catch(err => console.error('Translation err', err))
         }
       }
     })
@@ -67,9 +67,6 @@ router.post("/",
 );
 
 /*  gets conversations for a given user email
-    on successful return, json includes this object, dictEmailToLang
-    {email as string: language as string} for all conversation participants
-    as well as the conversations
 */
 router.get("/user/:email",
     passport.authenticate('jwt', { session: false }),
@@ -111,6 +108,5 @@ router.get("/:conversation_id",
         }) 
     }
 )
-
 
 module.exports = router;

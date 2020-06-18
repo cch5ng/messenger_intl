@@ -35,7 +35,6 @@ const Chat = props => {
   let { conversationId } = useParams();
   const {chatType} = props;
   const {user, emailToLangDict} = useAuth();
-  console.log('emailToLangDict', emailToLangDict)
   const {language} = user;
   const userEmail = user.email;
   const classes = useStyles();
@@ -46,7 +45,6 @@ const Chat = props => {
   const [postedMessages, setPostedMessages] = useState([]);
   const [chatUserEmails, setChatUserEmails] = useState([]);
   const [messageInputError, setMessageInputError] = useState('');
-  //const [friendLanguage, setFriendLanguage] = useState('');
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
 
@@ -99,10 +97,11 @@ const Chat = props => {
         created_on: Date.now(),
         translations: {}
       };
+      let friendLanguages = getFriendLanguages();
       //3 make post request for new conversation (get back id)
         //TODO BE should also translate the first message to friend languages
       let jwtToken = localStorage.getItem('authToken');
-      let body = { emailsAr, message };
+      let body = { emailsAr, message, friendLanguages };
       fetch('http://localhost:3001/conversations', {
         method: 'POST',
         headers: {
@@ -149,8 +148,6 @@ const Chat = props => {
 
   const getFriendLanguages = () => {
     let friendEmails = getFriendEmail();
-    console.log('friendEmails', friendEmails)
-    console.log('friend languages', friendEmails.map(email => emailToLangDict[email].language))
     return friendEmails.map(email => emailToLangDict[email].language);
   }
 
@@ -168,7 +165,6 @@ const Chat = props => {
     socket = io.connect('http://localhost:3001/chat');
     if (conversationId) {
       socket.on('connect', function(){
-        //maybe this should include conversationId + user email
         socket.emit('room', conversationId);
       });
     }

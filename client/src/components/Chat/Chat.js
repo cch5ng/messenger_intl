@@ -34,7 +34,8 @@ const useStyles = makeStyles((theme) => ({
 const Chat = props => {
   let { conversationId } = useParams();
   const {chatType} = props;
-  const {user} = useAuth();
+  const {user, emailToLangDict} = useAuth();
+  console.log('emailToLangDict', emailToLangDict)
   const {language} = user;
   const userEmail = user.email;
   const classes = useStyles();

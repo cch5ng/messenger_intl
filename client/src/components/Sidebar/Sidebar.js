@@ -13,6 +13,7 @@ import axios from 'axios';
 
 import SidebarHeader from './SidebarHeader';
 import ChatSummary from './ChatSummary/ChatSummary';
+import {useAuth} from '../../context/auth-context';
 //import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
@@ -39,6 +40,7 @@ const Sidebar = props => {
   const [searchQuery, setSearchQuery] = useState('');
   const [value, setValue] = useState(0);
   const classes = useStyles();
+  const {updateEmailToLangDict} = useAuth();
 
   //tab click handler
   const handleChange = (event, newValue) => {
@@ -101,7 +103,10 @@ const Sidebar = props => {
     if(email){
       const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, {headers: { Authorization: authToken}});
       if(res.data.contacts.length !== 0){
-      setFriends(res.data.contacts);
+        let {contacts} = res.data;
+        let contactEmails = Object.keys(contacts);
+        setFriends(contactEmails);
+        updateEmailToLangDict(contacts);
       }
       else {
         setFriends(['You dont have any contacts. Send invites to initiate a conversation']);

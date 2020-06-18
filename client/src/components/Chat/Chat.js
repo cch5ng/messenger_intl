@@ -46,7 +46,7 @@ const Chat = props => {
   const [postedMessages, setPostedMessages] = useState([]);
   const [chatUserEmails, setChatUserEmails] = useState([]);
   const [messageInputError, setMessageInputError] = useState('');
-  const [friendLanguage, setFriendLanguage] = useState('');
+  //const [friendLanguage, setFriendLanguage] = useState('');
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
 
@@ -139,12 +139,19 @@ const Chat = props => {
         message,
         conversationId,
         userEmails: chatUserEmails,
-        friendLanguage
+        friendLanguage: getFriendLanguages()
       });
       setPostedMessages(postedMessages.concat([message]));
       setCurMessage('');
       setMessageInputError('');
     }
+  }
+
+  const getFriendLanguages = () => {
+    let friendEmails = getFriendEmail();
+    console.log('friendEmails', friendEmails)
+    console.log('friend languages', friendEmails.map(email => emailToLangDict[email].language))
+    return friendEmails.map(email => emailToLangDict[email].language);
   }
 
   const getFriendEmail = () => {
@@ -185,24 +192,6 @@ const Chat = props => {
           }
           if (json.user_emails && json.user_emails.length) {
             setChatUserEmails(json.user_emails);
-            //make api call to get friend language by email
-            let friendEmail = json.user_emails[0] === userEmail ? json.user_emails[1]: json.user_emails[0];
-            fetch(`http://localhost:3001/user/${friendEmail}/language`, {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `${jwtToken}`
-              }
-            })
-            .then(resp => resp.json())
-            .then(json => {
-              if (json.language) {
-                setFriendLanguage(json.language);
-              } else {
-                setLanguageError(`Could not get the friend's language. Chat translations may not work.`)
-              }
-            })
-            .catch(err => console.error('Could not get language.', err))
           }
         })
         .catch(err => console.error('Could not find existing conversation.', err))

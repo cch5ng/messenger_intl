@@ -237,11 +237,12 @@ router.get("/user/requests/:to_email",
     }
 );
 
-//Returns contacts that the current user accepted invitations from
+//Returns contacts for the current user
 router.get("/user/:to_email/contacts",
   //passport.authenticate('jwt', { session: false }),
   function(req, res, next) {
     const {to_email} = req.params;
+    let contactsLang = {};
 
     Invitation.find({
       $or: [
@@ -255,12 +256,29 @@ router.get("/user/:to_email/contacts",
         contacts = invitations.map(invite => {
           return invite.to_user_email === to_email ? invite.from_user_email: invite.to_user_email;
         });
+        //retrieve each contact's language
+        contacts.forEach((contact, idx) => {
+          User.find({email: contact}, 'language', function(err, user) {
+            if (err) return console.error('Could not get contact language.', err);
+            if (user && user.length) {
+              if (!contactsLang[contact]) {
+                contactsLang[contact] = {language: user[0].language};
+              }
+              if (idx === contacts.length - 1) {
+                res.status(201).json({type: 'success', contacts: contactsLang});
+              }
+            }
+          })
+        })
+
+        //TODO TEST if this breaks providing language with contacts
         //if search query provided
         if(req.query.q){
           contacts = contacts.filter(contact => contact.includes(req.query.q))
-                             .map(filteredContact => filteredContact.split('@')[0]);                             
+                             .map(filteredContact => filteredContact.split('@')[0]);
+          res.status(201).json({type: 'success', contacts});                          
         }
-        res.status(201).json({type: 'success', contacts});
+        
       } else {
         res.status(201).json({type: 'success', message: 'No contacts were found.', contacts: []})
       }

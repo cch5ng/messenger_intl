@@ -99,7 +99,6 @@ const Chat = props => {
       };
       let friendLanguages = getFriendLanguages();
       //3 make post request for new conversation (get back id)
-        //TODO BE should also translate the first message to friend languages
       let jwtToken = localStorage.getItem('authToken');
       let body = { emailsAr, message, friendLanguages };
       fetch('http://localhost:3001/conversations', {
@@ -147,8 +146,15 @@ const Chat = props => {
   }
 
   const getFriendLanguages = () => {
-    let friendEmails = getFriendEmail();
-    return friendEmails.map(email => emailToLangDict[email].language);
+    let friendEmails =  getEmailAr(toEmailAddresses);
+    let friendLanguages = [];
+    friendEmails.forEach(email => {
+      let lang = emailToLangDict[email]['language'];
+      if (friendLanguages.indexOf(lang) === -1 && lang !== language) {
+        friendLanguages.push(lang);
+      }
+    });
+    return friendLanguages;
   }
 
   const getFriendEmail = () => {

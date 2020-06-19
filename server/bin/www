@@ -53,8 +53,9 @@ nsp.on('connection', function(socket){
           let language = friendLanguages[idx];
           message.translations = {...message.translations, [language]: translations[0]};
           if (idx === friendLanguages.length - 1) {
+            const updated_on = Date.now();
             socket.broadcast.emit(conversationId, data);
-            saveMessageToConversation({message, conversationId});
+            saveMessageToConversation({message, updated_on, conversationId});
           }
         })
         .catch(err => {
@@ -63,19 +64,6 @@ nsp.on('connection', function(socket){
           console.error('Translation API error', err);
         })
     })
-    
-    // getTranslation(message.original_message, friendLanguageCode)
-    //   .then(translations => {
-    //     message.translations = {...message.translations, [friendLanguage]: translations[0]};
-    //     socket.broadcast.emit(conversationId, data);
-    //     //save translated message
-    //     saveMessageToConversation({message, conversationId});
-    //   })
-    //   .catch(err => {
-    //     //save untranslated message
-    //     saveMessageToConversation({message, conversationId});
-    //     console.error('Translation API error', err);
-    //   })
   });
 
   socket.on("disconnect", () => {

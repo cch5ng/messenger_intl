@@ -110,6 +110,7 @@ const Sidebar = props => {
       }
       else {
         setFriends(['You dont have any contacts. Send invites to initiate a conversation']);
+        updateEmailToLangDict({});
       }
     }
   }

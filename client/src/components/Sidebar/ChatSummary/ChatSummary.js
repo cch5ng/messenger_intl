@@ -40,7 +40,7 @@ const ChatSummary = () => {
   return (
     <div className="chat_summary_container">
       <CreateOutlinedIcon onClick={clickIconHandler} />
-      <div className="scrollable">
+      <div>
         {conversationList.map((convo, idx) => {
           return (
             <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} />
@@ -49,7 +49,6 @@ const ChatSummary = () => {
         {conversationList.length === 0 && (
           <p>No conversations were found.</p>
         )}
-
       </div>
     </div>
   )

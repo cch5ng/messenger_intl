@@ -55,9 +55,9 @@ const Chat = props => {
     });
   }
 
-  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguage}) => {
+  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
     if (socket) {
-      socket.send({message, conversationId, userEmails, friendLanguage});
+      socket.send({message, conversationId, userEmails, friendLanguages});
     }
   }
 
@@ -137,7 +137,7 @@ const Chat = props => {
         message,
         conversationId,
         userEmails: chatUserEmails,
-        friendLanguage: getFriendLanguages()
+        friendLanguages: getFriendLanguages()
       });
       setPostedMessages(postedMessages.concat([message]));
       setCurMessage('');
@@ -146,7 +146,7 @@ const Chat = props => {
   }
 
   const getFriendLanguages = () => {
-    let friendEmails =  getEmailAr(toEmailAddresses);
+    let friendEmails =  chatType === 'new' ? getEmailAr(toEmailAddresses): getFriendEmail();
     let friendLanguages = [];
     friendEmails.forEach(email => {
       let lang = emailToLangDict[email]['language'];

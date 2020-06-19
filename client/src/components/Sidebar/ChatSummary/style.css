@@ -4,10 +4,6 @@
   padding: 18px;
 }
 
-.scrollable {
-  overflow-y: scroll;
-}
-
 /* ChatSummaryItem */
 
 .chat_summary_item_container {

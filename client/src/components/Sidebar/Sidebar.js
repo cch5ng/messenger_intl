@@ -22,11 +22,11 @@ const useStyles = makeStyles(() => ({
     maxWidth: 500,
   },
   sidebarContainer : {
-    '&:hover': {
+    //'&:hover': {
       maxHeight: '85vh',
       overflowY: 'auto',
       overflowX: 'hidden'
-    }
+    //}
   }
 }));
 

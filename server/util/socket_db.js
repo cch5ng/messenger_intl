@@ -3,15 +3,16 @@ const Conversation = require("../models/conversation");
 
 const saveMessageToConversation = ({message, updated_on, conversationId}) => {
   const id = mongoose.Types.ObjectId(conversationId);
-  Conversation.updateOne({_id: id}, {
-                      $push: {
-                        messages: message
-                      },
-                      updated_on
-                    }, function(err, chat) {
-                      if (err) return console.error('Could not save post', err);
-                      if (chat) console.log('Conversation was updated');
-                    })
+  Conversation.updateOne({_id: id},
+                {
+                  $push: {
+                    messages: message
+                  },
+                  updated_on
+                }, function(err, chat) {
+                  if (err) return console.error('Could not save post', err);
+                  if (chat) console.log('Conversation was updated');
+                })
 }
 
 module.exports = {saveMessageToConversation};

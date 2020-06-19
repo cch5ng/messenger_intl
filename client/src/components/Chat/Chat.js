@@ -41,6 +41,7 @@ const Chat = props => {
   let history = useHistory();
 
   const [toEmailAddresses, setToEmailAddresses] = useState('');
+  const [toEmailAddressesError, setToEmailAddressesError] = useState('');
   const [curMessage, setCurMessage] = useState('');
   const [postedMessages, setPostedMessages] = useState([]);
   const [chatUserEmails, setChatUserEmails] = useState([]);
@@ -67,6 +68,9 @@ const Chat = props => {
 
   const emailInpChangeHandler = ev => {
     let {value} = ev.target;
+    if (value.length === 0) {
+      setToEmailAddressesError('');
+    }
     setToEmailAddresses(value);
   }
 
@@ -89,36 +93,42 @@ const Chat = props => {
       let emailsAr = getEmailAr(toEmailAddresses);
       emailsAr.push(userEmail);
       emailsAr = emailsAr.filter(em => isEmailValid(em));
-      let message = {
-        author_id: user.id,
-        author_email: user.email,
-        original_message: curMessage,
-        language,
-        created_on: Date.now(),
-        translations: {}
-      };
-      let friendLanguages = getFriendLanguages();
-      //3 make post request for new conversation (get back id)
-      let jwtToken = localStorage.getItem('authToken');
-      let body = { emailsAr, message, friendLanguages };
-      fetch('http://localhost:3001/conversations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${jwtToken}`
-        },
-        body: JSON.stringify(body)
-      })
-        .then(resp => resp.json())
-        .then(json => {
-          if (json.conversationId) {
-            setToEmailAddresses('');
-            setCurMessage('');
-        //5 somehow indicate to contacts that new group conversation is available
-            history.push(`/conversations/${json.conversationId}`);
-          }
-        })
-        .catch(err => console.error('error with group convo', err))
+      if (areRecipientsFriends(emailsAr)) {
+        let message = {
+          author_id: user.id,
+          author_email: user.email,
+          original_message: curMessage,
+          language,
+          created_on: Date.now(),
+          translations: {}
+        };
+        let friendLanguages = getFriendLanguages();
+        if (friendLanguages.length) {
+          //3 make post request for new conversation (get back id)
+          let jwtToken = localStorage.getItem('authToken');
+          let body = { emailsAr, message, friendLanguages };
+          fetch('http://localhost:3001/conversations', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `${jwtToken}`
+            },
+            body: JSON.stringify(body)
+          })
+            .then(resp => resp.json())
+            .then(json => {
+              if (json.conversationId) {
+                setToEmailAddresses('');
+                setCurMessage('');
+            //5 somehow indicate to contacts that new group conversation is available
+                history.push(`/conversations/${json.conversationId}`);
+              }
+            })
+            .catch(err => console.error('error with group convo', err))
+        }
+      } else {
+        setToEmailAddressesError('The chat cannot be started because email addresses are invalid or recipients are not friends. Please check email addresses or invite people to become friends.')
+      }
     }
   }
 
@@ -149,6 +159,11 @@ const Chat = props => {
     let friendEmails =  chatType === 'new' ? getEmailAr(toEmailAddresses): getFriendEmail();
     let friendLanguages = [];
     friendEmails.forEach(email => {
+      //TODO handle case where one friend is not a contact
+      //CONSIDER should the case where one friend is not contact be handled the same as where all participants speak the same language?
+      if (!emailToLangDict[email]) {
+        return [];
+      }
       let lang = emailToLangDict[email]['language'];
       if (friendLanguages.indexOf(lang) === -1 && lang !== language) {
         friendLanguages.push(lang);
@@ -164,6 +179,20 @@ const Chat = props => {
 
   const switchTranslations = isChecked => {
     setShowMsgInOriginalLanguage(isChecked);
+  }
+
+  //validation for group conversation init; make sure that message recipients are already friends
+  const areRecipientsFriends = (emailsAr) => {
+    if (Object.keys(emailToLangDict).length) {
+      let currentContacts = Object.keys(emailToLangDict);
+      for (let i = 0; i < emailsAr.length; i++) {
+        if (currentContacts.indexOf(emailsAr[i]) === -1) {
+          return false;
+        }
+      }
+      return true;  
+    }
+    return false;
   }
 
   useEffect(() => {
@@ -212,11 +241,13 @@ const Chat = props => {
           <form className={classes.root} noValidate autoComplete="off" >
             <TextField
               id="inp_to_emails"
-              label="To: (emails separated by comma)"
+              //label="To: (emails separated by comma)"
               value={toEmailAddresses}
-              placeholder="To: email addresses"
+              placeholder="To: email addresses (separated by comma)"
               variant="outlined"
               onChange={emailInpChangeHandler}
+              error={toEmailAddressesError.length}
+              helperText={toEmailAddressesError.length ? toEmailAddressesError: ''}
               fullWidth
             />
           </form>

@@ -5,11 +5,15 @@ const Conversation = require("../models/conversation");
 const User = require("../models/user");
 const router = express.Router();
 
+const {getTranslation} = require("../util/translate_helpers");
+const {language_codes} = require("../util/languages");
+
 //post new conversation (given list of users) returning id
 router.post("/",
   passport.authenticate('jwt', {session: false}),
   function(req, res, next) {
-    const {emailsAr} = req.body;
+    const {emailsAr, friendLanguages} = req.body;
+    const message = req.body.message ? req.body.message : null;
     Conversation.find({ 
       $and: [{
         user_emails: { $all: emailsAr }
@@ -21,62 +25,64 @@ router.post("/",
       if (conversations && conversations.length) {
         res.status(200).json({type: "success", conversationId: conversations[0]._id.toString(), message: "An existing conversation was found."});
       } else {
-      //else create converation, returning _id
-        let newChat = new Conversation({user_emails: emailsAr});
-        newChat.save(function(err, conversation) {
-          if (err) console.error('Conversation could not be created', err);
-          if (conversation) {
-            res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString()});
-          } else {
-            res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
-          }
-        })
+        let newChat;
+        //case1 new conversation between 2 people, no message
+        if (!message) {
+          newChat = new Conversation({user_emails: emailsAr});
+          newChat.save(function(err, conversation) {
+            if (err) console.error('Conversation could not be created', err);
+            if (conversation) {
+              res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString(), user_emails: emailsAr});
+            } else {
+              res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
+            }
+          })
+        } else {
+          //case2 new conversation between >2 people, initial message (needs translation first)
+          let translations = {};
+          Promise.all(friendLanguages.map(lang => {
+            let target = language_codes[lang];
+            return getTranslation(message.original_message, target);
+          }))
+            .then(translated => {
+              translated.forEach((trans, idx) => {
+                translations[friendLanguages[idx]] = trans[0];
+              });
+              message.translations = translations;
+              newChat = new Conversation({user_emails: emailsAr, messages: [message]});
+              newChat.save(function(err, conversation) {
+                if (err) console.error('Conversation could not be created', err);
+                if (conversation) {
+                  res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString(), user_emails: emailsAr, conversation_message: message.original_message});
+                } else {
+                  res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
+                }
+              });
+            })
+            .catch(err => console.error('Translation err', err))
+        }
       }
     })
   }
 );
 
-/*  gets conversations for a given user id
-    on successful return, json includes this object, dictUidToObj
-    {uid_as_string: {email, language}}
-    as well as the conversations
+/*  gets conversations for a given user email
 */
-router.get("/user/:id",
+router.get("/user/:email",
     passport.authenticate('jwt', { session: false }),
     function(req, res, next) {
-        const {id} = req.params;
+        const {email} = req.params;
         let objId = mongoose.Types.ObjectId;
-        Conversation.find({users:{ "$in" : [new objId(id)]} })
+        Conversation.find({user_emails:{ "$in" : [email]} }, '_id user_emails created_on updated_on messages')
             .sort({updated_on: -1})
             .exec(function(err, conversations) {
                 if (err) {
                     return handleError(err);
                 }
                 if (conversations && conversations.length) {
-                    let dictUidToObj = {};
-                    conversations.forEach((conversation, idx) => {
-                        conversation.users.forEach((uid, idx2) => {
-                            let innerIdx = idx2;
-                            if (!dictUidToObj[uid.toString()]) {
-                                User.findById(uid.toString(), function(err, user) {
-                                    if (err) {
-                                        return handleError(err)
-                                    }
-                                    if (user) {
-                                        let userObj = {};
-                                        userObj.email = user.email;
-                                        userObj.language = user.language;
-                                        dictUidToObj[uid.toString()] = userObj;
-                                        if (idx === conversations.length - 1 && innerIdx === conversation.users.length - 1) {
-                                            res.json({ type: "success", conversations, dictUidToObj})
-                                        }                
-                                    }
-                                })
-                            }
-                        })
-                    })
+                  res.json({ type: "success", conversations})
                 } else {
-                    res.json({ type: "success", message: "There are no current conversations"})
+                    res.json({ type: "success", conversations: [], message: "There are no current conversations"})
                 }
             }
         )
@@ -102,6 +108,5 @@ router.get("/:conversation_id",
         }) 
     }
 )
-
 
 module.exports = router;

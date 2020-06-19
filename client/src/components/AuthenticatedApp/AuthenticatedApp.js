@@ -52,8 +52,9 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-const AppContainer = () => {
+const AppContainer = (props) => {
   let {user} = useAuth();
+  let chatType = props.chatType ? props.chatType : 'empty';
   const classes = useStyles();
   const [mobileMenuOpen, setMobileMenuOpen] = useState('false');
 
@@ -96,7 +97,7 @@ const AppContainer = () => {
           {drawer}        
         </Drawer>
       </Hidden>
-      <Chat user={user.email} />
+      <Chat user={user.email} chatType={chatType} />
       </Grid>
     </Grid>
   )
@@ -110,8 +111,11 @@ const AuthenticatedApp = () => {
           <Route exact path="/">
             <AppContainer />
           </Route>
+          <Route exact path="/conversations/new">
+            <AppContainer chatType="new"/>
+          </Route>
           <Route exact path="/conversations/:conversationId">
-            <AppContainer />
+            <AppContainer chatType="existing"/>
           </Route>
           <Route exact path="/login">
             <Redirect to="/" />

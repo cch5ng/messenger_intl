@@ -24,8 +24,18 @@ const Message = props => {
     }
     return '';
   }
+
   if (!props.isAuthorUser) {
-    const translation = message.translations && !props.showMsgInOriginalLanguage ? message.translations[language] : message.original_message;
+    let translation;
+    //cases
+    //1 friend language is same as author language
+    //3 friend language is different (original language toggle on)
+    if (language === message.language || props.showMsgInOriginalLanguage) {
+      translation = message.original_message;
+    } else if (language !== message.language && !props.showMsgInOriginalLanguage) {
+    //2 friend language is different from author language (original language toggle off)
+      translation = message.translations[language];
+    }
     return (
       <div ref={ref} style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'flex-start', alignItems: 'flex-start', margin: '18px 0'}}>
         <Avatar>{getUserInitial()}</Avatar>

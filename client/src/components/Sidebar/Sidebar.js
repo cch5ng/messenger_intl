@@ -2,12 +2,25 @@ import React, { useState, useEffect } from 'react';
 import Contacts from './Contacts/Contacts';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import Paper from '@material-ui/core/Paper';
+import { makeStyles } from '@material-ui/core/styles';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import ForumIcon from '@material-ui/icons/Forum';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
+import PersonPinIcon from '@material-ui/icons/PersonPin';
 import axios from 'axios';
 
 import SidebarHeader from './SidebarHeader';
-import { makeStyles } from '@material-ui/core';
+import ChatSummary from './ChatSummary/ChatSummary';
+import {useAuth} from '../../context/auth-context';
+//import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
+  root: {
+    flexGrow: 1,
+    maxWidth: 500,
+  },
   sidebarContainer : {
     '&:hover': {
       maxHeight: '85vh',
@@ -25,18 +38,24 @@ const Sidebar = props => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pendingInvites, setPendingInvites] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [value, setValue] = useState(0);
+  const classes = useStyles();
+  const {updateEmailToLangDict} = useAuth();
+
+  //tab click handler
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
   function closeAlertHandler() {
     setApproveInvite('');
   }
-  const classes = useStyles();
 
   function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   }
 
-
   const updateContact = async(fromEmail, action) => {
-
     if(action === 'approve') {
       const approvedRes = await axios.put(`http://localhost:3001/invitations/user/${email}/approve`, 
                                       {  'from_email': fromEmail }, {headers: { Authorization: authToken}});
@@ -84,7 +103,10 @@ const Sidebar = props => {
     if(email){
       const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, {headers: { Authorization: authToken}});
       if(res.data.contacts.length !== 0){
-      setFriends(res.data.contacts);
+        let {contacts} = res.data;
+        let contactEmails = Object.keys(contacts);
+        setFriends(contactEmails);
+        updateEmailToLangDict(contacts);
       }
       else {
         setFriends(['You dont have any contacts. Send invites to initiate a conversation']);
@@ -113,7 +135,34 @@ const Sidebar = props => {
   return (
     <div>
       <SidebarHeader />
+
       <div className={classes.sidebarContainer}>
+        <Paper square className={classes.root}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            variant="scrollable"
+            scrollButtons="on"
+            indicatorColor="primary"
+            textColor="primary"
+            aria-label="icon label tabs example"
+          >
+            <Tab icon={<ForumIcon />} label="CHATS" />
+            <Tab icon={<PersonPinIcon />} label="FRIENDS" />
+            <Tab icon={<MailOutlineIcon />} label="INVITES" />
+          </Tabs>
+        </Paper>
+
+        {value === 0 && (
+          <ChatSummary />
+        )}
+        {value === 1 && (
+          <h1>Friends display</h1>
+        )}
+        {value === 2 && (
+          <h1>Invitations display</h1>
+        )}
+
         <Contacts 
           friends={friends}
           loadPendingInvites = {loadPendingInvites}
@@ -126,10 +175,10 @@ const Sidebar = props => {
           search = {searchContacts}
         />
         <Snackbar open = {approveInvite.length !== 0} autoHideDuration={3000} onClose = { closeAlertHandler }>
-                            <Alert onClose={closeAlertHandler} severity="success">
-                              {approveInvite} 
-                            </Alert>
-          </Snackbar>
+          <Alert onClose={closeAlertHandler} severity="success">
+            {approveInvite} 
+          </Alert>
+        </Snackbar>
       </div>
     </div>
   );

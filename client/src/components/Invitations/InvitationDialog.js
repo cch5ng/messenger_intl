@@ -22,7 +22,7 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 
 import {isEmailValid} from '../../util/helpers';
 import { useAuth } from '../../context/auth-context';
-//import { ReactComponent as CopyButton } from '../../assets/copy_btn_exp.svg';
+import {getEmailAr} from '../../util/helpers';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -194,12 +194,6 @@ export default function InvitationDialog(props) {
 
   const emailsAreValid = (emailArray) => {
     return emailArray.every(email => isEmailValid(email) === true);
-  }
-
-  const getEmailAr = (emailStr) => {
-    let emailAr = emailStr.split(',');
-    emailAr = emailAr.map(email => email.trim());
-    return emailAr;
   }
 
   const getReferralUrl = () => {

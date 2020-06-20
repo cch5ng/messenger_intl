@@ -91,9 +91,9 @@ const Chat = props => {
     if (ev.key === 'Enter') {
       ev.preventDefault();
       let emailsAr = getEmailAr(toEmailAddresses);
-      emailsAr.push(userEmail);
-      emailsAr = emailsAr.filter(em => isEmailValid(em));
       if (areRecipientsFriends(emailsAr)) {
+        emailsAr.push(userEmail);
+        emailsAr = emailsAr.filter(em => isEmailValid(em));
         let message = {
           author_id: user.id,
           author_email: user.email,

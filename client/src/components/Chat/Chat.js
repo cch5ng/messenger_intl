@@ -5,6 +5,8 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ChatHeader from './ChatHeader';
@@ -22,6 +24,10 @@ const MAX_MESSAGE_LENGTHS = {
 };
 
 let socket;
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,12 +54,17 @@ const Chat = props => {
   const [messageInputError, setMessageInputError] = useState('');
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
+  const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
 
   //socket listener for incoming messages
   if (socket && conversationId) {
     socket.on(conversationId, (data) => {
       setPostedMessages(postedMessages.concat([data.message]));
     });
+  }
+
+  const closeAlertHandler = () => {
+    setSubmitGroupConversationError('');
   }
 
   const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
@@ -90,6 +101,7 @@ const Chat = props => {
   const newMessageInputSubmitHandler = ev => {
     if (ev.key === 'Enter') {
       ev.preventDefault();
+      setToEmailAddressesError('');
       let emailsAr = getEmailAr(toEmailAddresses);
       if (areRecipientsFriends(emailsAr)) {
         emailsAr.push(userEmail);
@@ -117,7 +129,10 @@ const Chat = props => {
           })
             .then(resp => resp.json())
             .then(json => {
-              if (json.conversationId) {
+              if (json.type === 'error') {
+                //TODO activate snackbar
+                setSubmitGroupConversationError(json.message);
+              } else if (json.conversationId) {
                 setToEmailAddresses('');
                 setCurMessage('');
             //5 somehow indicate to contacts that new group conversation is available
@@ -260,6 +275,11 @@ const Chat = props => {
           curMessage={curMessage}
           error={messageInputError}
         />
+        <Snackbar open={submitGroupConversationError.length !== 0} autoHideDuration={5000} onClose={ closeAlertHandler }>
+          <Alert onClose={closeAlertHandler} severity="error">
+            {submitGroupConversationError}
+          </Alert>
+        </Snackbar>
       </div>
     )
   }

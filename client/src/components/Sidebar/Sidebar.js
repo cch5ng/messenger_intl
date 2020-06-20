@@ -22,11 +22,11 @@ const useStyles = makeStyles(() => ({
     maxWidth: 500,
   },
   sidebarContainer : {
-    '&:hover': {
+    //'&:hover': {
       maxHeight: '85vh',
       overflowY: 'auto',
       overflowX: 'hidden'
-    }
+    //}
   }
 }));
 
@@ -110,6 +110,7 @@ const Sidebar = props => {
       }
       else {
         setFriends(['You dont have any contacts. Send invites to initiate a conversation']);
+        updateEmailToLangDict({});
       }
     }
   }

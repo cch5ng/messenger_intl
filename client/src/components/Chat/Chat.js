@@ -5,6 +5,8 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 
 import ChatHeader from './ChatHeader';
@@ -22,6 +24,10 @@ const MAX_MESSAGE_LENGTHS = {
 };
 
 let socket;
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,12 +47,14 @@ const Chat = props => {
   let history = useHistory();
 
   const [toEmailAddresses, setToEmailAddresses] = useState('');
+  const [toEmailAddressesError, setToEmailAddressesError] = useState('');
   const [curMessage, setCurMessage] = useState('');
   const [postedMessages, setPostedMessages] = useState([]);
   const [chatUserEmails, setChatUserEmails] = useState([]);
   const [messageInputError, setMessageInputError] = useState('');
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
+  const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
 
   //socket listener for incoming messages
   if (socket && conversationId) {
@@ -55,9 +63,13 @@ const Chat = props => {
     });
   }
 
-  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguage}) => {
+  const closeAlertHandler = () => {
+    setSubmitGroupConversationError('');
+  }
+
+  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
     if (socket) {
-      socket.send({message, conversationId, userEmails, friendLanguage});
+      socket.send({message, conversationId, userEmails, friendLanguages});
     }
   }
 
@@ -67,6 +79,9 @@ const Chat = props => {
 
   const emailInpChangeHandler = ev => {
     let {value} = ev.target;
+    if (value.length === 0) {
+      setToEmailAddressesError('');
+    }
     setToEmailAddresses(value);
   }
 
@@ -86,39 +101,49 @@ const Chat = props => {
   const newMessageInputSubmitHandler = ev => {
     if (ev.key === 'Enter') {
       ev.preventDefault();
+      setToEmailAddressesError('');
       let emailsAr = getEmailAr(toEmailAddresses);
-      emailsAr.push(userEmail);
-      emailsAr = emailsAr.filter(em => isEmailValid(em));
-      let message = {
-        author_id: user.id,
-        author_email: user.email,
-        original_message: curMessage,
-        language,
-        created_on: Date.now(),
-        translations: {}
-      };
-      let friendLanguages = getFriendLanguages();
-      //3 make post request for new conversation (get back id)
-      let jwtToken = localStorage.getItem('authToken');
-      let body = { emailsAr, message, friendLanguages };
-      fetch('http://localhost:3001/conversations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${jwtToken}`
-        },
-        body: JSON.stringify(body)
-      })
-        .then(resp => resp.json())
-        .then(json => {
-          if (json.conversationId) {
-            setToEmailAddresses('');
-            setCurMessage('');
-        //5 somehow indicate to contacts that new group conversation is available
-            history.push(`/conversations/${json.conversationId}`);
-          }
-        })
-        .catch(err => console.error('error with group convo', err))
+      if (areRecipientsFriends(emailsAr)) {
+        emailsAr.push(userEmail);
+        emailsAr = emailsAr.filter(em => isEmailValid(em));
+        let message = {
+          author_id: user.id,
+          author_email: user.email,
+          original_message: curMessage,
+          language,
+          created_on: Date.now(),
+          translations: {}
+        };
+        let friendLanguages = getFriendLanguages();
+        if (friendLanguages.length) {
+          //3 make post request for new conversation (get back id)
+          let jwtToken = localStorage.getItem('authToken');
+          let body = { emailsAr, message, friendLanguages };
+          fetch('http://localhost:3001/conversations', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `${jwtToken}`
+            },
+            body: JSON.stringify(body)
+          })
+            .then(resp => resp.json())
+            .then(json => {
+              if (json.type === 'error') {
+                //TODO activate snackbar
+                setSubmitGroupConversationError(json.message);
+              } else if (json.conversationId) {
+                setToEmailAddresses('');
+                setCurMessage('');
+            //5 somehow indicate to contacts that new group conversation is available
+                history.push(`/conversations/${json.conversationId}`);
+              }
+            })
+            .catch(err => console.error('error with group convo', err))
+        }
+      } else {
+        setToEmailAddressesError('The chat cannot be started because email addresses are invalid or recipients are not friends. Please check email addresses or invite people to become friends.')
+      }
     }
   }
 
@@ -137,7 +162,7 @@ const Chat = props => {
         message,
         conversationId,
         userEmails: chatUserEmails,
-        friendLanguage: getFriendLanguages()
+        friendLanguages: getFriendLanguages()
       });
       setPostedMessages(postedMessages.concat([message]));
       setCurMessage('');
@@ -146,9 +171,14 @@ const Chat = props => {
   }
 
   const getFriendLanguages = () => {
-    let friendEmails =  getEmailAr(toEmailAddresses);
+    let friendEmails =  chatType === 'new' ? getEmailAr(toEmailAddresses): getFriendEmail();
     let friendLanguages = [];
     friendEmails.forEach(email => {
+      //TODO handle case where one friend is not a contact
+      //CONSIDER should the case where one friend is not contact be handled the same as where all participants speak the same language?
+      if (!emailToLangDict[email]) {
+        return [];
+      }
       let lang = emailToLangDict[email]['language'];
       if (friendLanguages.indexOf(lang) === -1 && lang !== language) {
         friendLanguages.push(lang);
@@ -164,6 +194,20 @@ const Chat = props => {
 
   const switchTranslations = isChecked => {
     setShowMsgInOriginalLanguage(isChecked);
+  }
+
+  //validation for group conversation init; make sure that message recipients are already friends
+  const areRecipientsFriends = (emailsAr) => {
+    if (Object.keys(emailToLangDict).length) {
+      let currentContacts = Object.keys(emailToLangDict);
+      for (let i = 0; i < emailsAr.length; i++) {
+        if (currentContacts.indexOf(emailsAr[i]) === -1) {
+          return false;
+        }
+      }
+      return true;  
+    }
+    return false;
   }
 
   useEffect(() => {
@@ -212,11 +256,13 @@ const Chat = props => {
           <form className={classes.root} noValidate autoComplete="off" >
             <TextField
               id="inp_to_emails"
-              label="To: (emails separated by comma)"
+              //label="To: (emails separated by comma)"
               value={toEmailAddresses}
-              placeholder="To: email addresses"
+              placeholder="To: email addresses (separated by comma)"
               variant="outlined"
               onChange={emailInpChangeHandler}
+              error={toEmailAddressesError.length}
+              helperText={toEmailAddressesError.length ? toEmailAddressesError: ''}
               fullWidth
             />
           </form>
@@ -229,6 +275,11 @@ const Chat = props => {
           curMessage={curMessage}
           error={messageInputError}
         />
+        <Snackbar open={submitGroupConversationError.length !== 0} autoHideDuration={5000} onClose={ closeAlertHandler }>
+          <Alert onClose={closeAlertHandler} severity="error">
+            {submitGroupConversationError}
+          </Alert>
+        </Snackbar>
       </div>
     )
   }

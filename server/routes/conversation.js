@@ -2,11 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const Conversation = require("../models/conversation");
+const Invitation = require("../models/invitation");
 const User = require("../models/user");
 const router = express.Router();
 
 const {getTranslation} = require("../util/translate_helpers");
 const {language_codes} = require("../util/languages");
+const {getUniquePairsFromGroup, buildQueryIsPairFriends} = require ("../util/socket_db")
 
 //post new conversation (given list of users) returning id
 router.post("/",
@@ -25,42 +27,62 @@ router.post("/",
       if (conversations && conversations.length) {
         res.status(200).json({type: "success", conversationId: conversations[0]._id.toString(), message: "An existing conversation was found."});
       } else {
-        let newChat;
-        //case1 new conversation between 2 people, no message
-        if (!message) {
-          newChat = new Conversation({user_emails: emailsAr});
-          newChat.save(function(err, conversation) {
-            if (err) console.error('Conversation could not be created', err);
-            if (conversation) {
-              res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString(), user_emails: emailsAr});
-            } else {
-              res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
+        //verify that all users are connected to one another
+        let pairsToValidate = getUniquePairsFromGroup(emailsAr);
+        Promise.all(pairsToValidate.map(emailPair => {
+          let areFriendsQuery = buildQueryIsPairFriends(emailPair);
+          return Invitation.find(areFriendsQuery, function(err, invitations) {
+            if (err) console.error('Could not find invitations during duplicate invites check', err);
+            if (invitations && invitations.length) {
+              return invitations;
             }
           })
-        } else {
-          //case2 new conversation between >2 people, initial message (needs translation first)
-          let translations = {};
-          Promise.all(friendLanguages.map(lang => {
-            let target = language_codes[lang];
-            return getTranslation(message.original_message, target);
-          }))
-            .then(translated => {
-              translated.forEach((trans, idx) => {
-                translations[friendLanguages[idx]] = trans[0];
-              });
-              message.translations = translations;
-              newChat = new Conversation({user_emails: emailsAr, messages: [message]});
-              newChat.save(function(err, conversation) {
-                if (err) console.error('Conversation could not be created', err);
-                if (conversation) {
-                  res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString(), user_emails: emailsAr, conversation_message: message.original_message});
+        }))
+          .then(invitations => {
+            //returned expected # of valid friend pairs
+            let invitationsPopulated = invitations.filter(invite => invite.length)
+            if (invitationsPopulated.length !== pairsToValidate.length) {
+              return res.json({type: 'error', message: 'The conversation could not be created. All participants need to be friends.'})
+            } else {
+                let newChat;
+                //case1 new conversation between 2 people, no message
+                if (!message) {
+                  newChat = new Conversation({user_emails: emailsAr});
+                  newChat.save(function(err, conversation) {
+                    if (err) console.error('Conversation could not be created', err);
+                    if (conversation) {
+                      res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString(), user_emails: emailsAr});
+                    } else {
+                      res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
+                    }
+                  })
                 } else {
-                  res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
+                  //case2 new conversation between >2 people, initial message (needs translation first)
+                  let translations = {};
+                  Promise.all(friendLanguages.map(lang => {
+                    let target = language_codes[lang];
+                    return getTranslation(message.original_message, target);
+                  }))
+                    .then(translated => {
+                      translated.forEach((trans, idx) => {
+                        translations[friendLanguages[idx]] = trans[0];
+                      });
+                      message.translations = translations;
+                      newChat = new Conversation({user_emails: emailsAr, messages: [message]});
+                      newChat.save(function(err, conversation) {
+                        if (err) console.error('Conversation could not be created', err);
+                        if (conversation) {
+                          res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString(), user_emails: emailsAr, conversation_message: message.original_message});
+                        } else {
+                          res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
+                        }
+                      });
+                    })
+                    .catch(err => console.error('Translation err', err))
                 }
-              });
-            })
-            .catch(err => console.error('Translation err', err))
-        }
+            } 
+          })
+          .catch(err => console.error('Error with validate conversation friends are all connected', err))
       }
     })
   }

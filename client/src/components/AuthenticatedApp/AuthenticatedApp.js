@@ -66,11 +66,11 @@ const AppContainer = (props) => {
     spacing={0} direction='row' 
     className={classes.root}>
       <Hidden smDown>
-        <Grid item xs={12} sm={4} style={appStyle}>
+        <Grid item xs={12} sm={5} style={appStyle}>
             <Sidebar/>
         </Grid>
       </Hidden>
-      <Grid item xs={12} sm={8} style={appStyle}>
+      <Grid item xs={12} sm={7} style={appStyle}>
       <IconButton
             color="inherit"
             aria-label="Open drawer"

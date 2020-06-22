@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import Contacts from './Contacts/Contacts';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -13,6 +13,9 @@ import axios from 'axios';
 
 import SidebarHeader from './SidebarHeader';
 import ChatSummary from './ChatSummary/ChatSummary';
+import Friends from './Contacts/Friends';
+import Requests from './Contacts/Requests';
+import Pending from './Contacts/Pending';
 import {useAuth} from '../../context/auth-context';
 //import { makeStyles } from '@material-ui/core';
 
@@ -27,7 +30,15 @@ const useStyles = makeStyles(() => ({
       overflowY: 'auto',
       overflowX: 'hidden'
     //}
-  }
+  },
+  invitationHeadings: {
+    marginBottom: 0,
+    marginTop: '2rem'
+  },
+  tabsText: {
+    fontSize: '1rem',
+    fontWeight: 'bold'
+  },
 }));
 
 const Sidebar = props => {
@@ -158,13 +169,28 @@ const Sidebar = props => {
           <ChatSummary />
         )}
         {value === 1 && (
-          <h1>Friends display</h1>
+          <Friends
+            friends={friends}
+            selected={props.selected} 
+            requestContact={props.requestContact}
+            selectContact={props.selectContact}
+            loadPendingInvites = {loadPendingInvites}
+            search = {searchContacts}
+          />
+        
         )}
         {value === 2 && (
-          <h1>Invitations display</h1>
+          <Fragment>
+            <Requests 
+              requests={pendingRequests} 
+              updateContact={updateContact}
+              classes={classes}
+            />
+            <Pending pending={pendingInvites} classes={classes}/>
+          </Fragment>
         )}
 
-        <Contacts 
+        {/* <Contacts 
           friends={friends}
           loadPendingInvites = {loadPendingInvites}
           selected={props.selected}
@@ -174,7 +200,7 @@ const Sidebar = props => {
           requests={pendingRequests}
           pending = {pendingInvites}
           search = {searchContacts}
-        />
+        /> */}
         <Snackbar open = {approveInvite.length !== 0} autoHideDuration={3000} onClose = { closeAlertHandler }>
           <Alert onClose={closeAlertHandler} severity="success">
             {approveInvite} 

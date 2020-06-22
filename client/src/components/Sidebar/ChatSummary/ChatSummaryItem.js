@@ -65,9 +65,10 @@ const ChatSummaryItem = (props) => {
   }
 
   const getLastMessageTranslated = () => {
-    if (lastMessage.language === user.language) {
+    if (!lastMessage) return '';
+    if (lastMessage && lastMessage.language === user.language) {
       return lastMessage.original_message;
-    } else {
+    } else if (lastMessage && lastMessage.language !== user.language) {
       return lastMessage.translations[user.language];
     }
   }

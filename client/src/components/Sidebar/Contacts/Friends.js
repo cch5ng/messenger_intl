@@ -36,6 +36,7 @@ const Friends = props => {
   const contactClickHandler = (contactEmail) => {
     let jwtToken = localStorage.getItem('authToken');
     let emailsAr = [contactEmail, user.email];
+    console.log('emailsAr', emailsAr)
     let body = {emailsAr};
 
     if (jwtToken.length && emailsAr.length) {

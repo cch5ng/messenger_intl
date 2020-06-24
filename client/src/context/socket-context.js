@@ -21,8 +21,8 @@ function SocketProvider({children}) {
   }
 
   //should happen once per session
-  const initConversationsAr = () => {
-
+  const initConversationsAr = (conversations) => {
+    setConversationsAr(conversations);
   }
 
   const getConversationById = () => {

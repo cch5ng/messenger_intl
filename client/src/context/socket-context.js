@@ -5,18 +5,65 @@ const SocketContext = React.createContext([{}, () => {}])
 const socket = io.connect('http://localhost:3001/chat');
 
 function SocketProvider({children}) {
-  const setChatRoom = ({conversationId}) => {
-    socket.on('connect', function() {
+  const [conversationsDict, setConversationsDict] = useState({});
+  const [conversationsAr, setConversationsAr] = useState([]);
+  const [curConversationId, setCurConversationId] = useState(null);
+  const [conversationsColorsDict, setConversationsColorsDict] = useState({});
+
+  //TODO
+  const addMessageToConversation = ({conversationId, message}) => {
+
+  }
+
+  //should happen once per session, on initConversationsAr
+  const initConversationsDict = () => {
+
+  }
+
+  //should happen once per session
+  const initConversationsAr = () => {
+
+  }
+
+  const getConversationById = () => {
+
+  }
+
+  const setConversationId = (conversationId) => {
+    setCurConversationId(conversationId);
+  }
+
+  const addConversationColor = ({conversationId, color}) => {
+    setConversationsColorsDict({conversationsColorsDict, conversationId: color})
+  }
+
+  const getConversationColorById = ({conversationId}) => {
+    if (conversationsColorsDict[conversationId]) {
+      return conversationsColorsDict[conversationId];
+    }
+    return null;
+  }
+
+  // const setChatRoom = ({conversationId}) => {
+  //   socket.on('connect', function() {
       // Connected, let's sign-up for to receive messages for this room
-      socket.emit('room', conversationId);
-   });
+  //     socket.emit('room', conversationId);
+  //  });
+  // }
+
+  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
+    socket.send({message, conversationId, userEmails, friendLanguages});
   }
 
-  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguage}) => {
-    socket.send({message, conversationId, userEmails, friendLanguage});
-  }
-
-  const socketShare = {socket, sendChatMessage, setChatRoom};
+  const socketShare = {socket,
+                      conversationsAr,
+                      sendChatMessage,
+                      addMessageToConversation, 
+                      initConversationsAr,
+                      curConversationId,
+                      addConversationColor,
+                      getConversationColorById
+                    }; //setChatRoom
 
   return (
     <SocketContext.Provider value={socketShare}>

@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import CreateOutlinedIcon from '@material-ui/icons/CreateOutlined';
 
 import {useAuth} from '../../../context/auth-context';
+import {useSocket} from '../../../context/socket-context';
 import ChatSummaryItem from './ChatSummaryItem';
 import './style.css';
 
@@ -10,6 +11,7 @@ const ChatSummary = () => {
   let history = useHistory();
   const [conversationList, setConversationList] = useState([]);
   const {user} = useAuth();
+  const {conversationsAr, initConversationsAr} = useSocket();
 
   const clickIconHandler = () => {
     history.push('/conversations/new');
@@ -30,7 +32,8 @@ const ChatSummary = () => {
       .then(resp => resp.json())
       .then(json => {
         if (json && json.conversations.length) {
-          setConversationList(json.conversations);
+          initConversationsAr(json.conversations);
+          //setConversationList(json.conversations);
           let conversationId = json.conversations[0]._id.toString();
           history.push(`/conversations/${conversationId}`);
         }
@@ -38,11 +41,13 @@ const ChatSummary = () => {
       .catch(err => console.error('get convos summary err', err))
   }, []);
 
+//        {conversationList.map((convo, idx) => {
+
   return (
     <div className="chat_summary_container">
       <CreateOutlinedIcon onClick={clickIconHandler} />
       <div>
-        {conversationList.map((convo, idx) => {
+        {conversationsAr.map((convo, idx) => {
           return (
             <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} />
           )

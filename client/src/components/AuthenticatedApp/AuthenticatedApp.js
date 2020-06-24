@@ -15,6 +15,7 @@ import {theme} from "../../themes/theme";
 import Sidebar from '../Sidebar/Sidebar';
 import Chat from '../Chat/Chat';
 import { useAuth } from '../../context/auth-context';
+import {SocketProvider} from '../../context/socket-context';
 
 const appStyle = {
   backgroundColor: 'rgba(0, 0, 0, 0.04)'
@@ -62,44 +63,47 @@ const AppContainer = (props) => {
   const drawer = (<Sidebar/>);
 
   return (
-    <Grid container 
-    spacing={0} direction='row' 
-    className={classes.root}>
-      <Hidden smDown>
-        <Grid item xs={12} sm={5} style={appStyle}>
-            <Sidebar/>
-        </Grid>
-      </Hidden>
-      <Grid item xs={12} sm={7} style={appStyle}>
-      <IconButton
-            color="inherit"
-            aria-label="Open drawer"
-            edge="start"
-            onClick={handleMobileMenuToggle}
-            className={classes.menuButton}
-          >
-            <MenuIcon />
-        </IconButton>
-      <Hidden mdUp>
-        <Drawer variant='temporary'
-                anchor={theme.direction === 'rtl' ? 'right' : 'left'}
-                open={mobileMenuOpen}
-                onClose={handleMobileMenuToggle}
-                classes = {{
-                  paper: classes.drawerPaper
-                }}
-                ModalProps= {{
-                  keepMounted: true
-                }}>      
-          <IconButton onClick={handleMobileMenuToggle} className={classes.closeMenuButton}>
-            <CloseIcon/>
+    <SocketProvider>
+      <Grid container 
+      spacing={0} direction='row' 
+      className={classes.root}>
+        <Hidden smDown>
+          <Grid item xs={12} sm={5} style={appStyle}>
+              <Sidebar/>
+          </Grid>
+        </Hidden>
+        <Grid item xs={12} sm={7} style={appStyle}>
+        <IconButton
+              color="inherit"
+              aria-label="Open drawer"
+              edge="start"
+              onClick={handleMobileMenuToggle}
+              className={classes.menuButton}
+            >
+              <MenuIcon />
           </IconButton>
-          {drawer}        
-        </Drawer>
-      </Hidden>
-      <Chat user={user.email} chatType={chatType} />
+        <Hidden mdUp>
+          <Drawer variant='temporary'
+                  anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+                  open={mobileMenuOpen}
+                  onClose={handleMobileMenuToggle}
+                  classes = {{
+                    paper: classes.drawerPaper
+                  }}
+                  ModalProps= {{
+                    keepMounted: true
+                  }}>      
+            <IconButton onClick={handleMobileMenuToggle} className={classes.closeMenuButton}>
+              <CloseIcon/>
+            </IconButton>
+            {drawer}        
+          </Drawer>
+        </Hidden>
+        <Chat user={user.email} chatType={chatType} />
+        </Grid>
       </Grid>
-    </Grid>
+    </SocketProvider>
+
   )
 }
 

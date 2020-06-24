@@ -23,6 +23,7 @@ const ChatSummary = () => {
 
   useEffect(() => {
     let jwtToken = localStorage.getItem('authToken');
+    console.log('jwtToken', jwtToken)
     fetch(`http://localhost:3001/conversations/user/${user.email}`, {
       headers: {
         'Authorization': `${jwtToken}`,
@@ -33,15 +34,12 @@ const ChatSummary = () => {
       .then(json => {
         if (json && json.conversations.length) {
           initConversationsAr(json.conversations);
-          //setConversationList(json.conversations);
           let conversationId = json.conversations[0]._id.toString();
           history.push(`/conversations/${conversationId}`);
         }
       })
       .catch(err => console.error('get convos summary err', err))
   }, []);
-
-//        {conversationList.map((convo, idx) => {
 
   return (
     <div className="chat_summary_container">

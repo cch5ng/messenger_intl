@@ -48,9 +48,14 @@ function SocketProvider({children}) {
     setConversationsAr([conversation].concat(conversationsAr));
   }
 
-  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
-    socket.send({message, conversationId, userEmails, friendLanguages});
+  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages, action}) => {
+    socket.send({message, conversationId, userEmails, friendLanguages, action});
   }
+
+  const sendGroupChatInitMessage = ({from_email, message, conversationId, userEmails, action}) => {
+    socket.send({message, conversationId, userEmails, action});
+  }
+
 
   const socketShare = {socket,
                       conversationsAr,
@@ -60,7 +65,8 @@ function SocketProvider({children}) {
                       curConversationId,
                       addConversationColor,
                       getConversationColorById,
-                      addConversation
+                      addConversation,
+                      sendGroupChatInitMessage
                     };
 
   return (

@@ -44,10 +44,8 @@ nsp.on('connection', function(socket){
   })
 
   socket.on('message', (data) => {
-    console.log('data', data)
-
     if (data.action === 'group conversation init') {
-      console.log('TODO handle group convo init')
+      socket.broadcast.emit(conversationId, data);
     } else {
       let {conversationId, message, userEmails, friendLanguages} = data;
       let friendLanguageCodes = friendLanguages.map(lang => language_codes[lang]);

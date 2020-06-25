@@ -45,19 +45,21 @@ const Chat = props => {
   const {language} = user;
   const userEmail = user.email;
   const {socket, addConversation, sendGroupChatInitMessage, sendChatMessage,
-    addMessageToConversation, initConversationsDict} = useSocket();
+    addMessageToConversation, initConversationsDict, getConversationById,
+    setAllConversationMessages} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
   const [toEmailAddresses, setToEmailAddresses] = useState('');
   const [toEmailAddressesError, setToEmailAddressesError] = useState('');
   const [curMessage, setCurMessage] = useState('');
-  const [postedMessages, setPostedMessages] = useState([]);
+  //const [postedMessages, setPostedMessages] = useState([]);
   const [chatUserEmails, setChatUserEmails] = useState([]);
   const [messageInputError, setMessageInputError] = useState('');
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
   const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
+  let messages = [];
 
   if(socket && conversationId) {
     socket.on(conversationId, (data) => {
@@ -69,7 +71,7 @@ const Chat = props => {
       //     messages: conversationsDict[conversationId]['messages'].concat([data.message])
       //   }
       // })
-    });  
+    });
   }
 
   const closeAlertHandler = () => {
@@ -191,7 +193,8 @@ const Chat = props => {
         friendLanguages: getFriendLanguages(),
         action: 'message'
       });
-      setPostedMessages(postedMessages.concat([message]));
+      addMessageToConversation({conversationId, message});
+      //setPostedMessages(postedMessages.concat([message]));
       setCurMessage('');
       setMessageInputError('');
     }
@@ -248,29 +251,30 @@ const Chat = props => {
   //   }
   // }, [])
 
-  useEffect(() => {
-    setPostedMessages([]);
-    let jwtToken = localStorage.getItem('authToken');
-    if (conversationId) {
-      fetch(`http://localhost:3001/conversations/${conversationId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `${jwtToken}`
-        }
-      })
-        .then(resp => resp.json())
-        .then(json => {
-          if (json.messages && json.messages.length) {
-            setPostedMessages(json.messages);
-          }
-          if (json.user_emails && json.user_emails.length) {
-            setChatUserEmails(json.user_emails);
-          }
-        })
-        .catch(err => console.error('Could not find existing conversation.', err))
-    }
-  }, [conversationId]);
+  //TODO refactor to use socket instead of local state
+  // useEffect(() => {
+  //   //setPostedMessages([]);
+  //   let jwtToken = localStorage.getItem('authToken');
+  //   if (conversationId) {
+  //     fetch(`http://localhost:3001/conversations/${conversationId}`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `${jwtToken}`
+  //       }
+  //     })
+  //       .then(resp => resp.json())
+  //       .then(json => {
+  //         if (json.messages && json.messages.length) {
+  //          setAllConversationMessages({conversationId, message: json.messages})
+  //         }
+  //         if (json.user_emails && json.user_emails.length) {
+  //           setChatUserEmails(json.user_emails);
+  //         }
+  //       })
+  //       .catch(err => console.error('Could not find existing conversation.', err))
+  //   }
+  // }, [conversationId]);
 
   //TODO handle chatType = 'new', 'existing', 'empty'
   if (chatType === 'new') {
@@ -327,6 +331,13 @@ const Chat = props => {
   }
 
   if (chatType === 'existing') {
+    // if (conversationId) {
+    //   let conversation = getConversationById(conversationId)
+    //   let messages = conversation.messages ? conversation.messages: [];
+    //   console.log('conversation', conversation)
+    //   console.log('messages', conversation.messages)
+    // }
+  
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
         <ChatHeader 
@@ -337,7 +348,7 @@ const Chat = props => {
         <MessageDisplay
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
           userEmail={user.email} 
-          messages={postedMessages}
+          messages={getConversationById(conversationId).messages.length ? getConversationById(conversationId).messages : []}
         />
         <MessageInput
           userEmail={user}

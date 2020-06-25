@@ -44,12 +44,9 @@ function SocketProvider({children}) {
     return null;
   }
 
-  // const setChatRoom = ({conversationId}) => {
-  //   socket.on('connect', function() {
-      // Connected, let's sign-up for to receive messages for this room
-  //     socket.emit('room', conversationId);
-  //  });
-  // }
+  const addConversation = ({conversation}) => {
+    setConversationsAr([conversation].concat(conversationsAr));
+  }
 
   const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
     socket.send({message, conversationId, userEmails, friendLanguages});
@@ -62,8 +59,9 @@ function SocketProvider({children}) {
                       initConversationsAr,
                       curConversationId,
                       addConversationColor,
-                      getConversationColorById
-                    }; //setChatRoom
+                      getConversationColorById,
+                      addConversation
+                    };
 
   return (
     <SocketContext.Provider value={socketShare}>

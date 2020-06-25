@@ -23,7 +23,6 @@ const ChatSummary = () => {
 
   useEffect(() => {
     let jwtToken = localStorage.getItem('authToken');
-    console.log('jwtToken', jwtToken)
     fetch(`http://localhost:3001/conversations/user/${user.email}`, {
       headers: {
         'Authorization': `${jwtToken}`,
@@ -50,7 +49,7 @@ const ChatSummary = () => {
             <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} />
           )
         })}
-        {conversationList.length === 0 && (
+        {conversationsAr.length === 0 && (
           <p>No conversations were found.</p>
         )}
       </div>

@@ -53,7 +53,6 @@ const Chat = props => {
   const [toEmailAddresses, setToEmailAddresses] = useState('');
   const [toEmailAddressesError, setToEmailAddressesError] = useState('');
   const [curMessage, setCurMessage] = useState('');
-  //const [postedMessages, setPostedMessages] = useState([]);
   const [chatUserEmails, setChatUserEmails] = useState([]);
   const [messageInputError, setMessageInputError] = useState('');
   const [languageError, setLanguageError] = useState('');
@@ -65,25 +64,12 @@ const Chat = props => {
     socket.on(conversationId, (data) => {
       console.log('new incoming message', data)
       addMessageToConversation({conversationId, message: data['message']});
-
-      // setConversationsDict({...conversationsDict,
-      //   conversationId: {...conversationsDict[conversationId], 
-      //     messages: conversationsDict[conversationId]['messages'].concat([data.message])
-      //   }
-      // })
     });
   }
 
   const closeAlertHandler = () => {
     setSubmitGroupConversationError('');
   }
-
-  //TODO refactor: use the context version of this function
-  // const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
-  //   if (socket) {
-  //     socket.send({message, conversationId, userEmails, friendLanguages});
-  //   }
-  // }
 
   const handleLanguageToggle = () => {
     setShowMsgInOriginalLanguage(!showMsgInOriginalLanguage);
@@ -194,7 +180,6 @@ const Chat = props => {
         action: 'message'
       });
       addMessageToConversation({conversationId, message});
-      //setPostedMessages(postedMessages.concat([message]));
       setCurMessage('');
       setMessageInputError('');
     }
@@ -204,8 +189,6 @@ const Chat = props => {
     let friendEmails =  chatType === 'new' ? getEmailAr(toEmailAddresses): getFriendEmail();
     let friendLanguages = [];
     friendEmails.forEach(email => {
-      //TODO handle case where one friend is not a contact
-      //CONSIDER should the case where one friend is not contact be handled the same as where all participants speak the same language?
       if (!emailToLangDict[email]) {
         return [];
       }
@@ -239,42 +222,6 @@ const Chat = props => {
     }
     return false;
   }
-
-  //TODO refactor to use socket instance in context
-  // useEffect(() => {
-  //   //connect to socket
-  //   socket = io.connect('http://localhost:3001/chat');
-  //   if (conversationId) {
-  //     socket.on('connect', function(){
-  //       socket.emit('room', conversationId);
-  //     });
-  //   }
-  // }, [])
-
-  //TODO refactor to use socket instead of local state
-  // useEffect(() => {
-  //   //setPostedMessages([]);
-  //   let jwtToken = localStorage.getItem('authToken');
-  //   if (conversationId) {
-  //     fetch(`http://localhost:3001/conversations/${conversationId}`, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': `${jwtToken}`
-  //       }
-  //     })
-  //       .then(resp => resp.json())
-  //       .then(json => {
-  //         if (json.messages && json.messages.length) {
-  //          setAllConversationMessages({conversationId, message: json.messages})
-  //         }
-  //         if (json.user_emails && json.user_emails.length) {
-  //           setChatUserEmails(json.user_emails);
-  //         }
-  //       })
-  //       .catch(err => console.error('Could not find existing conversation.', err))
-  //   }
-  // }, [conversationId]);
 
   //TODO handle chatType = 'new', 'existing', 'empty'
   if (chatType === 'new') {

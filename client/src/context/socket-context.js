@@ -9,20 +9,11 @@ function SocketProvider({children}) {
   const [conversationsAr, setConversationsAr] = useState([]);
   const [curConversationId, setCurConversationId] = useState(null);
   const [conversationsColorsDict, setConversationsColorsDict] = useState({});
-  let conversationIdToArIdxDict = {}; //used to update the conversationsAr quickly on new messages
 
   //should happen once per session
   const initConversationsAr = (conversations) => {
     if (conversations.length) {
       setConversationsAr(conversations);
-      conversations.forEach((convo, idx) => {
-        let id = convo._idx.toString();
-        conversationIdToArIdxDict[id] = idx;
-        //TODO and TEST
-        //setClientSocketListener(convo._idx);
-      })
-      console.log('conversationIdToArIdxDict', conversationIdToArIdxDict)
-      //TODO verify timing of this, is setConversationsAr ever too slow to init the ConversationsDict?
       initConversationsDict(conversations);  
     }
   }
@@ -37,7 +28,6 @@ function SocketProvider({children}) {
           messages: conversationsDict[conversationId]['messages'].concat([data.message])
         }
       })
-      //TODO update the conversationsAr with new dict data
     });
   }
 
@@ -47,24 +37,31 @@ function SocketProvider({children}) {
     if (convoAr.length) {
       let dict = {};
       convoAr.forEach(convo => {
-        //verify whether need to convert _id value toString
         let id = convo._id.toString();
         dict[id] = convo;
       });
+      console.log('dict', dict)
       setConversationsDict(dict);
     }
   }
 
   //TODO TEST
   const addMessageToConversation = ({conversationId, message}) => {
-    console.log('conversationsDict', conversationsDict)
-    console.log('conversationId', conversationId)
-    console.log('type conversationId', typeof conversationId)
     setConversationsDict({
       ...conversationsDict,
       [conversationId]: {
         ...conversationsDict[conversationId],
         messages: conversationsDict[conversationId]['messages'].concat([message])
+      }
+    })
+  }
+
+  const setAllConversationMessages = ({conversationId, messages}) => {
+    setConversationsDict({
+      ...conversationsDict,
+      [conversationId]: {
+        ...conversationsDict[conversationId],
+        messages
       }
     })
   }
@@ -77,9 +74,11 @@ function SocketProvider({children}) {
     socket.send({message, conversationId, userEmails, action});
   }
 
-  //TODO resolve data storage when user goes to /conversations/:conversationId, do I update the conversationsDict with BE resp?
-  const getConversationById = () => {
-
+  const getConversationById = (id) => {
+    if (conversationsDict[id]) {
+      return conversationsDict[id];
+    }
+    return [];
   }
 
   const setConversationId = (conversationId) => {
@@ -103,18 +102,17 @@ function SocketProvider({children}) {
 
   //TODO and TEST
   useEffect(() => {
-    console.log('gets to socket context useEffect')
-    //should update conversationsAr
     if (Object.keys(conversationsDict).length) {
-      let newConversationsAr = [];
-      console.log('conversationIdToArIdxDict', conversationIdToArIdxDict)
-      Object.keys(conversationIdToArIdxDict).forEach(conversationId => {
-        let arIdx = conversationIdToArIdxDict[conversationId];
-        console.log('arIdx', arIdx)
-        newConversationsAr[arIdx] = conversationsDict[conversationId];
+      let convosAr = [];
+      Object.keys(conversationsDict).forEach(id => {
+        convosAr.push(conversationsDict[id]);
+      })
+      let orderedAr = [];
+      convosAr.sort((a, b) => {
+        return a.updated_on - b.updated_on;
       });
-      console.log('newConversationsAr', newConversationsAr);
-      setConversationsAr(newConversationsAr);      
+      console.log('convosAr', convosAr);
+      setConversationsAr(convosAr);      
     }
   }, [conversationsDict]);
 
@@ -128,7 +126,9 @@ function SocketProvider({children}) {
                       addConversationColor,
                       getConversationColorById,
                       addConversation,
-                      sendGroupChatInitMessage
+                      sendGroupChatInitMessage,
+                      getConversationById,
+                      setAllConversationMessages
                     };
 
   return (

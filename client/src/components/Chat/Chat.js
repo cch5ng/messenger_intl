@@ -44,7 +44,8 @@ const Chat = props => {
   const {user, emailToLangDict} = useAuth();
   const {language} = user;
   const userEmail = user.email;
-  const {addConversation, sendGroupChatInitMessage} = useSocket();
+  const {socket, addConversation, sendGroupChatInitMessage, sendChatMessage,
+    addMessageToConversation, initConversationsDict} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
@@ -58,13 +59,17 @@ const Chat = props => {
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
   const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
 
-  //socket listener for incoming messages
-  //TODO refactor: want to set the listener on the context; figure out instatiating a different listener per conversation
-  if (socket && conversationId) {
+  if(socket && conversationId) {
     socket.on(conversationId, (data) => {
       console.log('new incoming message', data)
-      setPostedMessages(postedMessages.concat([data.message]));
-    });
+      addMessageToConversation({conversationId, message: data['message']});
+
+      // setConversationsDict({...conversationsDict,
+      //   conversationId: {...conversationsDict[conversationId], 
+      //     messages: conversationsDict[conversationId]['messages'].concat([data.message])
+      //   }
+      // })
+    });  
   }
 
   const closeAlertHandler = () => {
@@ -72,11 +77,11 @@ const Chat = props => {
   }
 
   //TODO refactor: use the context version of this function
-  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
-    if (socket) {
-      socket.send({message, conversationId, userEmails, friendLanguages});
-    }
-  }
+  // const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
+  //   if (socket) {
+  //     socket.send({message, conversationId, userEmails, friendLanguages});
+  //   }
+  // }
 
   const handleLanguageToggle = () => {
     setShowMsgInOriginalLanguage(!showMsgInOriginalLanguage);
@@ -233,15 +238,15 @@ const Chat = props => {
   }
 
   //TODO refactor to use socket instance in context
-  useEffect(() => {
-    //connect to socket
-    socket = io.connect('http://localhost:3001/chat');
-    if (conversationId) {
-      socket.on('connect', function(){
-        socket.emit('room', conversationId);
-      });
-    }
-  }, [])
+  // useEffect(() => {
+  //   //connect to socket
+  //   socket = io.connect('http://localhost:3001/chat');
+  //   if (conversationId) {
+  //     socket.on('connect', function(){
+  //       socket.emit('room', conversationId);
+  //     });
+  //   }
+  // }, [])
 
   useEffect(() => {
     setPostedMessages([]);

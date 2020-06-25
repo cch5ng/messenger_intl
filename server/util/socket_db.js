@@ -35,7 +35,6 @@ const buildQueryIsPairFriends = (emails) => {
   let queryAr = [];
   let queryObj1 = {};
   let queryObj2 = {};
-  console.log('emails', emails)
   queryObj1.to_user_email = emails[0];
   queryObj1.from_user_email = emails[1];
   queryAr.push(queryObj1);
@@ -44,7 +43,6 @@ const buildQueryIsPairFriends = (emails) => {
   queryAr.push(queryObj2);
   query['$or'] = queryAr;
   query.approved = true;
-  console.log('query', query)
   return query;
 }
 

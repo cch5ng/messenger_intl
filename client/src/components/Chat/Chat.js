@@ -44,7 +44,7 @@ const Chat = props => {
   const {user, emailToLangDict} = useAuth();
   const {language} = user;
   const userEmail = user.email;
-  const {addConversation} = useSocket();
+  const {addConversation, sendGroupChatInitMessage} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
@@ -59,8 +59,10 @@ const Chat = props => {
   const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
 
   //socket listener for incoming messages
+  //TODO refactor: want to set the listener on the context; figure out instatiating a different listener per conversation
   if (socket && conversationId) {
     socket.on(conversationId, (data) => {
+      console.log('new incoming message', data)
       setPostedMessages(postedMessages.concat([data.message]));
     });
   }
@@ -69,6 +71,7 @@ const Chat = props => {
     setSubmitGroupConversationError('');
   }
 
+  //TODO refactor: use the context version of this function
   const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
     if (socket) {
       socket.send({message, conversationId, userEmails, friendLanguages});
@@ -146,6 +149,12 @@ const Chat = props => {
                     user_emails: emailsAr
                   }
                   addConversation({conversation});
+                  sendGroupChatInitMessage({from_email: user.email,
+                    action: 'group conversation init',
+                    message: json.conversation_message,
+                    conversationId: json.conversationId,
+                    userEmails: emailsAr
+                  });
                 }
                 history.push(`/conversations/${json.conversationId}`);
 
@@ -174,7 +183,8 @@ const Chat = props => {
         message,
         conversationId,
         userEmails: chatUserEmails,
-        friendLanguages: getFriendLanguages()
+        friendLanguages: getFriendLanguages(),
+        action: 'message'
       });
       setPostedMessages(postedMessages.concat([message]));
       setCurMessage('');
@@ -222,6 +232,7 @@ const Chat = props => {
     return false;
   }
 
+  //TODO refactor to use socket instance in context
   useEffect(() => {
     //connect to socket
     socket = io.connect('http://localhost:3001/chat');

@@ -13,6 +13,7 @@ import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
 import MessageInput from './MessageInput';
 import {useAuth} from '../../context/auth-context';
+import {useSocket} from '../../context/socket-context';
 import {getEmailAr, isEmailValid} from '../../util/helpers';
 
 const MAX_MESSAGE_LENGTHS = {
@@ -43,6 +44,7 @@ const Chat = props => {
   const {user, emailToLangDict} = useAuth();
   const {language} = user;
   const userEmail = user.email;
+  const {addConversation} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
@@ -135,8 +137,18 @@ const Chat = props => {
               } else if (json.conversationId) {
                 setToEmailAddresses('');
                 setCurMessage('');
+                console.log('json after init group convo', json)
             //5 somehow indicate to contacts that new group conversation is available
+                if (json.type === 'success' && json.message === 'A new conversation was created') {
+                  let conversation = {
+                    _id: json.conversationId, 
+                    messages: [json.conversation_message],
+                    user_emails: emailsAr
+                  }
+                  addConversation({conversation});
+                }
                 history.push(`/conversations/${json.conversationId}`);
+
               }
             })
             .catch(err => console.error('error with group convo', err))

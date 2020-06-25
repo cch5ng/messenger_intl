@@ -33,9 +33,9 @@ const ChatSummary = () => {
       .then(json => {
         if (json && json.conversations.length) {
           console.log('gets to initConversationsAr')
+          initConversationsAr(json.conversations);
           let conversationId = json.conversations[0]._id.toString();
           history.push(`/conversations/${conversationId}`);
-          initConversationsAr(json.conversations);
         }
       })
       .catch(err => console.error('get convos summary err', err))

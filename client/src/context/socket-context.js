@@ -115,6 +115,7 @@ function SocketProvider({children}) {
   //sendGroupChatInitMessage,
   const socketShare = {
     conversationsAr,
+    conversationsDict,
     addMessageToConversation, 
     initConversationsAr,
     initConversationsDict,

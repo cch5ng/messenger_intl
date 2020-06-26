@@ -44,9 +44,8 @@ const Chat = props => {
   const {user, emailToLangDict} = useAuth();
   const {language} = user;
   const userEmail = user.email;
-  //socket, sendChatMessage, sendGroupChatInitMessage, 
   const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
-    setAllConversationMessages, conversationsAr} = useSocket();
+    setAllConversationMessages, conversationsAr, conversationsDict} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
@@ -58,13 +57,12 @@ const Chat = props => {
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
   const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
-  const [messages, setMessages] = useState([]);
   let curConversation = {};
   let curMessages = [];
 
   if(socket && conversationId) {
     socket.on(conversationId, (data) => {
-      //console.log('new incoming message', data)
+      console.log('new incoming message', data)
       addMessageToConversation({conversationId, message: data['message']});
     });
   }
@@ -80,7 +78,6 @@ const Chat = props => {
       created_on: Date.now(), updated_on: Date.now()};
     addConversation(conversation);
   }
-
 
   const closeAlertHandler = () => {
     setSubmitGroupConversationError('');
@@ -150,8 +147,6 @@ const Chat = props => {
               } else if (json.conversationId) {
                 setToEmailAddresses('');
                 setCurMessage('');
-                console.log('json after init group convo', json)
-            //5 somehow indicate to contacts that new group conversation is available
                 if (json.type === 'success' && json.message === 'A new conversation was created') {
                   let conversation = {
                     _id: json.conversationId, 
@@ -219,10 +214,12 @@ const Chat = props => {
   }
 
   const getFriendEmail = () => {
-    let conversation = getConversationById(conversationId);
-    if (conversation.length) {
-      console.log('conversation', conversation)
-      let friendEmails = conversation.user_emails.filter(email => email !== user.email);
+    if (curConversation && curConversation.user_emails) {
+      let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
+      return friendEmails;  
+    } else if (conversationId) {
+      curConversation = getConversationById(conversationId);
+      let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
       return friendEmails;  
     }
     return [];
@@ -252,20 +249,15 @@ const Chat = props => {
       socket.on('connect', function(){
         socket.emit('room', conversationId);
       });
+      if (conversationsDict) {
+        curConversation = conversationsDict[conversationId];
+        curMessages = curConversation ? curConversation.messages : [];
+        console.log('curConversation', curConversation)
+        console.log('curMessages', curMessages)    
+      }
     }
   }, [])
   
-  useEffect(() => {
-    if (conversationId) {
-      curConversation = getConversationById(conversationId);
-      //    console.log('curConversation', curConversation)
-          curMessages = curConversation.messages ? curConversation.messages : [];
-         console.log('curMessages', curMessages)
-          setMessages(curMessages)      
-    }
-  }, [conversationId])
-
-  //TODO handle chatType = 'new', 'existing', 'empty'
   if (chatType === 'new') {
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
@@ -320,14 +312,9 @@ const Chat = props => {
   }
 
   if (chatType === 'existing') {
-    // if (!Object.keys(conversation).length) {
-    //   conversation = conversationsAr[conversationId] ? conversationsAr[conversationId] : {};
-    // }
-    // if (!messages.length && conversation && conversation.messages) {
-    //   messages = conversation.messages ? conversation.messages : [];
-    // }
-    console.log('curConversation', curConversation)
-    console.log('curMessages', curMessages)
+    curConversation = conversationId ? conversationsDict[conversationId] : {};
+    curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
+
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
         <ChatHeader 
@@ -338,7 +325,7 @@ const Chat = props => {
         <MessageDisplay
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
           userEmail={user.email} 
-          messages={messages}
+          messages={curMessages}
         />
         <MessageInput
           userEmail={user}

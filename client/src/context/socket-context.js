@@ -65,7 +65,7 @@ function SocketProvider({children}) {
     if (conversationsDict[id]) {
       return conversationsDict[id];
     }
-    return [];
+    return {};
   }
 
   const setConversationId = (conversationId) => {
@@ -83,8 +83,16 @@ function SocketProvider({children}) {
     return null;
   }
 
-  const addConversation = ({conversation}) => {
-    setConversationsAr([conversation].concat(conversationsAr));
+  const addConversation = (conversation) => {
+    let id = conversation._idx;
+    conversation.created_on = Date.now();
+    conversation.updated_on = Date.now();
+    if (!conversationsDict[id]) {
+      setConversationsDict({
+        ...conversationsDict,
+        [id]: conversation
+      })
+    }
   }
 
   //TODO and TEST

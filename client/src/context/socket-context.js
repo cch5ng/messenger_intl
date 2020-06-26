@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import io from 'socket.io-client';
 
 const SocketContext = React.createContext([{}, () => {}])
-const socket = io.connect('http://localhost:3001/chat');
+//const socket = io.connect('http://localhost:3001/chat');
 
 function SocketProvider({children}) {
   const [conversationsDict, setConversationsDict] = useState({});
@@ -16,19 +16,6 @@ function SocketProvider({children}) {
       setConversationsAr(conversations);
       initConversationsDict(conversations);  
     }
-  }
-
-  //TODO TEST, verify the data format of data.message
-  const setClientSocketListener = (conversationId) => {
-    //socket listener for incoming messages
-    socket.on(conversationId, (data) => {
-      console.log('new incoming message', data)
-      setConversationsDict({...conversationsDict,
-        conversationId: {...conversationsDict[conversationId], 
-          messages: conversationsDict[conversationId]['messages'].concat([data.message])
-        }
-      })
-    });
   }
 
   //TODO TEST
@@ -66,13 +53,13 @@ function SocketProvider({children}) {
     })
   }
   
-  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages, action}) => {
-    socket.send({message, conversationId, userEmails, friendLanguages, action});
-  }
+  // const sendChatMessage = ({socket, from_email, message, conversationId, userEmails, friendLanguages, action}) => {
+  //   socket.send({message, conversationId, userEmails, friendLanguages, action});
+  // }
 
-  const sendGroupChatInitMessage = ({from_email, message, conversationId, userEmails, action}) => {
-    socket.send({message, conversationId, userEmails, action});
-  }
+  // const sendGroupChatInitMessage = ({socket, from_email, message, conversationId, userEmails, action}) => {
+  //   socket.send({message, conversationId, userEmails, action});
+  // }
 
   const getConversationById = (id) => {
     if (conversationsDict[id]) {
@@ -116,20 +103,20 @@ function SocketProvider({children}) {
     }
   }, [conversationsDict]);
 
-  const socketShare = {socket,
-                      conversationsAr,
-                      sendChatMessage,
-                      addMessageToConversation, 
-                      initConversationsAr,
-                      initConversationsDict,
-                      curConversationId,
-                      addConversationColor,
-                      getConversationColorById,
-                      addConversation,
-                      sendGroupChatInitMessage,
-                      getConversationById,
-                      setAllConversationMessages
-                    };
+  //socket,//sendChatMessage,
+  //sendGroupChatInitMessage,
+  const socketShare = {
+    conversationsAr,
+    addMessageToConversation, 
+    initConversationsAr,
+    initConversationsDict,
+    curConversationId,
+    addConversationColor,
+    getConversationColorById,
+    addConversation,
+    getConversationById,
+    setAllConversationMessages
+  };
 
   return (
     <SocketContext.Provider value={socketShare}>

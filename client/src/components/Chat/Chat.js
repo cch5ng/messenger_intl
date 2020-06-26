@@ -44,8 +44,8 @@ const Chat = props => {
   const {user, emailToLangDict} = useAuth();
   const {language} = user;
   const userEmail = user.email;
-  const {socket, addConversation, sendGroupChatInitMessage, sendChatMessage,
-    addMessageToConversation, initConversationsDict, getConversationById,
+  //socket, sendChatMessage, sendGroupChatInitMessage, 
+  const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
     setAllConversationMessages} = useSocket();
   const classes = useStyles();
   let history = useHistory();
@@ -62,10 +62,19 @@ const Chat = props => {
 
   if(socket && conversationId) {
     socket.on(conversationId, (data) => {
-      console.log('new incoming message', data)
+      //console.log('new incoming message', data)
       addMessageToConversation({conversationId, message: data['message']});
     });
   }
+
+  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages, action}) => {
+    socket.send({message, conversationId, userEmails, friendLanguages, action});
+  }
+
+  const sendGroupChatInitMessage = ({from_email, message, conversationId, userEmails, action}) => {
+    socket.send({message, conversationId, userEmails, action});
+  }
+
 
   const closeAlertHandler = () => {
     setSubmitGroupConversationError('');
@@ -142,7 +151,7 @@ const Chat = props => {
                     user_emails: emailsAr
                   }
                   addConversation({conversation});
-                  sendGroupChatInitMessage({from_email: user.email,
+                  sendGroupChatInitMessage({socket, from_email: user.email,
                     action: 'group conversation init',
                     message: json.conversation_message,
                     conversationId: json.conversationId,
@@ -172,10 +181,12 @@ const Chat = props => {
         created_on: Date.now(),
         translations: {}
       };
-      sendChatMessage({from_email: user.email,
+      let conversation = getConversationById(conversationId);
+      sendChatMessage({socket,
+        from_email: user.email,
         message,
         conversationId,
-        userEmails: chatUserEmails,
+        userEmails: conversation.user_emails,
         friendLanguages: getFriendLanguages(),
         action: 'message'
       });
@@ -201,8 +212,9 @@ const Chat = props => {
   }
 
   const getFriendEmail = () => {
-    let friend = chatUserEmails.filter(email => email !== user.email);
-    return friend;
+    let conversation = getConversationById(conversationId);
+    let friendEmails = conversation.user_emails.filter(email => email !== user.email);
+    return friendEmails;
   }
 
   const switchTranslations = isChecked => {
@@ -222,6 +234,15 @@ const Chat = props => {
     }
     return false;
   }
+
+  useEffect(() => {
+    socket = io.connect('http://localhost:3001/chat');
+    if (conversationId) {
+      socket.on('connect', function(){
+        socket.emit('room', conversationId);
+      });
+    }
+  }, [])
 
   //TODO handle chatType = 'new', 'existing', 'empty'
   if (chatType === 'new') {

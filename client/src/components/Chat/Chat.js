@@ -46,7 +46,7 @@ const Chat = props => {
   const userEmail = user.email;
   //socket, sendChatMessage, sendGroupChatInitMessage, 
   const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
-    setAllConversationMessages} = useSocket();
+    setAllConversationMessages, conversationsAr} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
@@ -58,7 +58,9 @@ const Chat = props => {
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
   const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
-  let messages = [];
+  const [messages, setMessages] = useState([]);
+  let curConversation = {};
+  let curMessages = [];
 
   if(socket && conversationId) {
     socket.on(conversationId, (data) => {
@@ -69,10 +71,14 @@ const Chat = props => {
 
   const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages, action}) => {
     socket.send({message, conversationId, userEmails, friendLanguages, action});
+    addMessageToConversation({conversationId, message});
   }
 
   const sendGroupChatInitMessage = ({from_email, message, conversationId, userEmails, action}) => {
     socket.send({message, conversationId, userEmails, action});
+    let conversation = {messages: [message], _id: conversationId, user_emails: userEmails,
+      created_on: Date.now(), updated_on: Date.now()};
+    addConversation(conversation);
   }
 
 
@@ -107,6 +113,7 @@ const Chat = props => {
 
   const newMessageInputSubmitHandler = ev => {
     if (ev.key === 'Enter') {
+      console.log('gets to newMessageInputSubmitHandler')
       ev.preventDefault();
       setToEmailAddressesError('');
       let emailsAr = getEmailAr(toEmailAddresses);
@@ -138,6 +145,7 @@ const Chat = props => {
             .then(json => {
               if (json.type === 'error') {
                 //TODO activate snackbar
+                console.log('error on group convo init')
                 setSubmitGroupConversationError(json.message);
               } else if (json.conversationId) {
                 setToEmailAddresses('');
@@ -150,15 +158,14 @@ const Chat = props => {
                     messages: [json.conversation_message],
                     user_emails: emailsAr
                   }
-                  addConversation({conversation});
-                  sendGroupChatInitMessage({socket, from_email: user.email,
+                  sendGroupChatInitMessage({from_email: user.email,
                     action: 'group conversation init',
                     message: json.conversation_message,
                     conversationId: json.conversationId,
                     userEmails: emailsAr
                   });
+                  history.push(`/conversations/${json.conversationId}`);
                 }
-                history.push(`/conversations/${json.conversationId}`);
 
               }
             })
@@ -182,7 +189,7 @@ const Chat = props => {
         translations: {}
       };
       let conversation = getConversationById(conversationId);
-      sendChatMessage({socket,
+      sendChatMessage({
         from_email: user.email,
         message,
         conversationId,
@@ -213,8 +220,12 @@ const Chat = props => {
 
   const getFriendEmail = () => {
     let conversation = getConversationById(conversationId);
-    let friendEmails = conversation.user_emails.filter(email => email !== user.email);
-    return friendEmails;
+    if (conversation.length) {
+      console.log('conversation', conversation)
+      let friendEmails = conversation.user_emails.filter(email => email !== user.email);
+      return friendEmails;  
+    }
+    return [];
   }
 
   const switchTranslations = isChecked => {
@@ -243,6 +254,16 @@ const Chat = props => {
       });
     }
   }, [])
+  
+  useEffect(() => {
+    if (conversationId) {
+      curConversation = getConversationById(conversationId);
+      //    console.log('curConversation', curConversation)
+          curMessages = curConversation.messages ? curConversation.messages : [];
+         console.log('curMessages', curMessages)
+          setMessages(curMessages)      
+    }
+  }, [conversationId])
 
   //TODO handle chatType = 'new', 'existing', 'empty'
   if (chatType === 'new') {
@@ -299,13 +320,14 @@ const Chat = props => {
   }
 
   if (chatType === 'existing') {
-    // if (conversationId) {
-    //   let conversation = getConversationById(conversationId)
-    //   let messages = conversation.messages ? conversation.messages: [];
-    //   console.log('conversation', conversation)
-    //   console.log('messages', conversation.messages)
+    // if (!Object.keys(conversation).length) {
+    //   conversation = conversationsAr[conversationId] ? conversationsAr[conversationId] : {};
     // }
-  
+    // if (!messages.length && conversation && conversation.messages) {
+    //   messages = conversation.messages ? conversation.messages : [];
+    // }
+    console.log('curConversation', curConversation)
+    console.log('curMessages', curMessages)
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
         <ChatHeader 
@@ -316,7 +338,7 @@ const Chat = props => {
         <MessageDisplay
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
           userEmail={user.email} 
-          messages={getConversationById(conversationId).messages.length ? getConversationById(conversationId).messages : []}
+          messages={messages}
         />
         <MessageInput
           userEmail={user}

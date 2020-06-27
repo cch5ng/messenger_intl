@@ -47,11 +47,10 @@ nsp.on('connection', function(socket){
     if (data.action === 'group conversation init') {
       console.log('gets to server group conversation init')
       console.log('from_email', data.from_email)
-      let target_emails = user_emails.filter(email => email !== from_email);
+      let target_emails = data.user_emails.filter(email => email !== data.from_email);
       console.log('target_emails', target_emails)
       //emit on userId events, the same data
       //socket.broadcast(userId, data);
-      //socket.broadcast.emit(conversationId, data);
     } else if (data.action === 'message') {
       let {conversationId, message, userEmails, friendLanguages} = data;
       let friendLanguageCodes = friendLanguages.map(lang => language_codes[lang]);

@@ -72,9 +72,9 @@ const Chat = props => {
     addMessageToConversation({conversationId, message});
   }
 
-  const sendGroupChatInitMessage = ({from_email, message, conversationId, userEmails, action}) => {
-    socket.send({message, conversationId, userEmails, action});
-    let conversation = {messages: [message], _id: conversationId, user_emails: userEmails,
+  const sendGroupChatInitMessage = ({from_email, message, conversationId, user_emails, action}) => {
+    socket.send({message, conversationId, user_emails, action, from_email});
+    let conversation = {messages: [message], _id: conversationId, user_emails,
       created_on: Date.now(), updated_on: Date.now()};
     addConversation(conversation);
   }
@@ -117,6 +117,7 @@ const Chat = props => {
       if (areRecipientsFriends(emailsAr)) {
         emailsAr.push(userEmail);
         emailsAr = emailsAr.filter(em => isEmailValid(em));
+        console.log('emailsAr', emailsAr)
         let message = {
           author_id: user.id,
           author_email: user.email,
@@ -151,14 +152,19 @@ const Chat = props => {
                   let conversation = {
                     _id: json.conversationId, 
                     messages: [json.conversation_message],
-                    user_emails: emailsAr
+                    user_emails: emailsAr,
+                    created_on: Date.now(), updated_on: Date.now()
                   }
-                  sendGroupChatInitMessage({from_email: user.email,
+                  sendGroupChatInitMessage({from_email: userEmail,
                     action: 'group conversation init',
                     message: json.conversation_message,
                     conversationId: json.conversationId,
-                    userEmails: emailsAr
+                    user_emails: emailsAr
                   });
+                  //let conversation = {messages: [message], _id: conversationId, user_emails: emailsAr,
+                  //  created_on: Date.now(), updated_on: Date.now()};
+                  addConversation(conversation);
+              
                   history.push(`/conversations/${json.conversationId}`);
                 }
 
@@ -219,8 +225,10 @@ const Chat = props => {
       return friendEmails;  
     } else if (conversationId) {
       curConversation = getConversationById(conversationId);
-      let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
-      return friendEmails;  
+      if (curConversation.user_emails) {
+        let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
+        return friendEmails;  
+      }
     }
     return [];
   }
@@ -257,6 +265,20 @@ const Chat = props => {
       }
     }
   }, [])
+
+  //see if this makes a difference when navigating to a new conversation (from group convo init)
+  useEffect(() => {
+    if (conversationId) {
+      curConversation = conversationId && Object.keys(conversationsDict).length ? conversationsDict[conversationId] : {};
+      curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
+      console.log('curConversation', curConversation)
+      console.log('curMessages', curMessages)
+      let friendEmails = [];
+      if (curConversation && curConversation.user_emails) {
+        friendEmails = curConversation.user_emails.filter(email => email !== userEmail)
+      }  
+    }
+  }, [conversationsDict])
   
   if (chatType === 'new') {
     return (
@@ -312,15 +334,19 @@ const Chat = props => {
   }
 
   if (chatType === 'existing') {
-    curConversation = conversationId ? conversationsDict[conversationId] : {};
+    curConversation = conversationId && Object.keys(conversationsDict).length ? conversationsDict[conversationId] : {};
     curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
+    let friendEmails = [];
+    if (curConversation && curConversation.user_emails) {
+      friendEmails = curConversation.user_emails.filter(email => email !== userEmail)
+    }
 
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
         <ChatHeader 
           handleLanguageToggle = {handleLanguageToggle}
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
-          friendEmails={getFriendEmail()}
+          friendEmails={friendEmails}
         />
         <MessageDisplay
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}

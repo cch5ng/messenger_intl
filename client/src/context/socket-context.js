@@ -8,6 +8,7 @@ function SocketProvider({children}) {
   const [conversationsDict, setConversationsDict] = useState({});
   const [conversationsAr, setConversationsAr] = useState([]);
   const [curConversationId, setCurConversationId] = useState(null);
+  const [curConversation, setCurConversation] = useState({});
   const [conversationsColorsDict, setConversationsColorsDict] = useState({});
 
   //should happen once per session
@@ -95,6 +96,10 @@ function SocketProvider({children}) {
     }
   }
 
+  const updateCurConversation = (conversation) => {
+    setCurConversation(conversation);
+  }
+
   //TODO and TEST
   useEffect(() => {
     if (Object.keys(conversationsDict).length) {
@@ -116,6 +121,7 @@ function SocketProvider({children}) {
   const socketShare = {
     conversationsAr,
     conversationsDict,
+    curConversation,
     addMessageToConversation, 
     initConversationsAr,
     initConversationsDict,
@@ -124,7 +130,8 @@ function SocketProvider({children}) {
     getConversationColorById,
     addConversation,
     getConversationById,
-    setAllConversationMessages
+    setAllConversationMessages,
+    updateCurConversation
   };
 
   return (

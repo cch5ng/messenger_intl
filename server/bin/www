@@ -9,7 +9,7 @@ require("dotenv").config();
 
 var app = require("../app");
 var http = require("http");
-const {saveMessageToConversation} = require('../util/socket_db');
+const {saveMessageToConversation, getUidFromEmail} = require('../util/socket_db');
 const {language_codes} = require('../util/languages');
 const {getTranslation} = require('../util/translate_helpers');
 
@@ -46,9 +46,27 @@ nsp.on('connection', function(socket){
   socket.on('message', (data) => {
     if (data.action === 'group conversation init') {
       console.log('gets to server group conversation init')
-      console.log('from_email', data.from_email)
+      console.log('group data', data)
       let target_emails = data.user_emails.filter(email => email !== data.from_email);
-      console.log('target_emails', target_emails)
+      if (target_emails.length) {
+        let uids = [];
+        target_emails.forEach((email, idx) => {
+          getUidFromEmail({email})
+            .then(user => {
+              let conversation = {};
+              conversation.messages = [data.message];
+              conversation._id = data.conversationId;
+              conversation.user_emails = data.user_eails
+              let convoData = {
+                conversation,
+                action: 'group conversation init'
+              }
+              let _id = user._id.toString();
+              socket.broadcast.emit(_id, convoData);
+            })
+            .catch(err => console.error('Could not get friend ids', err)) 
+        })          
+      }
       //emit on userId events, the same data
       //socket.broadcast(userId, data);
     } else if (data.action === 'message') {

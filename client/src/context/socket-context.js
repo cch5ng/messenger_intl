@@ -35,14 +35,48 @@ function SocketProvider({children}) {
 
   //TODO TEST
   const addMessageToConversation = ({conversationId, message}) => {
-    setConversationsDict({
-      ...conversationsDict,
-      [conversationId]: {
-        ...conversationsDict[conversationId],
-        messages: conversationsDict[conversationId]['messages'].concat([message])
-      }
-    })
+    console.log('conversationsDict', conversationsDict)
+    console.log('curConversation', curConversation)
+    console.log('conversationId', conversationId)
+
+    //update curConversation
+    if (conversationId === curConversation._id) {
+      setCurConversation({
+        ...curConversation,
+        messages: curConversation.messages.concat([message])
+      })
+    }
+
+    //update conversationsDict
+    if (conversationsDict[conversationId]) {
+      setConversationsDict({
+        ...conversationsDict,
+        [conversationId]: {
+          ...conversationsDict[conversationId],
+          messages: conversationsDict[conversationId].messages.concat([message])
+        }
+      })
+    } else {
+      setConversationsDict({
+        ...conversationsDict,
+        [conversationId]: {
+          _id: conversationId,
+          created_on: Date.now(),
+          updated_on: Date.now(),
+          messages: [message]
+        }
+      })
+    }
   }
+
+  // const setConversationsDict = ({
+  //     ...conversationsDict,
+  //     [conversationId]: {
+  //       ...conversationsDict[conversationId],
+  //       messages: conversationsDict[conversationId]['messages'].concat([message])
+  //     }
+  //   })
+  // }
 
   const setAllConversationMessages = ({conversationId, messages}) => {
     setConversationsDict({
@@ -84,20 +118,27 @@ function SocketProvider({children}) {
     return null;
   }
 
-  const addConversation = (conversation) => {
-    let id = conversation._idx;
+  const addConversation = (conversation, conversationId) => {
     conversation.created_on = Date.now();
     conversation.updated_on = Date.now();
-    if (!conversationsDict[id]) {
+    if (!conversationsDict[conversationId]) {
       setConversationsDict({
         ...conversationsDict,
-        [id]: conversation
+        [conversationId]: conversation
       })
     }
   }
 
   const updateCurConversation = (conversation) => {
     setCurConversation(conversation);
+    let id = conversation._id;
+    setConversationsDict({
+      ...conversationsDict,
+      [id]: {
+        ...conversationsDict[id],
+        ...conversation
+      }
+    })
   }
 
   //TODO and TEST
@@ -111,13 +152,10 @@ function SocketProvider({children}) {
       convosAr.sort((a, b) => {
         return a.updated_on - b.updated_on;
       });
-      console.log('convosAr', convosAr);
       setConversationsAr(convosAr);      
     }
   }, [conversationsDict]);
 
-  //socket,//sendChatMessage,
-  //sendGroupChatInitMessage,
   const socketShare = {
     conversationsAr,
     conversationsDict,

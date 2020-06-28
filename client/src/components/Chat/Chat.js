@@ -109,7 +109,6 @@ const Chat = props => {
 
   const newMessageInputSubmitHandler = ev => {
     if (ev.key === 'Enter') {
-      console.log('gets to newMessageInputSubmitHandler')
       ev.preventDefault();
       setToEmailAddressesError('');
       let emailsAr = getEmailAr(toEmailAddresses);
@@ -267,12 +266,8 @@ const Chat = props => {
       })
         .then(resp => resp.json())
         .then(json => {
-          if (json && json.messages.length) {
-            let convo = {};
-            convo._id = conversationId;
-            convo.messages = json.messages;
-            convo.user_emails = json.user_emails;
-            updateCurConversation(convo);
+          if (json && json.type === 'success') {
+            updateCurConversation(json.conversation);
           }
         })
         .catch(err => console.error('Could not find existing conversation.', err))

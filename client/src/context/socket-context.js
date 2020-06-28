@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import io from 'socket.io-client';
+//import io from 'socket.io-client';
 
 const SocketContext = React.createContext([{}, () => {}])
-//const socket = io.connect('http://localhost:3001/chat');
 
 function SocketProvider({children}) {
   const [conversationsDict, setConversationsDict] = useState({});
@@ -11,7 +10,6 @@ function SocketProvider({children}) {
   const [curConversation, setCurConversation] = useState({});
   const [conversationsColorsDict, setConversationsColorsDict] = useState({});
 
-  //should happen once per session
   const initConversationsAr = (conversations) => {
     if (conversations.length) {
       setConversationsAr(conversations);
@@ -19,8 +17,6 @@ function SocketProvider({children}) {
     }
   }
 
-  //TODO TEST
-  //should happen once per session, on initConversationsAr
   const initConversationsDict = (convoAr) => {
     if (convoAr.length) {
       let dict = {};
@@ -28,17 +24,11 @@ function SocketProvider({children}) {
         let id = convo._id.toString();
         dict[id] = convo;
       });
-      console.log('dict', dict)
       setConversationsDict(dict);
     }
   }
 
-  //TODO TEST
   const addMessageToConversation = ({conversationId, message}) => {
-    console.log('conversationsDict', conversationsDict)
-    console.log('curConversation', curConversation)
-    console.log('conversationId', conversationId)
-
     //update curConversation
     if (conversationId === curConversation._id) {
       setCurConversation({
@@ -46,7 +36,6 @@ function SocketProvider({children}) {
         messages: curConversation.messages.concat([message])
       })
     }
-
     //update conversationsDict
     if (conversationsDict[conversationId]) {
       setConversationsDict({
@@ -69,15 +58,6 @@ function SocketProvider({children}) {
     }
   }
 
-  // const setConversationsDict = ({
-  //     ...conversationsDict,
-  //     [conversationId]: {
-  //       ...conversationsDict[conversationId],
-  //       messages: conversationsDict[conversationId]['messages'].concat([message])
-  //     }
-  //   })
-  // }
-
   const setAllConversationMessages = ({conversationId, messages}) => {
     setConversationsDict({
       ...conversationsDict,
@@ -88,14 +68,6 @@ function SocketProvider({children}) {
     })
   }
   
-  // const sendChatMessage = ({socket, from_email, message, conversationId, userEmails, friendLanguages, action}) => {
-  //   socket.send({message, conversationId, userEmails, friendLanguages, action});
-  // }
-
-  // const sendGroupChatInitMessage = ({socket, from_email, message, conversationId, userEmails, action}) => {
-  //   socket.send({message, conversationId, userEmails, action});
-  // }
-
   const getConversationById = (id) => {
     if (conversationsDict[id]) {
       return conversationsDict[id];
@@ -141,7 +113,6 @@ function SocketProvider({children}) {
     })
   }
 
-  //TODO and TEST
   useEffect(() => {
     if (Object.keys(conversationsDict).length) {
       let convosAr = [];

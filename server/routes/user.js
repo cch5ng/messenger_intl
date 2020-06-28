@@ -115,7 +115,6 @@ router.get("/:fromEmail/language",
   }
 );
 
-
 router.post('/register/referral',
   //passport.authenticate('jwt', { session: false }),
   (req, res) => {

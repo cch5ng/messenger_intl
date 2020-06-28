@@ -45,7 +45,7 @@ const Chat = props => {
   const {language} = user;
   const userEmail = user.email;
   const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
-    setAllConversationMessages, conversationsAr, conversationsDict} = useSocket();
+    setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, curConversation} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
@@ -57,8 +57,7 @@ const Chat = props => {
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
   const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
-  let curConversation = {};
-  let curMessages = [];
+  let curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
 
   if(socket && conversationId) {
     socket.on(conversationId, (data) => {
@@ -161,13 +160,9 @@ const Chat = props => {
                     conversationId: json.conversationId,
                     user_emails: emailsAr
                   });
-                  //let conversation = {messages: [message], _id: conversationId, user_emails: emailsAr,
-                  //  created_on: Date.now(), updated_on: Date.now()};
-                  addConversation(conversation);
-              
+                  addConversation(conversation, json.conversationId);              
                   history.push(`/conversations/${json.conversationId}`);
                 }
-
               }
             })
             .catch(err => console.error('error with group convo', err))
@@ -257,28 +252,32 @@ const Chat = props => {
       socket.on('connect', function(){
         socket.emit('room', conversationId);
       });
-      if (conversationsDict) {
-        curConversation = conversationsDict[conversationId];
-        curMessages = curConversation ? curConversation.messages : [];
-        console.log('curConversation', curConversation)
-        console.log('curMessages', curMessages)    
-      }
     }
   }, [])
 
-  //see if this makes a difference when navigating to a new conversation (from group convo init)
   useEffect(() => {
+    let jwtToken = localStorage.getItem('authToken');
     if (conversationId) {
-      curConversation = conversationId && Object.keys(conversationsDict).length ? conversationsDict[conversationId] : {};
-      curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
-      console.log('curConversation', curConversation)
-      console.log('curMessages', curMessages)
-      let friendEmails = [];
-      if (curConversation && curConversation.user_emails) {
-        friendEmails = curConversation.user_emails.filter(email => email !== userEmail)
-      }  
+      fetch(`http://localhost:3001/conversations/${conversationId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `${jwtToken}`
+        }
+      })
+        .then(resp => resp.json())
+        .then(json => {
+          if (json && json.messages.length) {
+            let convo = {};
+            convo._id = conversationId;
+            convo.messages = json.messages;
+            convo.user_emails = json.user_emails;
+            updateCurConversation(convo);
+          }
+        })
+        .catch(err => console.error('Could not find existing conversation.', err))
     }
-  }, [conversationsDict])
+  }, [conversationId]);
   
   if (chatType === 'new') {
     return (
@@ -334,7 +333,7 @@ const Chat = props => {
   }
 
   if (chatType === 'existing') {
-    curConversation = conversationId && Object.keys(conversationsDict).length ? conversationsDict[conversationId] : {};
+    //curConversation = conversationId && Object.keys(conversationsDict).length ? conversationsDict[conversationId] : {};
     curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
     let friendEmails = [];
     if (curConversation && curConversation.user_emails) {

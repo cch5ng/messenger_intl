@@ -72,7 +72,15 @@ router.post("/",
                       newChat.save(function(err, conversation) {
                         if (err) console.error('Conversation could not be created', err);
                         if (conversation) {
-                          res.status(201).json({type: 'success', message: 'A new conversation was created', conversationId: conversation._id.toString(), user_emails: emailsAr, conversation_message: message});
+                          res.status(201).json({
+                            type: 'success', 
+                            message: 'A new conversation was created', 
+                            conversationId: conversation._id.toString(), 
+                            user_emails: emailsAr, 
+                            conversation_message: message,
+                            created_on: conversation.created_on,
+                            updated_on: conversation.updated_on
+                          });
                         } else {
                           res.json({type: 'error', message: 'The conversation could not be created. Please try again.'})
                         }

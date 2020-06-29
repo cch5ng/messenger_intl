@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { useHistory } from "react-router-dom";
+import io from 'socket.io-client';
 import CreateOutlinedIcon from '@material-ui/icons/CreateOutlined';
 
 import {useAuth} from '../../../context/auth-context';
@@ -7,11 +8,19 @@ import {useSocket} from '../../../context/socket-context';
 import ChatSummaryItem from './ChatSummaryItem';
 import './style.css';
 
+let socket;
+
 const ChatSummary = () => {
   let history = useHistory();
   const [conversationList, setConversationList] = useState([]);
   const {user} = useAuth();
-  const {conversationsAr, initConversationsAr} = useSocket();
+  const {conversationsAr, initConversationsAr, addConversation} = useSocket();
+
+  if(socket && user) {
+    socket.on(user.id, (data) => {
+      addConversation(data.conversation);
+    });
+  }
 
   const clickIconHandler = () => {
     history.push('/conversations/new');
@@ -22,6 +31,8 @@ const ChatSummary = () => {
   }
 
   useEffect(() => {
+    socket = io.connect('http://localhost:3001/chat');
+
     let jwtToken = localStorage.getItem('authToken');
     fetch(`http://localhost:3001/conversations/user/${user.email}`, {
       headers: {

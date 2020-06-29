@@ -102,6 +102,10 @@ router.get("/user/:email",
                     return handleError(err);
                 }
                 if (conversations && conversations.length) {
+                  conversations.forEach(convo => {
+                    let shortMessages = [convo.messages[convo.messages.length - 1]];
+                    convo.messages = shortMessages;
+                  })
                   res.json({ type: "success", conversations})
                 } else {
                     res.json({ type: "success", conversations: [], message: "There are no current conversations"})
@@ -122,8 +126,6 @@ router.get("/:conversation_id",
           if (conversation && conversation.messages && conversation.user_emails) {
             res.status(200).json({type: 'success',
               conversation,
-              //messages: conversation.messages,
-              //user_emails: conversation.user_emails,
               message: 'An existing conversation was found.'})
           } else {
             res.json({type: 'error', message: 'That conversation was not found'})

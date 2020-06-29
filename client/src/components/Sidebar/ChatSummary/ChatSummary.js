@@ -18,7 +18,15 @@ const ChatSummary = () => {
 
   if(socket && user) {
     socket.on(user.id, (data) => {
-      addConversation(data.conversation);
+      if (typeof data.conversation.created_on === 'number') {
+        let created_on_date = new Date(data.conversation.created_on);
+        data.conversation.created_on = created_on_date.toISOString();
+      }
+      if (typeof data.conversation.updated_on === 'number') {
+        let updated_on_date = new Date(data.conversation.updated_on);
+        data.conversation.updated_on = updated_on_date.toISOString();
+      }
+      addConversation(data.conversation, data.conversation._id);
     });
   }
 

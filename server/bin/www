@@ -45,8 +45,6 @@ nsp.on('connection', function(socket){
 
   socket.on('message', (data) => {
     if (data.action === 'group conversation init') {
-      console.log('gets to server group conversation init')
-      console.log('group data', data)
       let target_emails = data.user_emails.filter(email => email !== data.from_email);
       if (target_emails.length) {
         let uids = [];
@@ -57,6 +55,8 @@ nsp.on('connection', function(socket){
               conversation.messages = [data.message];
               conversation._id = data.conversationId;
               conversation.user_emails = data.user_emails;
+              conversation.created_on = data.created_on;
+              conversation.updated_on = data.updated_on;
               let convoData = {
                 conversation,
                 action: 'group conversation init'
@@ -67,8 +67,6 @@ nsp.on('connection', function(socket){
             .catch(err => console.error('Could not get friend ids', err)) 
         })          
       }
-      //emit on userId events, the same data
-      //socket.broadcast(userId, data);
     } else if (data.action === 'message') {
       let {conversationId, message, userEmails, friendLanguages} = data;
       let friendLanguageCodes = friendLanguages.map(lang => language_codes[lang]);

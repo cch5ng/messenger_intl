@@ -55,7 +55,7 @@ const ChatSummaryItem = (props) => {
   const classes = useStyles();
   let color = avatarColors[idx % 6];
 
-  let lastMessage = conversation.messages && conversation.messages.length ? conversation.messages[0] : '';
+  let lastMessage = conversation.messages && conversation.messages.length ? conversation.messages[conversation.messages.length - 1] : '';
 
   const filterSelfEmail = (emailAr) => {
     let selfIdx = emailAr.indexOf(user.email);

@@ -33,6 +33,7 @@ function SocketProvider({children}) {
     if (conversationId === curConversation._id) {
       setCurConversation({
         ...curConversation,
+        updated_on: message.created_on,
         messages: curConversation.messages.concat([message])
       })
     }
@@ -42,6 +43,7 @@ function SocketProvider({children}) {
         ...conversationsDict,
         [conversationId]: {
           ...conversationsDict[conversationId],
+          updated_on: message.created_on,
           messages: conversationsDict[conversationId].messages.concat([message])
         }
       })
@@ -50,8 +52,8 @@ function SocketProvider({children}) {
         ...conversationsDict,
         [conversationId]: {
           _id: conversationId,
-          created_on: Date.now(),
-          updated_on: Date.now(),
+          created_on: message.created_on,
+          updated_on: message.created_on,
           messages: [message]
         }
       })

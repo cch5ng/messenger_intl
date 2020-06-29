@@ -71,10 +71,10 @@ const Chat = props => {
     addMessageToConversation({conversationId, message});
   }
 
-  const sendGroupChatInitMessage = ({from_email, message, conversationId, user_emails, action}) => {
-    socket.send({message, conversationId, user_emails, action, from_email});
+  const sendGroupChatInitMessage = ({from_email, message, conversationId, user_emails, action, created_on, updated_on}) => {
+    socket.send({message, conversationId, user_emails, action, from_email, created_on, updated_on});
     let conversation = {messages: [message], _id: conversationId, user_emails,
-      created_on: Date.now(), updated_on: Date.now()};
+      created_on, updated_on};
     addConversation(conversation);
   }
 
@@ -147,17 +147,21 @@ const Chat = props => {
                 setToEmailAddresses('');
                 setCurMessage('');
                 if (json.type === 'success' && json.message === 'A new conversation was created') {
+                  console.log('json conversation', json)
                   let conversation = {
                     _id: json.conversationId, 
                     messages: [json.conversation_message],
                     user_emails: emailsAr,
-                    created_on: Date.now(), updated_on: Date.now()
+                    created_on: json.created_on,
+                    updated_on: json.updated_on
                   }
                   sendGroupChatInitMessage({from_email: userEmail,
                     action: 'group conversation init',
                     message: json.conversation_message,
                     conversationId: json.conversationId,
-                    user_emails: emailsAr
+                    user_emails: emailsAr,
+                    created_on: json.created_on,
+                    updated_on: json.updated_on
                   });
                   addConversation(conversation, json.conversationId);              
                   history.push(`/conversations/${json.conversationId}`);

@@ -56,7 +56,7 @@ nsp.on('connection', function(socket){
               let conversation = {};
               conversation.messages = [data.message];
               conversation._id = data.conversationId;
-              conversation.user_emails = data.user_eails
+              conversation.user_emails = data.user_emails;
               let convoData = {
                 conversation,
                 action: 'group conversation init'

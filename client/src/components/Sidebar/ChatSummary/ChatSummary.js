@@ -14,7 +14,7 @@ const ChatSummary = () => {
   let history = useHistory();
   const [conversationList, setConversationList] = useState([]);
   const {user} = useAuth();
-  const {conversationsAr, initConversationsAr, addConversation} = useSocket();
+  const {conversationsAr, initConversationsAr, addConversation, getColorForConversationId} = useSocket();
 
   if(socket && user) {
     socket.on(user.id, (data) => {
@@ -64,8 +64,10 @@ const ChatSummary = () => {
       <CreateOutlinedIcon onClick={clickIconHandler} />
       <div>
         {conversationsAr.map((convo, idx) => {
+          console.log('convo', convo)
           return (
-            <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} />
+            <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} 
+              color={getColorForConversationId(convo._id)} />
           )
         })}
         {conversationsAr.length === 0 && (

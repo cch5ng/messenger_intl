@@ -64,7 +64,6 @@ const ChatSummary = () => {
       <CreateOutlinedIcon onClick={clickIconHandler} />
       <div>
         {conversationsAr.map((convo, idx) => {
-          console.log('convo', convo)
           return (
             <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} 
               color={getColorForConversationId(convo._id)} />

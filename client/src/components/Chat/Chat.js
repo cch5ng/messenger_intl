@@ -328,7 +328,6 @@ const Chat = props => {
   }
 
   if (chatType === 'existing') {
-    //curConversation = conversationId && Object.keys(conversationsDict).length ? conversationsDict[conversationId] : {};
     curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
     let friendEmails = [];
     if (curConversation && curConversation.user_emails) {

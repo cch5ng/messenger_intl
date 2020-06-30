@@ -13,6 +13,7 @@ import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
 import MessageInput from './MessageInput';
 import {useAuth} from '../../context/auth-context';
+import {useSocket} from '../../context/socket-context';
 import {getEmailAr, isEmailValid} from '../../util/helpers';
 
 const MAX_MESSAGE_LENGTHS = {
@@ -43,34 +44,40 @@ const Chat = props => {
   const {user, emailToLangDict} = useAuth();
   const {language} = user;
   const userEmail = user.email;
+  const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
+    setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, curConversation} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
   const [toEmailAddresses, setToEmailAddresses] = useState('');
   const [toEmailAddressesError, setToEmailAddressesError] = useState('');
   const [curMessage, setCurMessage] = useState('');
-  const [postedMessages, setPostedMessages] = useState([]);
   const [chatUserEmails, setChatUserEmails] = useState([]);
   const [messageInputError, setMessageInputError] = useState('');
   const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
   const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
+  let curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
 
-  //socket listener for incoming messages
-  if (socket && conversationId) {
+  if(socket && conversationId) {
     socket.on(conversationId, (data) => {
-      setPostedMessages(postedMessages.concat([data.message]));
+      addMessageToConversation({conversationId, message: data['message']});
     });
+  }
+
+  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages, action}) => {
+    socket.send({message, conversationId, userEmails, friendLanguages, action});
+    addMessageToConversation({conversationId, message});
+  }
+
+  const sendGroupChatInitMessage = ({from_email, message, conversationId, user_emails, action, created_on, updated_on}) => {
+    socket.send({message, conversationId, user_emails, action, from_email, created_on, updated_on});
+    let conversation = {messages: [message], _id: conversationId, user_emails,
+      created_on, updated_on};
   }
 
   const closeAlertHandler = () => {
     setSubmitGroupConversationError('');
-  }
-
-  const sendChatMessage = ({from_email, message, conversationId, userEmails, friendLanguages}) => {
-    if (socket) {
-      socket.send({message, conversationId, userEmails, friendLanguages});
-    }
   }
 
   const handleLanguageToggle = () => {
@@ -131,12 +138,30 @@ const Chat = props => {
             .then(json => {
               if (json.type === 'error') {
                 //TODO activate snackbar
+                console.log('error on group convo init')
                 setSubmitGroupConversationError(json.message);
               } else if (json.conversationId) {
                 setToEmailAddresses('');
                 setCurMessage('');
-            //5 somehow indicate to contacts that new group conversation is available
-                history.push(`/conversations/${json.conversationId}`);
+                if (json.type === 'success' && json.message === 'A new conversation was created') {
+                    let conversation = {
+                      _id: json.conversationId, 
+                      messages: [json.conversation_message],
+                      user_emails: emailsAr,
+                      created_on: json.created_on,
+                      updated_on: json.updated_on
+                    }
+                    sendGroupChatInitMessage({from_email: userEmail,
+                      action: 'group conversation init',
+                      message: json.conversation_message,
+                      conversationId: json.conversationId,
+                      user_emails: emailsAr,
+                      created_on: json.created_on,
+                      updated_on: json.updated_on
+                    });
+                    addConversation(conversation, json.conversationId);              
+                    history.push(`/conversations/${json.conversationId}`);  
+                  }
               }
             })
             .catch(err => console.error('error with group convo', err))
@@ -158,13 +183,16 @@ const Chat = props => {
         created_on: Date.now(),
         translations: {}
       };
-      sendChatMessage({from_email: user.email,
+      let conversation = getConversationById(conversationId);
+      sendChatMessage({
+        from_email: user.email,
         message,
         conversationId,
-        userEmails: chatUserEmails,
-        friendLanguages: getFriendLanguages()
+        userEmails: conversation.user_emails,
+        friendLanguages: getFriendLanguages(),
+        action: 'message'
       });
-      setPostedMessages(postedMessages.concat([message]));
+      addMessageToConversation({conversationId, message});
       setCurMessage('');
       setMessageInputError('');
     }
@@ -174,8 +202,6 @@ const Chat = props => {
     let friendEmails =  chatType === 'new' ? getEmailAr(toEmailAddresses): getFriendEmail();
     let friendLanguages = [];
     friendEmails.forEach(email => {
-      //TODO handle case where one friend is not a contact
-      //CONSIDER should the case where one friend is not contact be handled the same as where all participants speak the same language?
       if (!emailToLangDict[email]) {
         return [];
       }
@@ -188,8 +214,17 @@ const Chat = props => {
   }
 
   const getFriendEmail = () => {
-    let friend = chatUserEmails.filter(email => email !== user.email);
-    return friend;
+    if (curConversation && curConversation.user_emails) {
+      let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
+      return friendEmails;  
+    } else if (conversationId) {
+      curConversation = getConversationById(conversationId);
+      if (curConversation.user_emails) {
+        let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
+        return friendEmails;  
+      }
+    }
+    return [];
   }
 
   const switchTranslations = isChecked => {
@@ -211,7 +246,6 @@ const Chat = props => {
   }
 
   useEffect(() => {
-    //connect to socket
     socket = io.connect('http://localhost:3001/chat');
     if (conversationId) {
       socket.on('connect', function(){
@@ -221,7 +255,6 @@ const Chat = props => {
   }, [])
 
   useEffect(() => {
-    setPostedMessages([]);
     let jwtToken = localStorage.getItem('authToken');
     if (conversationId) {
       fetch(`http://localhost:3001/conversations/${conversationId}`, {
@@ -233,18 +266,14 @@ const Chat = props => {
       })
         .then(resp => resp.json())
         .then(json => {
-          if (json.messages && json.messages.length) {
-            setPostedMessages(json.messages);
-          }
-          if (json.user_emails && json.user_emails.length) {
-            setChatUserEmails(json.user_emails);
+          if (json && json.type === 'success') {
+            updateCurConversation(json.conversation);
           }
         })
         .catch(err => console.error('Could not find existing conversation.', err))
     }
   }, [conversationId]);
-
-  //TODO handle chatType = 'new', 'existing', 'empty'
+  
   if (chatType === 'new') {
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
@@ -299,17 +328,24 @@ const Chat = props => {
   }
 
   if (chatType === 'existing') {
+    //curConversation = conversationId && Object.keys(conversationsDict).length ? conversationsDict[conversationId] : {};
+    curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
+    let friendEmails = [];
+    if (curConversation && curConversation.user_emails) {
+      friendEmails = curConversation.user_emails.filter(email => email !== userEmail)
+    }
+
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
         <ChatHeader 
           handleLanguageToggle = {handleLanguageToggle}
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
-          friendEmails={getFriendEmail()}
+          friendEmails={friendEmails}
         />
         <MessageDisplay
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
           userEmail={user.email} 
-          messages={postedMessages}
+          messages={curMessages}
         />
         <MessageInput
           userEmail={user}

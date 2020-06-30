@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Conversation = require("../models/conversation");
+const User = require("../models/user");
 
 const saveMessageToConversation = ({message, updated_on, conversationId}) => {
   const id = mongoose.Types.ObjectId(conversationId);
@@ -13,6 +14,19 @@ const saveMessageToConversation = ({message, updated_on, conversationId}) => {
                   if (err) return console.error('Could not save post', err);
                   if (chat) console.log('Conversation was updated');
                 })
+}
+
+const getUidFromEmail = ({email}) => {
+  return User.findOne({email}, '_id', function(err, user) {
+    if (err) return console.error(err);
+    if (!user) {
+      console.error('Could not find user');
+    }
+    if (user) {
+      return user;
+    }
+  });
+
 }
 
 const getUniquePairsFromGroup = (emails) => {
@@ -35,7 +49,6 @@ const buildQueryIsPairFriends = (emails) => {
   let queryAr = [];
   let queryObj1 = {};
   let queryObj2 = {};
-  console.log('emails', emails)
   queryObj1.to_user_email = emails[0];
   queryObj1.from_user_email = emails[1];
   queryAr.push(queryObj1);
@@ -44,8 +57,7 @@ const buildQueryIsPairFriends = (emails) => {
   queryAr.push(queryObj2);
   query['$or'] = queryAr;
   query.approved = true;
-  console.log('query', query)
   return query;
 }
 
-module.exports = {saveMessageToConversation, getUniquePairsFromGroup, buildQueryIsPairFriends};
+module.exports = {saveMessageToConversation, getUniquePairsFromGroup, buildQueryIsPairFriends, getUidFromEmail};

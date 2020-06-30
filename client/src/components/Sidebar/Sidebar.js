@@ -189,18 +189,6 @@ const Sidebar = props => {
             <Pending pending={pendingInvites} classes={classes}/>
           </Fragment>
         )}
-
-        {/* <Contacts 
-          friends={friends}
-          loadPendingInvites = {loadPendingInvites}
-          selected={props.selected}
-          requestContact={props.requestContact}
-          updateContact={updateContact}
-          selectContact={props.selectContact}
-          requests={pendingRequests}
-          pending = {pendingInvites}
-          search = {searchContacts}
-        /> */}
         <Snackbar open = {approveInvite.length !== 0} autoHideDuration={3000} onClose = { closeAlertHandler }>
           <Alert onClose={closeAlertHandler} severity="success">
             {approveInvite} 

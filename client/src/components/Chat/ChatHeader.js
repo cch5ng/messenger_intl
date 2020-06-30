@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, Fragment} from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
@@ -61,7 +61,7 @@ const AntSwitch = withStyles((theme) => ({
 }))(Switch);
 
 const ChatHeader = props => {
-  let friendEmails = props && props.friendEmails ? props.friendEmails : [];
+  let friendEmails = props && props.friendEmails.length ? props.friendEmails : [];
   const classes = useStyles();
 
   let initial = friendEmails && friendEmails.length === 1 ? friendEmails[0][0].toUpperCase() : '';
@@ -88,8 +88,15 @@ const ChatHeader = props => {
   return (
     <div className="chatHeaderContainer">
       <div className="chatHeaderLeft">
-        <Avatar className={classes.orange}>{initial}</Avatar>
-        <Typography variant='h5' className={classes.chatHeaderName}>{email.split('@')[0]}</Typography>
+        {friendEmails.length === 1 && (
+          <Fragment>
+            <Avatar className={classes.orange}>{initial}</Avatar>
+            <Typography variant='h5' className={classes.chatHeaderName}>{friendEmails[0].split('@')[0]}</Typography>
+          </Fragment>
+        )}
+        {friendEmails.length > 1 && (
+          <Typography variant='h5' className={classes.chatHeaderName}>Group Conversation ({friendEmails.length})</Typography>
+        )}
       </div>
       <div className="chatHeaderSpacer" />
       <div className="chatHeaderRight">

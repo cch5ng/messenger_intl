@@ -61,7 +61,6 @@ const Chat = props => {
 
   if(socket && conversationId) {
     socket.on(conversationId, (data) => {
-      console.log('new incoming message', data)
       addMessageToConversation({conversationId, message: data['message']});
     });
   }
@@ -75,7 +74,6 @@ const Chat = props => {
     socket.send({message, conversationId, user_emails, action, from_email, created_on, updated_on});
     let conversation = {messages: [message], _id: conversationId, user_emails,
       created_on, updated_on};
-    addConversation(conversation);
   }
 
   const closeAlertHandler = () => {
@@ -115,7 +113,6 @@ const Chat = props => {
       if (areRecipientsFriends(emailsAr)) {
         emailsAr.push(userEmail);
         emailsAr = emailsAr.filter(em => isEmailValid(em));
-        console.log('emailsAr', emailsAr)
         let message = {
           author_id: user.id,
           author_email: user.email,
@@ -147,25 +144,24 @@ const Chat = props => {
                 setToEmailAddresses('');
                 setCurMessage('');
                 if (json.type === 'success' && json.message === 'A new conversation was created') {
-                  console.log('json conversation', json)
-                  let conversation = {
-                    _id: json.conversationId, 
-                    messages: [json.conversation_message],
-                    user_emails: emailsAr,
-                    created_on: json.created_on,
-                    updated_on: json.updated_on
+                    let conversation = {
+                      _id: json.conversationId, 
+                      messages: [json.conversation_message],
+                      user_emails: emailsAr,
+                      created_on: json.created_on,
+                      updated_on: json.updated_on
+                    }
+                    sendGroupChatInitMessage({from_email: userEmail,
+                      action: 'group conversation init',
+                      message: json.conversation_message,
+                      conversationId: json.conversationId,
+                      user_emails: emailsAr,
+                      created_on: json.created_on,
+                      updated_on: json.updated_on
+                    });
+                    addConversation(conversation, json.conversationId);              
+                    history.push(`/conversations/${json.conversationId}`);  
                   }
-                  sendGroupChatInitMessage({from_email: userEmail,
-                    action: 'group conversation init',
-                    message: json.conversation_message,
-                    conversationId: json.conversationId,
-                    user_emails: emailsAr,
-                    created_on: json.created_on,
-                    updated_on: json.updated_on
-                  });
-                  addConversation(conversation, json.conversationId);              
-                  history.push(`/conversations/${json.conversationId}`);
-                }
               }
             })
             .catch(err => console.error('error with group convo', err))

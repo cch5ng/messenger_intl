@@ -45,7 +45,8 @@ const Chat = props => {
   const {language} = user;
   const userEmail = user.email;
   const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
-    setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, curConversation} = useSocket();
+    setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, 
+    getColorForConversationId, curConversation} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
@@ -340,6 +341,7 @@ const Chat = props => {
           handleLanguageToggle = {handleLanguageToggle}
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
           friendEmails={friendEmails}
+          color={getColorForConversationId(conversationId)}
         />
         <MessageDisplay
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}

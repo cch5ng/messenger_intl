@@ -93,13 +93,11 @@ function SocketProvider({children}) {
   }
 
   const addConversation = (conversation, conversationId) => {
-    conversation.created_on = Date.now();
-    conversation.updated_on = Date.now();
-    if (!conversationsDict[conversationId]) {
+    if (conversationId) {
       setConversationsDict({
         ...conversationsDict,
         [conversationId]: conversation
-      })
+      });  
     }
   }
 
@@ -123,7 +121,9 @@ function SocketProvider({children}) {
       })
       let orderedAr = [];
       convosAr.sort((a, b) => {
-        return a.updated_on - b.updated_on;
+        let date_a = Date.parse(a.updated_on);
+        let date_b = Date.parse(b.updated_on);
+        return date_b - date_a;
       });
       setConversationsAr(convosAr);      
     }

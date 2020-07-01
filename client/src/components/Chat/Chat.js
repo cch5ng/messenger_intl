@@ -247,12 +247,12 @@ const Chat = props => {
   }
 
   useEffect(() => {
-    socket = io.connect('http://localhost:3001/chat');
     if (conversationId) {
       socket.on('connect', function(){
         socket.emit('room', conversationId);
       });
     }
+    socket = io.connect('http://localhost:3001/chat');
   }, [])
 
   useEffect(() => {

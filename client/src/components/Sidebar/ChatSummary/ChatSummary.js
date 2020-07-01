@@ -14,7 +14,32 @@ const ChatSummary = () => {
   let history = useHistory();
   const [conversationList, setConversationList] = useState([]);
   const {user} = useAuth();
-  const {conversationsAr, initConversationsAr, addConversation, getColorForConversationId} = useSocket();
+  const {conversationsAr, initConversationsAr, addConversation, getColorForConversationId,
+    addFriendOnline, removeFriendOnline, friendsDict} = useSocket();
+
+  console.log('friendsDict', friendsDict);
+
+  socket = io.connect(`http://localhost:3001/chat`);
+
+  if(socket) {
+    socket.on('connect', () => {
+      socket.send({user_email: user.email, action: 'user connected'})
+    })
+    socket.on('disconnect', () => {
+      socket.send({user_email: user.email, action: 'user disconnected'})
+    })
+    socket.on('friend connected', (data) => {
+      console.log('connected data', data)
+      if (data.email !== user.email) {
+        addFriendOnline(data.email);
+      }
+    })
+    socket.on('friend disconnected', (data) => {
+      if (data.email !== user.email) {
+        removeFriendOnline(data.email)
+      }
+    })
+  }
 
   if(socket && user) {
     socket.on(user.id, (data) => {
@@ -39,8 +64,6 @@ const ChatSummary = () => {
   }
 
   useEffect(() => {
-    socket = io.connect('http://localhost:3001/chat');
-
     let jwtToken = localStorage.getItem('authToken');
     fetch(`http://localhost:3001/conversations/user/${user.email}`, {
       headers: {
@@ -51,7 +74,8 @@ const ChatSummary = () => {
       .then(resp => resp.json())
       .then(json => {
         if (json && json.conversations.length) {
-          initConversationsAr(json.conversations);
+          console.log('calls initConversationsAr')
+          initConversationsAr(json.conversations, user.email);
           let conversationId = json.conversations[0]._id.toString();
           history.push(`/conversations/${conversationId}`);
         }

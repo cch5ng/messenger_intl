@@ -18,11 +18,28 @@ function SocketProvider({children}) {
   const [curConversationId, setCurConversationId] = useState(null);
   const [curConversation, setCurConversation] = useState({});
   const [conversationsColorsDict, setConversationsColorsDict] = useState({});
+  const [friendsDict, setFriendsDict] = useState({});
 
-  const initConversationsAr = (conversations) => {
+  const initConversationsAr = (conversations, userEmail) => {
     if (conversations.length) {
       setConversationsAr(conversations);
       initConversationsDict(conversations);  
+      conversations.forEach(convo => {
+        if (convo.user_emails.length) {
+          let newFriendsDict = {};
+          convo.user_emails.forEach(email => {
+            if (email !== userEmail && !friendsDict[email]) {
+              newFriendsDict[email] = {online: false};
+            }
+          })
+          console.log('friendsDict', friendsDict)
+          console.log('newFriendsDict', newFriendsDict)
+          setFriendsDict({
+            ...friendsDict,
+            ...newFriendsDict
+          });
+        }  
+      })
     }
   }
 
@@ -115,6 +132,16 @@ function SocketProvider({children}) {
         ...conversationsDict,
         [conversationId]: conversation
       });
+      let newFriendsDict = {};
+      conversation.user_emails.forEach(email => {
+        if (!friendsDict[email]) {
+          newFriendsDict[email] = {online: false};
+        }
+      })
+      setFriendsDict({
+        ...friendsDict,
+        ...newFriendsDict
+      });
     }
   }
 
@@ -132,6 +159,24 @@ function SocketProvider({children}) {
 
   const getColorForConversationId = (conversationId) => {
     return conversationsColorsDict[conversationId] ? conversationsColorsDict[conversationId] : null;
+  }
+
+  const addFriendOnline = (email) => {
+    if (friendsDict[email] && !friendsDict[email]['online']) {
+      setFriendsDict({
+        ...friendsDict,
+        [email]: {online: true}
+      })
+    }
+  }
+
+  const removeFriendOnline = (email) => {
+    if (friendsDict[email] && friendsDict[email]['online']) {
+      setFriendsDict({
+        ...friendsDict,
+        [email]: {online: false}
+      })
+    }
   }
 
   useEffect(() => {
@@ -153,7 +198,6 @@ function SocketProvider({children}) {
           let id = convo._id;
           colorsDict[id] = avatarColors[idx % avatarColors.length];
         })
-        console.log('colorsDict', colorsDict)
         setConversationsColorsDict(colorsDict);
       }  
     }
@@ -163,6 +207,7 @@ function SocketProvider({children}) {
     conversationsAr,
     conversationsDict,
     curConversation,
+    friendsDict,
     addMessageToConversation, 
     initConversationsAr,
     initConversationsDict,
@@ -173,7 +218,9 @@ function SocketProvider({children}) {
     getConversationById,
     setAllConversationMessages,
     updateCurConversation,
-    getColorForConversationId
+    getColorForConversationId,
+    addFriendOnline,
+    removeFriendOnline
   };
 
   return (

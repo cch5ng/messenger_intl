@@ -24,9 +24,9 @@ function SocketProvider({children}) {
     if (conversations.length) {
       setConversationsAr(conversations);
       initConversationsDict(conversations);  
+      let newFriendsDict = {};
       conversations.forEach(convo => {
         if (convo.user_emails.length) {
-          let newFriendsDict = {};
           convo.user_emails.forEach(email => {
             if (email !== userEmail && !friendsDict[email]) {
               newFriendsDict[email] = {online: false};

@@ -189,7 +189,7 @@ const Chat = props => {
         from_email: user.email,
         message,
         conversationId,
-        userEmails: conversation.user_emails,
+        userEmails: curConversation.user_emails,
         friendLanguages: getFriendLanguages(),
         action: 'message'
       });

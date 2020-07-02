@@ -50,11 +50,9 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ChatSummaryItem = (props) => {
-  const {conversation, idx, handleChatClick} = props;
+  const {conversation, idx, handleChatClick, color} = props;
   const {user} = useAuth();
   const classes = useStyles();
-  let color = avatarColors[idx % 6];
-
   let lastMessage = conversation.messages && conversation.messages.length ? conversation.messages[conversation.messages.length - 1] : '';
 
   const filterSelfEmail = (emailAr) => {
@@ -85,7 +83,12 @@ const ChatSummaryItem = (props) => {
   return (
     <div className="chat_summary_item_container"
       onClick={(ev) => handleChatClick(conversation._id.toString())}>
-      <Avatar className={classes[color]}>{getFriendInitial()}</Avatar>
+      {!color && (
+        <Avatar>{getFriendInitial()}</Avatar>
+      )}
+      {color && (
+        <Avatar className={classes[color]}>{getFriendInitial()}</Avatar>
+      )}
       <div className="chat_summary_detail_container">
         <div className="friends_name_text">
           {filterSelfEmail(conversation.user_emails).join(', ')}

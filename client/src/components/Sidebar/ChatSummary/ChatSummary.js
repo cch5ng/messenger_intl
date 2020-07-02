@@ -14,7 +14,7 @@ const ChatSummary = () => {
   let history = useHistory();
   const [conversationList, setConversationList] = useState([]);
   const {user} = useAuth();
-  const {conversationsAr, initConversationsAr, addConversation} = useSocket();
+  const {conversationsAr, initConversationsAr, addConversation, getColorForConversationId} = useSocket();
 
   if(socket && user) {
     socket.on(user.id, (data) => {
@@ -39,7 +39,7 @@ const ChatSummary = () => {
   }
 
   useEffect(() => {
-    socket = io.connect('http://localhost:3001/chat');
+    socket = io.connect(`http://localhost:3001/chat`);
 
     let jwtToken = localStorage.getItem('authToken');
     fetch(`http://localhost:3001/conversations/user/${user.email}`, {
@@ -51,7 +51,8 @@ const ChatSummary = () => {
       .then(resp => resp.json())
       .then(json => {
         if (json && json.conversations.length) {
-          initConversationsAr(json.conversations);
+          console.log('calls initConversationsAr')
+          initConversationsAr(json.conversations, user.email);
           let conversationId = json.conversations[0]._id.toString();
           history.push(`/conversations/${conversationId}`);
         }
@@ -65,7 +66,8 @@ const ChatSummary = () => {
       <div>
         {conversationsAr.map((convo, idx) => {
           return (
-            <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} />
+            <ChatSummaryItem conversation={convo} idx={idx} handleChatClick={handleChatClick} 
+              color={getColorForConversationId(convo._id)} />
           )
         })}
         {conversationsAr.length === 0 && (

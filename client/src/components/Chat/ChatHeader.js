@@ -1,10 +1,16 @@
-import React, {useState} from 'react';
+import React, {useState, Fragment} from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Switch from '@material-ui/core/Switch';
 import { deepOrange, deepPurple } from '@material-ui/core/colors';
+import pink from '@material-ui/core/colors/pink';
+import indigo from '@material-ui/core/colors/indigo';
+import amber from '@material-ui/core/colors/amber';
+import teal from '@material-ui/core/colors/teal';
+import red from '@material-ui/core/colors/red';
+import green from '@material-ui/core/colors/green';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,6 +26,30 @@ const useStyles = makeStyles((theme) => ({
   purple: {
     color: theme.palette.getContrastText(deepPurple[500]),
     backgroundColor: deepPurple[500],
+  },
+  pink: {
+    color: theme.palette.getContrastText(deepOrange[500]),
+    backgroundColor: pink[500],
+  },
+  indigo: {
+    color: theme.palette.getContrastText(deepPurple[500]),
+    backgroundColor: indigo[500],
+  },
+  amber: {
+    color: theme.palette.getContrastText(deepOrange[500]),
+    backgroundColor: amber[500],
+  },
+  teal: {
+    color: theme.palette.getContrastText(deepPurple[500]),
+    backgroundColor: teal[500],
+  },
+  red: {
+    color: theme.palette.getContrastText(deepOrange[500]),
+    backgroundColor: red[500],
+  },
+  green: {
+    color: theme.palette.getContrastText(deepPurple[500]),
+    backgroundColor: green[500],
   },
   chatHeaderName: {
     padding: '0 5px',
@@ -61,7 +91,8 @@ const AntSwitch = withStyles((theme) => ({
 }))(Switch);
 
 const ChatHeader = props => {
-  let friendEmails = props && props.friendEmails ? props.friendEmails : [];
+  let friendEmails = props && props.friendEmails.length ? props.friendEmails : [];
+  let {color} = props;
   const classes = useStyles();
 
   let initial = friendEmails && friendEmails.length === 1 ? friendEmails[0][0].toUpperCase() : '';
@@ -88,8 +119,20 @@ const ChatHeader = props => {
   return (
     <div className="chatHeaderContainer">
       <div className="chatHeaderLeft">
-        <Avatar className={classes.orange}>{initial}</Avatar>
-        <Typography variant='h5' className={classes.chatHeaderName}>{email.split('@')[0]}</Typography>
+        {friendEmails.length === 1 && (
+          <Fragment>
+            {color && (
+              <Avatar className={classes[color]}>{initial}</Avatar>
+            )}
+            {!color && (
+              <Avatar>{initial}</Avatar>
+            )}
+            <Typography variant='h5' className={classes.chatHeaderName}>{friendEmails[0].split('@')[0]}</Typography>
+          </Fragment>
+        )}
+        {friendEmails.length > 1 && (
+          <Typography variant='h5' className={classes.chatHeaderName}>Group Conversation ({friendEmails.length})</Typography>
+        )}
       </div>
       <div className="chatHeaderSpacer" />
       <div className="chatHeaderRight">

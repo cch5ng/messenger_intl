@@ -45,7 +45,8 @@ const Chat = props => {
   const {language} = user;
   const userEmail = user.email;
   const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
-    setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, curConversation} = useSocket();
+    setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, 
+    getColorForConversationId, curConversation} = useSocket();
   const classes = useStyles();
   let history = useHistory();
 
@@ -188,7 +189,7 @@ const Chat = props => {
         from_email: user.email,
         message,
         conversationId,
-        userEmails: conversation.user_emails,
+        userEmails: curConversation.user_emails,
         friendLanguages: getFriendLanguages(),
         action: 'message'
       });
@@ -246,12 +247,12 @@ const Chat = props => {
   }
 
   useEffect(() => {
-    socket = io.connect('http://localhost:3001/chat');
     if (conversationId) {
       socket.on('connect', function(){
         socket.emit('room', conversationId);
       });
     }
+    socket = io.connect('http://localhost:3001/chat');
   }, [])
 
   useEffect(() => {
@@ -328,7 +329,6 @@ const Chat = props => {
   }
 
   if (chatType === 'existing') {
-    //curConversation = conversationId && Object.keys(conversationsDict).length ? conversationsDict[conversationId] : {};
     curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
     let friendEmails = [];
     if (curConversation && curConversation.user_emails) {
@@ -341,6 +341,7 @@ const Chat = props => {
           handleLanguageToggle = {handleLanguageToggle}
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
           friendEmails={friendEmails}
+          color={getColorForConversationId(conversationId)}
         />
         <MessageDisplay
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}

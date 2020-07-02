@@ -1,6 +1,15 @@
 import React, {useEffect, useState} from 'react';
 //import io from 'socket.io-client';
 
+const avatarColors = [
+  'pink',
+  'indigo',
+  'amber',
+  'teal',
+  'red',
+  'green'
+];
+
 const SocketContext = React.createContext([{}, () => {}])
 
 function SocketProvider({children}) {
@@ -10,7 +19,7 @@ function SocketProvider({children}) {
   const [curConversation, setCurConversation] = useState({});
   const [conversationsColorsDict, setConversationsColorsDict] = useState({});
 
-  const initConversationsAr = (conversations) => {
+  const initConversationsAr = (conversations, userEmail) => {
     if (conversations.length) {
       setConversationsAr(conversations);
       initConversationsDict(conversations);  
@@ -94,10 +103,18 @@ function SocketProvider({children}) {
 
   const addConversation = (conversation, conversationId) => {
     if (conversationId) {
+      if (!conversationsColorsDict[conversationId]) {
+        let curConversationsLen = Object.keys(conversationsDict).length;
+        let newColor = avatarColors[curConversationsLen % avatarColors.length];
+        setConversationsColorsDict({
+          ...conversationsColorsDict,
+          [conversationId]: newColor
+        });
+      }
       setConversationsDict({
         ...conversationsDict,
         [conversationId]: conversation
-      });  
+      });
     }
   }
 
@@ -113,6 +130,10 @@ function SocketProvider({children}) {
     })
   }
 
+  const getColorForConversationId = (conversationId) => {
+    return conversationsColorsDict[conversationId] ? conversationsColorsDict[conversationId] : null;
+  }
+
   useEffect(() => {
     if (Object.keys(conversationsDict).length) {
       let convosAr = [];
@@ -125,7 +146,15 @@ function SocketProvider({children}) {
         let date_b = Date.parse(b.updated_on);
         return date_b - date_a;
       });
-      setConversationsAr(convosAr);      
+      setConversationsAr(convosAr);
+      let colorsDict = {};
+      if (Object.keys(conversationsColorsDict).length === 0) {
+        convosAr.forEach((convo, idx) => {
+          let id = convo._id;
+          colorsDict[id] = avatarColors[idx % avatarColors.length];
+        })
+        setConversationsColorsDict(colorsDict);
+      }  
     }
   }, [conversationsDict]);
 
@@ -142,7 +171,8 @@ function SocketProvider({children}) {
     addConversation,
     getConversationById,
     setAllConversationMessages,
-    updateCurConversation
+    updateCurConversation,
+    getColorForConversationId  
   };
 
   return (

@@ -39,13 +39,6 @@ const nsp = io.of('/chat');
 //io.on('connection', function(socket){
 nsp.on('connection', function(socket){
   console.log('someone connected on /chat');
-  //console.log('socket', socket)
-  console.log('socket.handshake', socket.handshake)
-  let email;
-  if (socket.handshake.query.email) {
-    email = socket.handshake.query.email;
-    console.log('email', email);
-  }
 
   socket.on('room', (data) => {
     console.log('room data', data);
@@ -96,12 +89,6 @@ nsp.on('connection', function(socket){
             console.error('Translation API error', err);
           })
       })  
-    } else if (data.action === 'user connected') {
-      console.log('data', data)
-      socket.broadcast.emit('friend connected', data)
-    } else if (data.action === 'user disconnected') {
-      console.log('data', data)
-      socket.broadcast.emit('friend disconnected', data)
     }
   });
 

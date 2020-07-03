@@ -21,7 +21,7 @@ const appStyle = {
   backgroundColor: 'rgba(0, 0, 0, 0.04)'
 };
 
-const drawerWidth = 480;
+const drawerWidth = '100%';
 
 const useStyles = makeStyles((theme) => ({
   root: {

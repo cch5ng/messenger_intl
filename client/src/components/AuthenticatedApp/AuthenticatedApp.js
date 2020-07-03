@@ -21,8 +21,7 @@ const appStyle = {
   backgroundColor: 'rgba(0, 0, 0, 0.04)'
 };
 
-//240
-const drawerWidth = 575;
+const drawerWidth = 480;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,8 +62,6 @@ const AppContainer = (props) => {
   const handleMobileMenuToggle = () => setMobileMenuOpen(!mobileMenuOpen);
   const drawer = (<Sidebar/>);
 
-  //smDown
-  //mdUp
   return (
     <SocketProvider>
       <Grid container 

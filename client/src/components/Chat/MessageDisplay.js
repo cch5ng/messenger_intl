@@ -6,7 +6,7 @@ import {useAuth} from '../../context/auth-context';
 
 const MessageDisplay = props => {
   const {user} = useAuth();
-  const {messages} = props;
+  const {messages, color} = props;
   const [messagesEnd, setMessagesEnd] = useState(null);
 
   const scrollToBottom = () => {
@@ -27,6 +27,7 @@ const MessageDisplay = props => {
       userEmail={msg.author_email}
       key={`${idx}-${msg}`}
       isAuthorUser={msg.author_email === user.email}
+      color={color}
     />
   ))
 

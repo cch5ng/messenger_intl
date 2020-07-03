@@ -40,14 +40,12 @@ const useStyles = makeStyles(() => ({
 const Sidebar = props => {
   const email = localStorage.getItem('email');
   const authToken = localStorage.getItem('authToken');
-  const [friends, setFriends] = useState([]);
   const [approveInvite, setApproveInvite] = useState('');
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pendingInvites, setPendingInvites] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [value, setValue] = useState(0);
   const classes = useStyles();
-  const {updateEmailToLangDict} = useAuth();
 
   //tab click handler
   const handleChange = (event, newValue) => {
@@ -68,7 +66,7 @@ const Sidebar = props => {
                                       {  'from_email': fromEmail }, {headers: { Authorization: authToken}});
       if(approvedRes.data.approved && approvedRes.data.from_user_email === fromEmail){
         setApproveInvite(`${fromEmail} is now your friend`);
-        loadFriends();
+        //loadFriends();
       }
     }
     else if(action === 'reject') {
@@ -104,33 +102,7 @@ const Sidebar = props => {
         setPendingInvites(['No pending invitations']);
       }
     }
-  }
-
-  const loadFriends = async(q='') => {
-    if(email){
-      const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, {headers: { Authorization: authToken}});
-      if(res.data.contacts.length !== 0){
-        let {contacts} = res.data;
-        let contactEmails = Object.keys(contacts);
-        setFriends(contactEmails);
-        updateEmailToLangDict(contacts);
-      }
-      else {
-        setFriends(['You dont have any contacts. Send invites to initiate a conversation']);
-        updateEmailToLangDict({});
-      }
-    }
-  }
-
-  const searchContacts = async(e) => {
-    setSearchQuery(e.target.value);
-    loadFriends(searchQuery);
-  }
- 
-  useEffect(() => {
-    loadFriends(searchQuery);
-  },[friends.length, searchQuery]);
- 
+  } 
 
   useEffect(() => {
     loadPendingRequests();
@@ -165,12 +137,10 @@ const Sidebar = props => {
         )}
         {value === 1 && (
           <Friends
-            friends={friends}
             selected={props.selected} 
             requestContact={props.requestContact}
             selectContact={props.selectContact}
             loadPendingInvites = {loadPendingInvites}
-            search = {searchContacts}
           />
         
         )}

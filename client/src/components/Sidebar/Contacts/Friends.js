@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
+import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import TextField from '@material-ui/core/TextField';
@@ -19,6 +20,10 @@ const useStyles = makeStyles({
     },
     marginLeft: '2rem'
   },
+  emptyContactList: {
+    marginLeft: '2rem',
+    height: 75,
+  },
   searchBar : {
     width: '85%',
     marginLeft: '1rem'
@@ -29,7 +34,10 @@ const useStyles = makeStyles({
 });
 
 const Friends = props => {
-  const {user} = useAuth();
+  const [friends, setFriends] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const {user, updateEmailToLangDict} = useAuth();
+  let email = user.email;
   let history = useHistory();
   const classes = useStyles();
 
@@ -59,7 +67,38 @@ const Friends = props => {
     }
   }
 
-  const entries = () => props.friends.map(curr => (
+  const loadFriends = async(q='') => {
+    if(email){
+      let authToken = localStorage.getItem('authToken');
+      const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, {headers: { Authorization: authToken}});
+      if(res.data.contacts.length !== 0){
+        let {contacts} = res.data;
+        let contactEmails = Object.keys(contacts);
+        setFriends(contactEmails);
+        updateEmailToLangDict(contacts);
+      }
+      else {
+        //'You dont have any contacts. Send invites to initiate a conversation'
+        setFriends([]);
+        updateEmailToLangDict({});
+      }
+    }
+  }
+
+  const searchContacts = async(e) => {
+    setSearchQuery(e.target.value);
+    loadFriends(searchQuery);
+  }
+
+  useEffect(() => {
+    loadFriends();
+  }, [])
+
+  // useEffect(() => {
+  //   loadFriends(searchQuery);
+  // },[searchQuery]);
+
+  const entries = () => friends.map(curr => (
     <Grid
       item
       container
@@ -95,16 +134,26 @@ const Friends = props => {
       direction='column'
       spacing={2}
     >
-      <Grid item>
-        <TextField id="filled-search" className= {classes.searchBar} placeholder="Search" type="search" variant="filled" margin="normal" onChange={props.search} border={0} InputProps={{ 
+      {/* <Grid item>
+        <TextField id="filled-search" className= {classes.searchBar} placeholder="Search" type="search" variant="filled" margin="normal" onChange={searchContacts} border={0} InputProps={{ 
           startAdornment: (<InputAdornment position="start"><SearchIcon/></InputAdornment>),
           disableUnderline: true
         }}/>
-      </Grid>
+      </Grid> */}
       <Grid item >
         <InvitationDialog loadPendingInvites={props.loadPendingInvites} />
       </Grid>
-      {entries(props.selected, props.selectContact)}
+      {friends.length > 0 && (entries())}
+      {friends.length === 0 && (    
+        <Grid
+          item
+          container
+          spacing={2}
+          className={classes.emptyContactList}
+        >
+          <Typography variant='p1'>You dont have any contacts. Send invites to initiate a conversation</Typography>
+        </Grid>
+      )}
     </Grid>
   );
 }

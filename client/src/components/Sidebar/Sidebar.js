@@ -2,7 +2,6 @@ import React, { useState, useEffect, Fragment } from 'react';
 import Contacts from './Contacts/Contacts';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -17,19 +16,12 @@ import Friends from './Contacts/Friends';
 import Requests from './Contacts/Requests';
 import Pending from './Contacts/Pending';
 import {useAuth} from '../../context/auth-context';
-//import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
-  root: {
-    flexGrow: 1,
-    maxWidth: 500,
-  },
   sidebarContainer : {
-    //'&:hover': {
-      maxHeight: '85vh',
-      overflowY: 'auto',
-      overflowX: 'hidden'
-    //}
+    maxHeight: '85vh',
+    overflowY: 'auto',
+    overflowX: 'hidden'
   },
   invitationHeadings: {
     marginBottom: 0,
@@ -39,6 +31,10 @@ const useStyles = makeStyles(() => ({
     fontSize: '1rem',
     fontWeight: 'bold'
   },
+  tabsBackground: {
+    flexGrow: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0)'
+  }
 }));
 
 const Sidebar = props => {
@@ -149,7 +145,7 @@ const Sidebar = props => {
       <SidebarHeader />
 
       <div className={classes.sidebarContainer}>
-        <Paper square className={classes.root}>
+        <div className={classes.tabsBackground}>
           <Tabs
             value={value}
             onChange={handleChange}
@@ -163,8 +159,7 @@ const Sidebar = props => {
             <Tab icon={<PersonPinIcon />} label="FRIENDS" />
             <Tab icon={<MailOutlineIcon />} label="INVITES" />
           </Tabs>
-        </Paper>
-
+        </div>
         {value === 0 && (
           <ChatSummary />
         )}

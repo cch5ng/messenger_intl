@@ -21,7 +21,7 @@ const appStyle = {
   backgroundColor: 'rgba(0, 0, 0, 0.04)'
 };
 
-const drawerWidth = 240;
+const drawerWidth = '100%';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       display: 'none',
     },
   },
@@ -67,7 +67,7 @@ const AppContainer = (props) => {
       <Grid container 
       spacing={0} direction='row' 
       className={classes.root}>
-        <Hidden smDown>
+        <Hidden xsDown>
           <Grid item xs={12} sm={5} style={appStyle}>
               <Sidebar/>
           </Grid>
@@ -82,7 +82,7 @@ const AppContainer = (props) => {
             >
               <MenuIcon />
           </IconButton>
-        <Hidden mdUp>
+        <Hidden smUp>
           <Drawer variant='temporary'
                   anchor={theme.direction === 'rtl' ? 'right' : 'left'}
                   open={mobileMenuOpen}

@@ -334,6 +334,7 @@ const Chat = props => {
     if (curConversation && curConversation.user_emails) {
       friendEmails = curConversation.user_emails.filter(email => email !== userEmail)
     }
+    let color = getColorForConversationId(conversationId);
 
     return (
       <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
@@ -341,12 +342,13 @@ const Chat = props => {
           handleLanguageToggle = {handleLanguageToggle}
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
           friendEmails={friendEmails}
-          color={getColorForConversationId(conversationId)}
+          color={color}
         />
         <MessageDisplay
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
           userEmail={user.email} 
           messages={curMessages}
+          color={color}
         />
         <MessageInput
           userEmail={user}

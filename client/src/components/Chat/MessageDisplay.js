@@ -33,7 +33,8 @@ const MessageDisplay = props => {
   return (
     <div
       style={{backgroundColor: '#fff', padding: '18px', 
-      overflow: 'scroll', flexGrow: '1'}}>
+      flexGrow: '1', overflowY: 'auto', 
+    }}>
       {messageList}
       <div style={{ float:"left", clear: "both" }}
         ref={(el) => { setMessagesEnd(el) }}>

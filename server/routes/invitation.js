@@ -7,11 +7,11 @@ const User = require("../models/user");
 const {sendEmail, getSuccessCount} = require("../util/sendgrid_helpers")
 const router = express.Router();
 const invitationRejectApproveHelper = require('../controllers/invitationRejectApproveHelper');
-const {getEmailSendSuccessMessage, getInviteSendSuccessMessage, getInviteNotSentMessage, getEmailSendMixedMessage} = require("../util");
+const {getInviteSendSuccessMessage, getInviteNotSentMessage, getEmailSendMixedMessage} = require("../util");
 
 //send an invite to user
 router.post("/user/:fromEmail",
-    //passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     function(req, res, next) {
         const {toEmailAr, referralId} = req.body;
         const {fromEmail} = req.params;
@@ -180,7 +180,7 @@ router.post("/user/:fromEmail",
                             .then(resp => {
                               if (getSuccessCount(resp) === nonCurUserEmails.length) {
                                 res.json({ type: "success",
-                                  message: getEmailSendSuccessMessage(nonCurUserEmails)});
+                                  message: getInviteSendSuccessMessage(nonCurUserEmails)});
                               }
                             })
                             .catch(err => {

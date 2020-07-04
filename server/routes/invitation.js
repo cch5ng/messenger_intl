@@ -9,6 +9,36 @@ const router = express.Router();
 const invitationRejectApproveHelper = require('../controllers/invitationRejectApproveHelper');
 const {getInviteSendSuccessMessage, getInviteNotSentMessage, getEmailSendMixedMessage} = require("../util");
 
+
+//////
+//helper
+
+const handleEmailInvitations = ({fromEmail, toEmailAr, referralId, inviteRecipients, dupeInviteRecipients}) => {
+  console.log('gets here')
+  if (!inviteRecipients) {
+  inviteRecipients = []
+  }
+  if (!dupeInviteRecipiets) {
+  dupeInviteRecipients = []
+  }
+  sendEmail({from_email: fromEmail, 
+            to_email_ar: toEmailAr, 
+            referral_id: referralId})
+    .then(resp => {
+      console.log('sendgrid resp', resp)
+      if (getSuccessCount(resp) === nonCurUserEmails.length) {
+        inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
+        res.json({ type: "success", 
+          message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
+        });
+      }
+    })
+    .catch(err => {
+        console.error('Sendgrid email invitation sending error:', err)
+    })
+}
+
+
 //send an invite to user
 router.post("/user/:fromEmail",
     passport.authenticate('jwt', { session: false }),
@@ -85,6 +115,11 @@ router.post("/user/:fromEmail",
                                   if (err) return console.error(err);
                                   inviteRecipients = inviteRecipients.concat(nonDupeInviteRecipients);
                                   if (nonCurUserEmails.length) {
+                                    // handleEmailInvitations({fromEmail, 
+                                    //   toEmailAr: nonCurUserEmails, 
+                                    //   referralId, 
+                                    //   inviteRecipients: inviteRecipients.concat(nonCurUserEmails), 
+                                    //   dupeInviteRecipients}) 
                                     sendEmail({from_email: fromEmail, 
                                                 to_email_ar: nonCurUserEmails, 
                                                 referral_id: referralId})
@@ -101,24 +136,30 @@ router.post("/user/:fromEmail",
                                       })
                                   }
                                 })
-                              } else {
+                              } else if (nonCurUserEmails.length){
                                 //all registered invite recipients already received invites earlier
-                                if (nonCurUserEmails.length) {
-                                  sendEmail({from_email: fromEmail, 
-                                              to_email_ar: nonCurUserEmails, 
-                                              referral_id: referralId})
-                                    .then(resp => {
-                                      if (getSuccessCount(resp) === nonCurUserEmails.length) {
-                                        inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
-                                        res.json({ type: "success", 
-                                          message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
-                                        });
-                                      }
-                                    })
-                                    .catch(err => {
-                                        console.error('sendgrid email err', err)
-                                    })
-                                }
+                                // handleEmailInvitations({fromEmail, 
+                                //   toEmailAr: nonCurUserEmails, 
+                                //   referralId, 
+                                //   inviteRecipients: inviteRecipients.concat(nonCurUserEmails), 
+                                //   dupeInviteRecipients})
+
+                                console.log('gets to line 146')
+
+                                sendEmail({from_email: fromEmail, 
+                                            to_email_ar: nonCurUserEmails, 
+                                            referral_id: referralId})
+                                  .then(resp => {
+                                    if (getSuccessCount(resp) === nonCurUserEmails.length) {
+                                      inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
+                                      res.json({ type: "success", 
+                                        message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
+                                      });
+                                    }
+                                  })
+                                  .catch(err => {
+                                      console.error('sendgrid email err', err)
+                                  })
                               }
                             }
                           })
@@ -174,6 +215,14 @@ router.post("/user/:fromEmail",
                             }
                           })
                         } else if (nonCurUserEmails.length) {
+                          console.log('gets to line 217')
+                          // handleEmailInvitations({fromEmail, 
+                          //   toEmailAr: nonCurUserEmails, 
+                          //   referralId, 
+                          //   inviteRecipients: [], 
+                          //   dupeInviteRecipients: []}) 
+
+
                           sendEmail({from_email: fromEmail,
                                     to_email_ar: nonCurUserEmails, 
                                     referral_id: referralId})
@@ -184,7 +233,7 @@ router.post("/user/:fromEmail",
                               }
                             })
                             .catch(err => {
-                              console.error('sendgrid email err', err)
+                              console.error('Sendgrid email invitation sending error:', err)
                             })
                         }
                     }
@@ -295,4 +344,5 @@ router.put("/user/:to_email/approve", (req, res) => {
 router.put("/user/:to_email/reject", (req, res) => {
   invitationRejectApproveHelper(req,res,'rejected');
 });
+
 module.exports = router;

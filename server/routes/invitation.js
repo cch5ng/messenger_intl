@@ -13,30 +13,30 @@ const {getInviteSendSuccessMessage, getInviteNotSentMessage, getEmailSendMixedMe
 //////
 //helper
 
-const handleEmailInvitations = ({fromEmail, toEmailAr, referralId, inviteRecipients, dupeInviteRecipients}) => {
-  console.log('gets here')
-  if (!inviteRecipients) {
-  inviteRecipients = []
-  }
-  if (!dupeInviteRecipiets) {
-  dupeInviteRecipients = []
-  }
-  sendEmail({from_email: fromEmail, 
-            to_email_ar: toEmailAr, 
-            referral_id: referralId})
-    .then(resp => {
-      console.log('sendgrid resp', resp)
-      if (getSuccessCount(resp) === nonCurUserEmails.length) {
-        inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
-        res.json({ type: "success", 
-          message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
-        });
-      }
-    })
-    .catch(err => {
-        console.error('Sendgrid email invitation sending error:', err)
-    })
-}
+// const handleEmailInvitations = ({fromEmail, toEmailAr, referralId, inviteRecipients, dupeInviteRecipients}) => {
+//   console.log('gets here')
+//   if (!inviteRecipients) {
+//   inviteRecipients = []
+//   }
+//   if (!dupeInviteRecipiets) {
+//   dupeInviteRecipients = []
+//   }
+//   sendEmail({from_email: fromEmail, 
+//             to_email_ar: toEmailAr, 
+//             referral_id: referralId})
+//     .then(resp => {
+//       console.log('sendgrid resp', resp)
+//       if (getSuccessCount(resp) === nonCurUserEmails.length) {
+//         inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
+//         res.json({ type: "success", 
+//           message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
+//         });
+//       }
+//     })
+//     .catch(err => {
+//         console.error('Sendgrid email invitation sending error:', err)
+//     })
+// }
 
 
 //send an invite to user
@@ -124,6 +124,8 @@ router.post("/user/:fromEmail",
                                                 to_email_ar: nonCurUserEmails, 
                                                 referral_id: referralId})
                                       .then(resp => {
+                                        console.log('resp', resp)
+
                                         if (getSuccessCount(resp) === nonCurUserEmails.length) {
                                           inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
                                           res.json({ type: "success", 
@@ -150,6 +152,8 @@ router.post("/user/:fromEmail",
                                             to_email_ar: nonCurUserEmails, 
                                             referral_id: referralId})
                                   .then(resp => {
+                                    console.log('resp', resp)
+
                                     if (getSuccessCount(resp) === nonCurUserEmails.length) {
                                       inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
                                       res.json({ type: "success", 
@@ -227,6 +231,7 @@ router.post("/user/:fromEmail",
                                     to_email_ar: nonCurUserEmails, 
                                     referral_id: referralId})
                             .then(resp => {
+                              console.log('resp', resp)
                               if (getSuccessCount(resp) === nonCurUserEmails.length) {
                                 res.json({ type: "success",
                                   message: getInviteSendSuccessMessage(nonCurUserEmails)});

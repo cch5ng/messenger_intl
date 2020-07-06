@@ -1,11 +1,10 @@
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-let from_email = process.env.SENDGRID_SENDER_EMAIL;
 
 const sendEmail = ({from_email, to_email_ar, referral_id}) => {
   let messages = to_email_ar.map(to_email => (
     {to: `${to_email}`,
-    from: from_email,
+    from: 'messengerintl901@gmail.com',
     subject: 'World messenger invitation',
     text: `${from_email} has invited you to connect on World messenger! Here’s the link to it! http://localhost:3000/join/${referral_id}`,}
   ))

@@ -239,6 +239,11 @@ router.post("/user/:fromEmail",
                             })
                             .catch(err => {
                               console.error('Sendgrid email invitation sending error:', err)
+                              if (err.response) {
+                                const {message, code, response} = err;
+                                const {headers, body} = response;                          
+                                console.error(body);
+                              }
                             })
                         }
                     }

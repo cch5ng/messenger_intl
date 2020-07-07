@@ -81,93 +81,82 @@ router.post("/user/:fromEmail",
                     if (idx === validEmails.length - 1) {
                       //1 handle case where recipients include registered users and non registered
                         if (curUserEmails.length && nonCurUserEmails.length) {
-                          //verify requested invite does not exist
-                          let query = {};
-                          let queryAr = [];
-                          curUserEmails.forEach(toEmail => {
-                            let queryObj1 = {};
-                            let queryObj2 = {};
-                            queryObj1.to_user_email = toEmail;
-                            queryObj1.from_user_email = fromEmail;
-                            queryAr.push(queryObj1);
-                            queryObj2.to_user_email = fromEmail;
-                            queryObj2.from_user_email = toEmail;
-                            queryAr.push(queryObj2);
-                          })
-                          query['$or'] = queryAr;
-                          Invitation.find(query, function(err, invitations) {
-                            if (err) console.error('Could not find invitations during duplicate invites check', err);
-                            if (invitations && invitations.length) {
-                              invitations.forEach(invite => {
-                                if (dupeInviteRecipients.indexOf(invite.to_user_email) === -1 &&curUserEmails.indexOf(invite.to_user_email) > -1) {
-                                    dupeInviteRecipients.push(invite.to_user_email);
-                                  }
-                                if (invite.to_user_email === fromEmail &&
-                                  dupeInviteRecipients.indexOf(invite.from_user_email) === -1 &&
-                                  curUserEmails.indexOf(invite.from_user_email) > -1) {
-                                    dupeInviteRecipients.push(invite.from_user_email);
-                                  }
-                              });
-                              nonDupeInviteRecipients = curUserEmails.filter(email =>   dupeInviteRecipients.indexOf(email) === -1);
-                              if (nonDupeInviteRecipients.length) {
-                                let newInvites = nonDupeInviteRecipients.map(to_user_email => {return {to_user_email, from_user_email: fromEmail}});
-                                Invitation.insertMany(newInvites, function(err) {
-                                  if (err) return console.error(err);
-                                  inviteRecipients = inviteRecipients.concat(nonDupeInviteRecipients);
-                                  if (nonCurUserEmails.length) {
-                                    // handleEmailInvitations({fromEmail, 
-                                    //   toEmailAr: nonCurUserEmails, 
-                                    //   referralId, 
-                                    //   inviteRecipients: inviteRecipients.concat(nonCurUserEmails), 
-                                    //   dupeInviteRecipients}) 
-                                    sendEmail({from_email: fromEmail, 
-                                                to_email_ar: nonCurUserEmails, 
-                                                referral_id: referralId})
-                                      .then(resp => {
-                                        console.log('resp', resp)
+                          //handle non registered users
+                          sendEmail({from_email: fromEmail, 
+                                      to_email_ar: nonCurUserEmails, 
+                                      referral_id: referralId})
+                            .then(resp => {
+                              console.log('resp', resp)
 
-                                        if (getSuccessCount(resp) === nonCurUserEmails.length) {
-                                          inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
-                                          res.json({ type: "success", 
-                                            message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
-                                          });
-                                        }
-                                      })
-                                      .catch(err => {
-                                          console.error('sendgrid email err', err);
-                                      })
-                                  }
-                                })
-                              } else if (nonCurUserEmails.length){
-                                //all registered invite recipients already received invites earlier
-                                // handleEmailInvitations({fromEmail, 
-                                //   toEmailAr: nonCurUserEmails, 
-                                //   referralId, 
-                                //   inviteRecipients: inviteRecipients.concat(nonCurUserEmails), 
-                                //   dupeInviteRecipients})
-
-                                console.log('gets to line 146')
-
-                                sendEmail({from_email: fromEmail, 
-                                            to_email_ar: nonCurUserEmails, 
-                                            referral_id: referralId})
-                                  .then(resp => {
-                                    console.log('resp', resp)
-
-                                    if (getSuccessCount(resp) === nonCurUserEmails.length) {
-                                      inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
+                              if (getSuccessCount(resp) === nonCurUserEmails.length) {
+                                inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
+                              }
+                              //handled registered users
+                              //verify requested invite does not exist
+                              let query = {};
+                              let queryAr = [];
+                              curUserEmails.forEach(toEmail => {
+                                let queryObj1 = {};
+                                let queryObj2 = {};
+                                queryObj1.to_user_email = toEmail;
+                                queryObj1.from_user_email = fromEmail;
+                                queryAr.push(queryObj1);
+                                queryObj2.to_user_email = fromEmail;
+                                queryObj2.from_user_email = toEmail;
+                                queryAr.push(queryObj2);
+                              })
+                              query['$or'] = queryAr;
+                              Invitation.find(query, function(err, invitations) {
+                                if (err) console.error('Could not find invitations during duplicate invites check', err);
+                                //handle duplicate invitations
+                                if (invitations && invitations.length) {
+                                  invitations.forEach(invite => {
+                                    if (dupeInviteRecipients.indexOf(invite.to_user_email) === -1 &&curUserEmails.indexOf(invite.to_user_email) > -1) {
+                                        dupeInviteRecipients.push(invite.to_user_email);
+                                      }
+                                    if (invite.to_user_email === fromEmail &&
+                                      dupeInviteRecipients.indexOf(invite.from_user_email) === -1 &&
+                                      curUserEmails.indexOf(invite.from_user_email) > -1) {
+                                        dupeInviteRecipients.push(invite.from_user_email);
+                                      }
+                                  });
+                                  nonDupeInviteRecipients = curUserEmails.filter(email =>   dupeInviteRecipients.indexOf(email) === -1);
+                                  if (nonDupeInviteRecipients.length) {
+                                    let newInvites = nonDupeInviteRecipients.map(to_user_email => {return {to_user_email, from_user_email: fromEmail}});
+                                    Invitation.insertMany(newInvites, function(err) {
+                                      if (err) return console.error(err);
+                                      inviteRecipients = inviteRecipients.concat(nonDupeInviteRecipients);
                                       res.json({ type: "success", 
                                         message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
                                       });
-                                    }
+                                    })
+                                  } else {
+                                    res.json({ type: "success", 
+                                      message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
+                                    });
+                                  }
+                                } else if (invitations.length === 0) {
+                                  let newInvites = curUserEmails.map(to_user_email => {return {to_user_email, from_user_email: fromEmail}});
+                                  Invitation.insertMany(newInvites, function(err) {
+                                    if (err) return console.error(err);
+                                    inviteRecipients = inviteRecipients.concat(curUserEmails);
+                                    res.json({ type: "success", 
+                                      message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
+                                    });
                                   })
-                                  .catch(err => {
-                                      console.error('sendgrid email err', err)
-                                  })
+                                }
+                              })
+                            })
+                            .catch(err => {
+                              console.error('Sendgrid email invitation sending error:', err)
+                              if (err.response) {
+                                const {message, code, response} = err;
+                                const {headers, body} = response;                          
+                                console.error(body);
                               }
-                            }
-                          })
+                            })
                         } else if (curUserEmails.length) {
+                          //handle only registered users
                           //verify requested invite does not exist
                           let query = {};
                           let queryAr = [];
@@ -202,7 +191,7 @@ router.post("/user/:fromEmail",
                                 Invitation.insertMany(newInvites, function(err) {
                                   if (err) return console.error(err);
                                   res.json({ type: "success",
-                                    message: getInviteSendSuccessMessage(nonDupeInviteRecipients)});
+                                    message: getEmailSendMixedMessage(nonDupeInviteRecipients, dupeInviteRecipients)});
                                 })
                               } else {
                                 res.status(200).json({ type: "error",
@@ -211,7 +200,7 @@ router.post("/user/:fromEmail",
                             } else if (invitations.length === 0) {
                               let newInvites = curUserEmails.map(to_user_email => {
                                 return {to_user_email, from_user_email: fromEmail}});
-                              Invitation.insertMany(newInvites, function(err) {
+                              Invitation.insertMany(newInvites, function(err, invitations) {
                                 if (err) return console.error(err);
                                 res.json({ type: "success", 
                                   message: getInviteSendSuccessMessage(curUserEmails)});
@@ -219,19 +208,11 @@ router.post("/user/:fromEmail",
                             }
                           })
                         } else if (nonCurUserEmails.length) {
-                          console.log('gets to line 217')
-                          // handleEmailInvitations({fromEmail, 
-                          //   toEmailAr: nonCurUserEmails, 
-                          //   referralId, 
-                          //   inviteRecipients: [], 
-                          //   dupeInviteRecipients: []}) 
-
-
+                          //handle all non registered users
                           sendEmail({from_email: fromEmail,
                                     to_email_ar: nonCurUserEmails, 
                                     referral_id: referralId})
                             .then(resp => {
-                              console.log('resp', resp)
                               if (getSuccessCount(resp) === nonCurUserEmails.length) {
                                 res.json({ type: "success",
                                   message: getInviteSendSuccessMessage(nonCurUserEmails)});

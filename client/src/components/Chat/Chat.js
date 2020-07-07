@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
+//import { makeStyles } from '@material-ui/core/styles';
 
 import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
@@ -30,14 +30,6 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& .MuiTextField-root': {
-      //margin: theme.spacing(1),
-    },
-  },
-}));
-
 const Chat = props => {
   let { conversationId } = useParams();
   const {chatType} = props;
@@ -47,7 +39,6 @@ const Chat = props => {
   const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
     setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, 
     getColorForConversationId, curConversation} = useSocket();
-  const classes = useStyles();
   let history = useHistory();
 
   const [toEmailAddresses, setToEmailAddresses] = useState('');
@@ -283,7 +274,7 @@ const Chat = props => {
           friendEmails={[]}
         />
         <div className="spacer">
-          <form className={classes.root} noValidate autoComplete="off" >
+          <form noValidate autoComplete="off" >
             <TextField
               id="inp_to_emails"
               //label="To: (emails separated by comma)"

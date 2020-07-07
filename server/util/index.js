@@ -1,7 +1,11 @@
 const getEmailSendMixedMessage = (sentEmails, unsentEmails) => {
-  let inviteNotCreatedEmailMessage = `Invitations were not sent to ${unsentEmails.join(', ')} because the invitation was already sent, pending, or rejected.`;
-  let inviteCreatedEmailMessage = `Invitations were sent to ${sentEmails.join(', ')}.`;
-  return `${inviteCreatedEmailMessage} ${inviteNotCreatedEmailMessage}`;
+  let inviteCreatedEmailMessage = sentEmails.length ? 
+    `Invitations were sent to ${sentEmails.join(', ')}.`:
+    '';
+  let inviteNotCreatedEmailMessage = unsentEmails.length ?
+    ` Invitations were not sent to ${unsentEmails.join(', ')} because the invitation was already sent, pending, or rejected.`:
+    '';
+  return `${inviteCreatedEmailMessage}${inviteNotCreatedEmailMessage}`;
 }
 
 //internal invitations to registered users

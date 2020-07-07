@@ -86,3 +86,14 @@
   float: left;
   clear: both;
 }
+
+/* Message Input Container */
+
+.messageInputContainer {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #fff;
+  padding: 18px;
+  flex-basis: 50px;
+  flex-shrink: 0;
+}

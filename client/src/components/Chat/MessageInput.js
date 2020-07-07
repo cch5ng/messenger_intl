@@ -4,11 +4,9 @@ import InputBase from '@material-ui/core/InputBase';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 
+import styles from './Chat.module.css';
+
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
@@ -19,23 +17,22 @@ const MessageInput = (props) => {
   const classes = useStyles();
   const {messageInputOnChangeHandler, messageInputSubmitHandler, curMessage, error} = props;
 
-    return (
-      <form className={classes.root} style={{backgroundColor: '#fff', padding: '18px',
-        flexBasis: '50px', flexShrink: '0' }}>
-        <TextField name='msg'
-          error={error.length}
-          value={curMessage}
-          onChange={messageInputOnChangeHandler}
-          onKeyPress={messageInputSubmitHandler}
-          placeholder="Type something"
-          fullWidth 
-          margin="normal"
-          variant="filled"
-          className={classes.textField}
-          helperText={error}
-        />
-      </form>
-    );
+  return (
+    <form className={styles.messageInputContainer} >
+      <TextField name='msg'
+        error={error.length}
+        value={curMessage}
+        onChange={messageInputOnChangeHandler}
+        onKeyPress={messageInputSubmitHandler}
+        placeholder="Type something"
+        fullWidth 
+        margin="normal"
+        variant="filled"
+        className={classes.textField}
+        helperText={error}
+      />
+    </form>
+  );
 }
 
 export default MessageInput;

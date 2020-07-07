@@ -1,5 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
+import classNames from 'classnames/bind';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
@@ -12,7 +12,7 @@ import green from '@material-ui/core/colors/green';
 import { deepOrange, deepPurple } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 
-import './style.css';
+import styles from './Chat.module.css';
 import {getPrettyTime} from '../../util/helpers';
 import {useAuth} from '../../context/auth-context';
 
@@ -43,13 +43,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+var cx = classNames.bind(styles);
+
 const Message = props => {
   const {message, userEmail, messageTime, ref, color} = props;
   const {user} = useAuth();
   const {language} = user;
   const classes = useStyles();
 
-  var msgClass = classNames({
+  var msgClass = cx({
     messageBubble: true,
     'messageBubbleFriend': !props.isAuthorUser,
     'messageBubbleUser': props.isAuthorUser

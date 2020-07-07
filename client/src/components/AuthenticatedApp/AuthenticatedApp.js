@@ -16,10 +16,7 @@ import Sidebar from '../Sidebar/Sidebar';
 import Chat from '../Chat/Chat';
 import { useAuth } from '../../context/auth-context';
 import {SocketProvider} from '../../context/socket-context';
-
-const appStyle = {
-  backgroundColor: 'rgba(0, 0, 0, 0.04)'
-};
+import styles from './AuthenticatedApp.module.css';
 
 const drawerWidth = '100%';
 
@@ -68,11 +65,11 @@ const AppContainer = (props) => {
       spacing={0} direction='row' 
       className={classes.root}>
         <Hidden xsDown>
-          <Grid item xs={12} sm={5} style={appStyle}>
+          <Grid item xs={12} sm={5} className={styles.appContainer}>
               <Sidebar/>
           </Grid>
         </Hidden>
-        <Grid item xs={12} sm={7} style={appStyle}>
+        <Grid item xs={12} sm={7} className={styles.appContainer}>
         <IconButton
               color="inherit"
               aria-label="Open drawer"

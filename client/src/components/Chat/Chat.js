@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
+//import { makeStyles } from '@material-ui/core/styles';
 
 import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
@@ -15,6 +15,7 @@ import MessageInput from './MessageInput';
 import {useAuth} from '../../context/auth-context';
 import {useSocket} from '../../context/socket-context';
 import {getEmailAr, isEmailValid} from '../../util/helpers';
+import styles from './Chat.module.css';
 
 const MAX_MESSAGE_LENGTHS = {
   'english': 200,
@@ -30,14 +31,6 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& .MuiTextField-root': {
-      //margin: theme.spacing(1),
-    },
-  },
-}));
-
 const Chat = props => {
   let { conversationId } = useParams();
   const {chatType} = props;
@@ -47,7 +40,6 @@ const Chat = props => {
   const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
     setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, 
     getColorForConversationId, curConversation} = useSocket();
-  const classes = useStyles();
   let history = useHistory();
 
   const [toEmailAddresses, setToEmailAddresses] = useState('');
@@ -277,13 +269,13 @@ const Chat = props => {
   
   if (chatType === 'new') {
     return (
-      <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
+      <div className={styles.chatContainer}>
         <ChatHeader 
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <div className="spacer">
-          <form className={classes.root} noValidate autoComplete="off" >
+        <div className={styles.spacer}>
+          <form noValidate autoComplete="off" >
             <TextField
               id="inp_to_emails"
               //label="To: (emails separated by comma)"
@@ -297,7 +289,7 @@ const Chat = props => {
             />
           </form>
         </div>
-        <div className="spacer" />
+        <div className={styles.spacer} />
         <MessageInput
           userEmail={user}
           messageInputOnChangeHandler={messageInputOnChangeHandler}
@@ -316,12 +308,12 @@ const Chat = props => {
 
   if (chatType === 'empty') {
     return (
-      <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
+      <div className={styles.chatContainer}>
         <ChatHeader 
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <div className="spacer">
+        <div className={styles.spacer}>
         <Typography variant='p1'>No conversations have been started yet. Click on a contact to start chatting.</Typography>
         </div>
       </div>
@@ -337,7 +329,7 @@ const Chat = props => {
     let color = getColorForConversationId(conversationId);
 
     return (
-      <div style={{display: 'flex', flexFlow: 'column nowrap', justifyContent: 'space-between', height: '100vh'}}>
+      <div className={styles.chatContainer}>
         <ChatHeader 
           handleLanguageToggle = {handleLanguageToggle}
           showMsgInOriginalLanguage = {showMsgInOriginalLanguage}

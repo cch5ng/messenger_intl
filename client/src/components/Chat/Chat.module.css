@@ -6,6 +6,13 @@
   background-color: #fff;
 }
 
+.chatContainer {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+  height: 100vh;
+}
+
 /* Chat header style */
 
 .chatHeaderContainer {
@@ -64,4 +71,29 @@
 
 .messageAuthorTime {
   color: #616161;
+}
+
+/* Message Display */
+
+.messageDisplayContainer {
+  background-color: #fff;
+  padding: 18px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.messageListEnd {
+  float: left;
+  clear: both;
+}
+
+/* Message Input Container */
+
+.messageInputContainer {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #fff;
+  padding: 18px;
+  flex-basis: 50px;
+  flex-shrink: 0;
 }

@@ -12,6 +12,8 @@ import teal from '@material-ui/core/colors/teal';
 import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 
+import styles from './Chat.module.css';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
@@ -100,9 +102,9 @@ const ChatHeader = props => {
   
   if (!friendEmails.length) {
     return (
-      <div className="chatHeaderContainer">
-        <div className="chatHeaderSpacer" />
-        <div className="chatHeaderRight">
+      <div className={styles.chatHeaderContainer}>
+        <div className={styles.chatHeaderSpacer} />
+        <div className={styles.chatHeaderRight}>
           <Typography component="div">
             <Grid component="label" container alignItems="center" spacing={1}>
               <Grid item>Original Language</Grid>
@@ -117,8 +119,8 @@ const ChatHeader = props => {
   }
 
   return (
-    <div className="chatHeaderContainer">
-      <div className="chatHeaderLeft">
+    <div className={styles.chatHeaderContainer}>
+      <div className={styles.chatHeaderLeft}>
         {friendEmails.length === 1 && (
           <Fragment>
             {color && (
@@ -134,8 +136,8 @@ const ChatHeader = props => {
           <Typography variant='h5' className={classes.chatHeaderName}>Group Conversation ({friendEmails.length})</Typography>
         )}
       </div>
-      <div className="chatHeaderSpacer" />
-      <div className="chatHeaderRight">
+      <div className={styles.chatHeaderSpacer} />
+      <div className={styles.chatHeaderRight}>
         <Typography component="div">
           <Grid component="label" container alignItems="center" spacing={1}>
             <Grid item>Original Language</Grid>

@@ -10,9 +10,10 @@ import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
-import {useAuth} from '../../context/auth-context';
-import './style.css'
 import { Badge } from '@material-ui/core';
+
+import {useAuth} from '../../context/auth-context';
+import styles from './Sidebar.module.css';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -80,8 +81,8 @@ const SidebarHeader = (props) => {
   }
 
   return (
-    <div className="headerContainer">
-      <div className="headerLeft">
+    <div className={styles.headerContainer}>
+      <div className={styles.headerLeft}>
         <Badge 
           anchorOrigin={{ 
             vertical: 'bottom', 
@@ -95,8 +96,8 @@ const SidebarHeader = (props) => {
         </Badge>
         <Typography variant='h5' className={classes.chatHeaderName}>{email.split('@')[0]}</Typography>      
       </div>
-      <div className="headerSpacer" />
-      <div className="headerRight">
+      <div className={styles.headerSpacer} />
+      <div className={styles.headerRight} >
         <MoreHorizIcon 
           ref={anchorRef}
           aria-controls={open ? 'menu-list-grow' : undefined}

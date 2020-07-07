@@ -10,7 +10,7 @@ import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 
 import {useAuth} from '../../../context/auth-context';
-import './style.css';
+import styles from './ChatSummary.module.css';
 
 const avatarColors = [
   'pink',
@@ -81,7 +81,7 @@ const ChatSummaryItem = (props) => {
   }
 
   return (
-    <div className="chat_summary_item_container"
+    <div className={styles.chat_summary_item_container}
       onClick={(ev) => handleChatClick(conversation._id.toString())}>
       {!color && (
         <Avatar>{getFriendInitial()}</Avatar>
@@ -89,11 +89,11 @@ const ChatSummaryItem = (props) => {
       {color && (
         <Avatar className={classes[color]}>{getFriendInitial()}</Avatar>
       )}
-      <div className="chat_summary_detail_container">
-        <div className="friends_name_text">
+      <div className={styles.chat_summary_detail_container}>
+        <div className={styles.friends_name_text}>
           {filterSelfEmail(conversation.user_emails).join(', ')}
         </div>
-        <div className="message_text">{getLastMessageTranslated()}</div>
+        <div className={styles.message_text}>{getLastMessageTranslated()}</div>
       </div>
     </div>
   )

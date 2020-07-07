@@ -6,7 +6,7 @@ import CreateOutlinedIcon from '@material-ui/icons/CreateOutlined';
 import {useAuth} from '../../../context/auth-context';
 import {useSocket} from '../../../context/socket-context';
 import ChatSummaryItem from './ChatSummaryItem';
-import './style.css';
+import styles from './ChatSummary.module.css';
 
 let socket;
 
@@ -61,7 +61,7 @@ const ChatSummary = () => {
   }, []);
 
   return (
-    <div className="chat_summary_container">
+    <div className={styles.chat_summary_container}>
       <CreateOutlinedIcon onClick={clickIconHandler} />
       <div>
         {conversationsAr.map((convo, idx) => {

@@ -18,10 +18,6 @@ import { useAuth } from '../../context/auth-context';
 import {SocketProvider} from '../../context/socket-context';
 import styles from './AuthenticatedApp.module.css';
 
-// const appStyle = {
-//   backgroundColor: 'rgba(0, 0, 0, 0.04)'
-// };
-
 const drawerWidth = '100%';
 
 const useStyles = makeStyles((theme) => ({

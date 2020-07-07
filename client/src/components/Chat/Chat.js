@@ -274,7 +274,7 @@ const Chat = props => {
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <div className="styles.spacer">
+        <div className={styles.spacer}>
           <form noValidate autoComplete="off" >
             <TextField
               id="inp_to_emails"
@@ -289,7 +289,7 @@ const Chat = props => {
             />
           </form>
         </div>
-        <div className="styles.spacer" />
+        <div className={styles.spacer} />
         <MessageInput
           userEmail={user}
           messageInputOnChangeHandler={messageInputOnChangeHandler}
@@ -313,7 +313,7 @@ const Chat = props => {
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <div className="styles.spacer">
+        <div className={styles.spacer}>
         <Typography variant='p1'>No conversations have been started yet. Click on a contact to start chatting.</Typography>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
+import classNames from 'classnames/bind';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
@@ -43,13 +43,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+var cx = classNames.bind(styles);
+
 const Message = props => {
   const {message, userEmail, messageTime, ref, color} = props;
   const {user} = useAuth();
   const {language} = user;
   const classes = useStyles();
 
-  var msgClass = classNames({
+  var msgClass = cx({
     messageBubble: true,
     'messageBubbleFriend': !props.isAuthorUser,
     'messageBubbleUser': props.isAuthorUser
@@ -78,7 +80,7 @@ const Message = props => {
         <Avatar className={classes[color]}>{getUserInitial()}</Avatar>
         <div style={{display: 'flex', flexFlow: 'column nowrap', marginLeft: '8px'}}>
           <Typography variant='body1' className="messageAuthorTime">{userEmail} {getPrettyTime(messageTime)}</Typography>
-          <div className={styles.msgClass}>{translation}</div>
+          <div className={msgClass}>{translation}</div>
         </div>
       </div>
     )  
@@ -87,7 +89,7 @@ const Message = props => {
       <div ref={ref} style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'flex-end', alignItems: 'flex-end', margin: '18px 0'}}>
         <div style={{display: 'flex', flexFlow: 'column nowrap', marginLeft: '8px', alignItems: 'flex-end'}}>
           <Typography variant='body1' className="messageAuthorTime">{getPrettyTime(messageTime)}</Typography>
-          <div className={styles.msgClass}>{props.message.original_message}</div>
+          <div className={msgClass}>{props.message.original_message}</div>
         </div>
       </div>
     )  

@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid';
 
 import Message from './Message';
 import {useAuth} from '../../context/auth-context';
+import styles from './Chat.module.css';
 
 const MessageDisplay = props => {
   const {user} = useAuth();
@@ -32,12 +33,9 @@ const MessageDisplay = props => {
   ))
 
   return (
-    <div
-      style={{backgroundColor: '#fff', padding: '18px', 
-      flexGrow: '1', overflowY: 'auto', 
-    }}>
+    <div className={styles.messageDisplayContainer}>
       {messageList}
-      <div style={{ float:"left", clear: "both" }}
+      <div className={styles.messageListEnd} 
         ref={(el) => { setMessagesEnd(el) }}>
       </div>
     </div>

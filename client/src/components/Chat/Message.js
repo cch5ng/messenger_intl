@@ -12,7 +12,7 @@ import green from '@material-ui/core/colors/green';
 import { deepOrange, deepPurple } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 
-import './style.css';
+import styles from './Chat.module.css';
 import {getPrettyTime} from '../../util/helpers';
 import {useAuth} from '../../context/auth-context';
 
@@ -78,7 +78,7 @@ const Message = props => {
         <Avatar className={classes[color]}>{getUserInitial()}</Avatar>
         <div style={{display: 'flex', flexFlow: 'column nowrap', marginLeft: '8px'}}>
           <Typography variant='body1' className="messageAuthorTime">{userEmail} {getPrettyTime(messageTime)}</Typography>
-          <div className={msgClass}>{translation}</div>
+          <div className={styles.msgClass}>{translation}</div>
         </div>
       </div>
     )  
@@ -87,7 +87,7 @@ const Message = props => {
       <div ref={ref} style={{display: 'flex', flexFlow: 'row nowrap', justifyContent: 'flex-end', alignItems: 'flex-end', margin: '18px 0'}}>
         <div style={{display: 'flex', flexFlow: 'column nowrap', marginLeft: '8px', alignItems: 'flex-end'}}>
           <Typography variant='body1' className="messageAuthorTime">{getPrettyTime(messageTime)}</Typography>
-          <div className={msgClass}>{props.message.original_message}</div>
+          <div className={styles.msgClass}>{props.message.original_message}</div>
         </div>
       </div>
     )  

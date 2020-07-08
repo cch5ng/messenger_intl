@@ -175,6 +175,7 @@ const Sidebar = props => {
             selectContact={props.selectContact}
             loadPendingInvites = {loadPendingInvites}
             friends={friends}
+            searchContacts={searchContacts}
           />
         
         )}

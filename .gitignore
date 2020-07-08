@@ -23,4 +23,4 @@ yarn-error.log*
 
 #TODO add .env to your gitignore
 /server/db-credentials.json
-/server/world-messenger-a751eb6a9d4f.json
+/server/messenger_international_53d664c994ab.json

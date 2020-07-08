@@ -34,17 +34,17 @@ const useStyles = makeStyles({
 });
 
 const Friends = props => {
-  const [friends, setFriends] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  //const [searchQuery, setSearchQuery] = useState('');
   const {user, updateEmailToLangDict} = useAuth();
   let email = user.email;
   let history = useHistory();
   const classes = useStyles();
+  const {friends} = props;
 
   const contactClickHandler = (contactEmail) => {
     let jwtToken = localStorage.getItem('authToken');
     let emailsAr = [contactEmail, user.email];
-    console.log('emailsAr', emailsAr)
+    //console.log('emailsAr', emailsAr)
     let body = {emailsAr};
 
     if (jwtToken.length && emailsAr.length) {
@@ -66,37 +66,6 @@ const Friends = props => {
         .catch(err => console.error(err));
     }
   }
-
-  const loadFriends = async(q='') => {
-    if(email){
-      let authToken = localStorage.getItem('authToken');
-      const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, {headers: { Authorization: authToken}});
-      if(res.data.contacts.length !== 0){
-        let {contacts} = res.data;
-        let contactEmails = Object.keys(contacts);
-        setFriends(contactEmails);
-        updateEmailToLangDict(contacts);
-      }
-      else {
-        //'You dont have any contacts. Send invites to initiate a conversation'
-        setFriends([]);
-        updateEmailToLangDict({});
-      }
-    }
-  }
-
-  const searchContacts = async(e) => {
-    setSearchQuery(e.target.value);
-    loadFriends(searchQuery);
-  }
-
-  useEffect(() => {
-    loadFriends();
-  }, [])
-
-  // useEffect(() => {
-  //   loadFriends(searchQuery);
-  // },[searchQuery]);
 
   const entries = () => friends.map(curr => (
     <Grid

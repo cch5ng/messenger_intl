@@ -38,8 +38,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Sidebar = props => {
+  const {user, updateEmailToLangDict} = useAuth();
   const email = localStorage.getItem('email');
   const authToken = localStorage.getItem('authToken');
+  const [friends, setFriends] = useState([]);
   const [approveInvite, setApproveInvite] = useState('');
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pendingInvites, setPendingInvites] = useState([]);
@@ -104,6 +106,37 @@ const Sidebar = props => {
     }
   } 
 
+  const loadFriends = async(q='') => {
+    if(email){
+      let authToken = localStorage.getItem('authToken');
+      const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, {headers: { Authorization: authToken}});
+      if(res.data.contacts.length !== 0){
+        let {contacts} = res.data;
+        let contactEmails = Object.keys(contacts);
+        setFriends(contactEmails);
+        updateEmailToLangDict(contacts);
+      }
+      else {
+        //'You dont have any contacts. Send invites to initiate a conversation'
+        setFriends([]);
+        updateEmailToLangDict({});
+      }
+    }
+  }
+
+  const searchContacts = async(e) => {
+    setSearchQuery(e.target.value);
+    loadFriends(searchQuery);
+  }
+
+  useEffect(() => {
+    loadFriends();
+  }, [])
+
+  useEffect(() => {
+    loadFriends(searchQuery);
+  },[searchQuery]);
+
   useEffect(() => {
     loadPendingRequests();
   }, [pendingRequests.length]);
@@ -141,6 +174,7 @@ const Sidebar = props => {
             requestContact={props.requestContact}
             selectContact={props.selectContact}
             loadPendingInvites = {loadPendingInvites}
+            friends={friends}
           />
         
         )}

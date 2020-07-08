@@ -34,17 +34,15 @@ const useStyles = makeStyles({
 });
 
 const Friends = props => {
-  //const [searchQuery, setSearchQuery] = useState('');
-  const {user, updateEmailToLangDict} = useAuth();
+  const {user} = useAuth();
   let email = user.email;
   let history = useHistory();
   const classes = useStyles();
-  const {friends} = props;
+  const {friends, searchContacts} = props;
 
   const contactClickHandler = (contactEmail) => {
     let jwtToken = localStorage.getItem('authToken');
-    let emailsAr = [contactEmail, user.email];
-    //console.log('emailsAr', emailsAr)
+    let emailsAr = [contactEmail, email];
     let body = {emailsAr};
 
     if (jwtToken.length && emailsAr.length) {

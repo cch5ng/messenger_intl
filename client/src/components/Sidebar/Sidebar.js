@@ -68,7 +68,7 @@ const Sidebar = props => {
                                       {  'from_email': fromEmail }, {headers: { Authorization: authToken}});
       if(approvedRes.data.approved && approvedRes.data.from_user_email === fromEmail){
         setApproveInvite(`${fromEmail} is now your friend`);
-        //loadFriends();
+        loadFriends();
       }
     }
     else if(action === 'reject') {

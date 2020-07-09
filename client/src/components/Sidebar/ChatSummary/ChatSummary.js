@@ -44,7 +44,7 @@ const ChatSummary = () => {
     let jwtToken = localStorage.getItem('authToken');
     fetch(`http://localhost:3001/conversations/user/${user.email}`, {
       headers: {
-        'Authorization': `${jwtToken}`,
+        'Authorization': `Bearer ${jwtToken}`,
         'Content-Type': 'application/json'
       },
     })

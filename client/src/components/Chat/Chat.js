@@ -34,7 +34,7 @@ function Alert(props) {
 const Chat = props => {
   let { conversationId } = useParams();
   const {chatType} = props;
-  const {user, emailToLangDict} = useAuth();
+  const {user, emailToLangDict, logout} = useAuth();
   const {language} = user;
   const userEmail = user.email;
   const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
@@ -123,7 +123,7 @@ const Chat = props => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `${jwtToken}`
+              'Authorization': `Bearer ${jwtToken}`
             },
             body: JSON.stringify(body)
           })
@@ -249,22 +249,31 @@ const Chat = props => {
 
   useEffect(() => {
     let jwtToken = localStorage.getItem('authToken');
-    if (conversationId) {
+    if (conversationId && jwtToken) {
       fetch(`http://localhost:3001/conversations/${conversationId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `${jwtToken}`
+          'Authorization': `Bearer ${jwtToken}`
         }
       })
-        .then(resp => resp.json())
+        .then(resp => {
+          if (resp.status === 401) {
+            logout();
+          } else {
+            return resp.json();
+          }
+        })
         .then(json => {
           if (json && json.type === 'success') {
             updateCurConversation(json.conversation);
           }
         })
         .catch(err => console.error('Could not find existing conversation.', err))
+    } else if (!jwtToken) {
+      logout();
     }
+
   }, [conversationId]);
   
   if (chatType === 'new') {

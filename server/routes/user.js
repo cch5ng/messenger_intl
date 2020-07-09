@@ -61,7 +61,7 @@ router.post('/login', (req, res) => {
                     email: user.email
                   };
                   jwt.sign(payload, secretKey["secretOrKey"], {
-                    expiresIn: 86400 //expires in 1 days
+                    expiresIn: 86400 //expires in 1 day
                   },
                   (err, token) => {
                     res.json({

@@ -61,12 +61,12 @@ router.post('/login', (req, res) => {
                     email: user.email
                   };
                   jwt.sign(payload, secretKey["secretOrKey"], {
-                    expiresIn: 86400 //expires in 1 day
+                    expiresIn: 86400 //expires in 1 days
                   },
                   (err, token) => {
                     res.json({
                       success: `${user.email} is logged in successfully`,
-                      token: `Bearer ${token}`,
+                      token: `${token}`,
                       user: {email: user.email,
                         language: user.language,
                         referralId: user.referral_id.toString(),

@@ -65,7 +65,8 @@ const Sidebar = props => {
   const updateContact = async(fromEmail, action) => {
     if(action === 'approve') {
       const approvedRes = await axios.put(`http://localhost:3001/invitations/user/${email}/approve`, 
-                                      {  'from_email': fromEmail }, {headers: { Authorization: authToken}});
+                                      {  'from_email': fromEmail }, 
+                                      {headers: { Authorization: `Bearer ${authToken}`}});
       if(approvedRes.data.approved && approvedRes.data.from_user_email === fromEmail){
         setApproveInvite(`${fromEmail} is now your friend`);
         loadFriends();
@@ -73,7 +74,8 @@ const Sidebar = props => {
     }
     else if(action === 'reject') {
       const rejectedRes = await axios.put(`http://localhost:3001/invitations/user/${email}/reject`, 
-                                      {  'from_email': fromEmail }, {headers: { Authorization: authToken}});
+                                      {  'from_email': fromEmail }, 
+                                      {headers: { Authorization: `Bearer ${authToken}`}});
       if(rejectedRes.data.rejected){
         setApproveInvite(`You have declined ${fromEmail}'s request`);
       }
@@ -84,7 +86,8 @@ const Sidebar = props => {
 
   const loadPendingRequests = async() => {
     if(email){
-      const res = await axios.get(`http://localhost:3001/invitations/user/requests/${email}`, {headers: { Authorization: authToken}});
+      const res = await axios.get(`http://localhost:3001/invitations/user/requests/${email}`, 
+                                {headers: { Authorization: `Bearer ${authToken}`}});
       if(res.data.invitations && res.data.invitations.length !== 0){
       setPendingRequests(res.data.invitations);
       }
@@ -96,7 +99,8 @@ const Sidebar = props => {
 
   const loadPendingInvites = async() => {
     if(email){
-      const res = await axios.get(`http://localhost:3001/invitations/user/${email}`, {headers: { Authorization: authToken}});
+      const res = await axios.get(`http://localhost:3001/invitations/user/${email}`, 
+                                {headers: { Authorization: `Bearer ${authToken}`}});
       if(res.data.invitations && res.data.invitations.length !== 0){
       setPendingInvites(res.data.invitations);
       }
@@ -109,7 +113,8 @@ const Sidebar = props => {
   const loadFriends = async(q='') => {
     if(email){
       let authToken = localStorage.getItem('authToken');
-      const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, {headers: { Authorization: authToken}});
+      const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, 
+                                {headers: { Authorization: `Bearer ${authToken}`}});
       if(res.data.contacts.length !== 0){
         let {contacts} = res.data;
         let contactEmails = Object.keys(contacts);

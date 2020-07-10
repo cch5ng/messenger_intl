@@ -42,7 +42,7 @@ const ChatSummary = () => {
     socket = io.connect(`http://localhost:3001/chat`);
 
     let jwtToken = localStorage.getItem('authToken');
-    fetch(`http://localhost:3001/conversations/user/${user.email}`, {
+    fetch(`/conversations/user/${user.email}`, {
       headers: {
         'Authorization': `Bearer ${jwtToken}`,
         'Content-Type': 'application/json'

@@ -48,17 +48,21 @@ These files need to be copied and modified before a local app can run.
 
 This file needs to be copied and renamed as db-credentials.json
 
+------
+
 ```
 /server/sample.env
 ```
 
 This file needs to be copied and renamed as .env
 
+------
+
 ```
 /server/sample.translation-credentials.json
 ```
 
-This file needs to be copied and renamed as translation-credentials.json
+This file is a template for the Google API key. During account setup, there is a step where you download a private key file (json). Make a copy of this file, rename it as translation-credentials.json, and place it in the /server directory.
 
 Please refer to the documentation from MongoDB, SendGrid, and Google for instructions on how to create developer accounts for those services.
 

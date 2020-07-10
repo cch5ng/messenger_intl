@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-//import { makeStyles } from '@material-ui/core/styles';
 
 import ChatHeader from './ChatHeader';
 import MessageDisplay from './MessageDisplay';
@@ -119,7 +118,7 @@ const Chat = props => {
           //3 make post request for new conversation (get back id)
           let jwtToken = localStorage.getItem('authToken');
           let body = { emailsAr, message, friendLanguages };
-          fetch('http://localhost:3001/conversations', {
+          fetch('/conversations', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -250,7 +249,7 @@ const Chat = props => {
   useEffect(() => {
     let jwtToken = localStorage.getItem('authToken');
     if (conversationId && jwtToken) {
-      fetch(`http://localhost:3001/conversations/${conversationId}`, {
+      fetch(`/conversations/${conversationId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -287,7 +286,6 @@ const Chat = props => {
           <form noValidate autoComplete="off" >
             <TextField
               id="inp_to_emails"
-              //label="To: (emails separated by comma)"
               value={toEmailAddresses}
               placeholder="To: email addresses (separated by comma)"
               variant="outlined"

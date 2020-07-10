@@ -84,7 +84,7 @@ export default function SignUp(props) {
   async function submit() {
     if (!props.match.params.referralId) {
       try{
-        const resp = await axios.post('http://localhost:3001/user/register', formValues);
+        const resp = await axios.post('/user/register', formValues);
         setSuccessAlertMsg(true);
         setRedirect('/login');
       }
@@ -95,7 +95,7 @@ export default function SignUp(props) {
     if (props.match.params.referralId) {
       const {referralId} = props.match.params;
       try{
-        const resp = await axios.post('http://localhost:3001/user/register/referral', {...formValues, referralId});
+        const resp = await axios.post('/user/register/referral', {...formValues, referralId});
         setSuccessAlertMsg(true);
         setRedirect('/login');
       }

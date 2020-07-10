@@ -8,6 +8,22 @@ This is a Messenger copy project with an additional message translation feature.
 
 The project is currently hosted at:
 
+These are the features:
+
+* Ability to register and log in to the app.
+
+* Ability to send an email invitation to friends to connect on the app.
+
+* Ability to accept or reject an invitation.
+
+* Ability to start a conversation with connected friends.
+
+* Ability to view conversation message in native language (translated) or the friend's language (original).
+
+## Known Limitations
+
+**TODO**
+
 ## Run the App
 
 These are instructions to download and run the application locally.

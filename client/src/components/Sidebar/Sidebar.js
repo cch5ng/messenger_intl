@@ -64,7 +64,7 @@ const Sidebar = props => {
 
   const updateContact = async(fromEmail, action) => {
     if(action === 'approve') {
-      const approvedRes = await axios.put(`http://localhost:3001/invitations/user/${email}/approve`, 
+      const approvedRes = await axios.put(`/invitations/user/${email}/approve`, 
                                       {  'from_email': fromEmail }, 
                                       {headers: { Authorization: `Bearer ${authToken}`}});
       if(approvedRes.data.approved && approvedRes.data.from_user_email === fromEmail){
@@ -73,7 +73,7 @@ const Sidebar = props => {
       }
     }
     else if(action === 'reject') {
-      const rejectedRes = await axios.put(`http://localhost:3001/invitations/user/${email}/reject`, 
+      const rejectedRes = await axios.put(`/invitations/user/${email}/reject`, 
                                       {  'from_email': fromEmail }, 
                                       {headers: { Authorization: `Bearer ${authToken}`}});
       if(rejectedRes.data.rejected){
@@ -86,7 +86,7 @@ const Sidebar = props => {
 
   const loadPendingRequests = async() => {
     if(email){
-      const res = await axios.get(`http://localhost:3001/invitations/user/requests/${email}`, 
+      const res = await axios.get(`/invitations/user/requests/${email}`, 
                                 {headers: { Authorization: `Bearer ${authToken}`}});
       if(res.data.invitations && res.data.invitations.length !== 0){
       setPendingRequests(res.data.invitations);
@@ -99,7 +99,7 @@ const Sidebar = props => {
 
   const loadPendingInvites = async() => {
     if(email){
-      const res = await axios.get(`http://localhost:3001/invitations/user/${email}`, 
+      const res = await axios.get(`/invitations/user/${email}`, 
                                 {headers: { Authorization: `Bearer ${authToken}`}});
       if(res.data.invitations && res.data.invitations.length !== 0){
       setPendingInvites(res.data.invitations);
@@ -113,7 +113,7 @@ const Sidebar = props => {
   const loadFriends = async(q='') => {
     if(email){
       let authToken = localStorage.getItem('authToken');
-      const res = await axios.get(`http://localhost:3001/invitations/user/${email}/contacts?q=${q}`, 
+      const res = await axios.get(`/invitations/user/${email}/contacts?q=${q}`, 
                                 {headers: { Authorization: `Bearer ${authToken}`}});
       if(res.data.contacts.length !== 0){
         let {contacts} = res.data;
@@ -122,7 +122,6 @@ const Sidebar = props => {
         updateEmailToLangDict(contacts);
       }
       else {
-        //'You dont have any contacts. Send invites to initiate a conversation'
         setFriends([]);
         updateEmailToLangDict({});
       }
@@ -153,7 +152,6 @@ const Sidebar = props => {
   return (
     <div>
       <SidebarHeader />
-
       <div className={classes.sidebarContainer}>
         <div className={classes.tabsBackground}>
           <Tabs
@@ -182,7 +180,6 @@ const Sidebar = props => {
             friends={friends}
             searchContacts={searchContacts}
           />
-        
         )}
         {value === 2 && (
           <Fragment>

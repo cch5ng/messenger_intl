@@ -164,7 +164,7 @@ export default function InvitationDialog(props) {
 
       if (user && user.email.length && user.referralId && jwtToken.length) {
         let body = {toEmailAr, referralId: user.referralId};
-        fetch(`http://localhost:3001/invitations/user/${user.email}`, {
+        fetch(`/invitations/user/${user.email}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

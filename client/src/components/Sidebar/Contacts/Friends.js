@@ -47,7 +47,7 @@ const Friends = props => {
 
     if (jwtToken.length && emailsAr.length) {
       //call API to either create a conversation (or find existing) and get back conversation id
-      fetch('http://localhost:3001/conversations', {
+      fetch('/conversations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -33,7 +33,7 @@ function AuthProvider({children}) {
 
   const login = async(formValues) => {
     try {
-      const res = await axios.post('http://localhost:3001/user/login', formValues);
+      const res = await axios.post('/user/login', formValues);
       if(res.data.token) {
         setState({status:'success', error:null, user: res.data.user});
         localStorage.setItem('authToken', res.data.token);

@@ -1,0 +1,21 @@
+{
+  "name": "messenger_intl",
+  "version": "1.0.0",
+  "description": "## Purpose",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./server/bin/www",
+    "heroku-postbuild": "cd ./server && npm install && cd ../client && npm install && cd ../server ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cch5ng/messenger_intl.git"
+  },
+  "author": "Carol Chung, Rajat Basal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cch5ng/messenger_intl/issues"
+  },
+  "homepage": "https://github.com/cch5ng/messenger_intl#readme"
+}

@@ -25,21 +25,35 @@ const dbUrl= `mongodb+srv://${dbUsername}:${dbPwd}@cluster0-wkjls.mongodb.net/${
 
 var app = express();
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(join(__dirname, "build")));
+}
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(express.static(join(__dirname, "public")));
+}
+
 app.use(logger("dev"));
 app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(join(__dirname, "public")));
 
 app.use(passport.initialize());
 require("./controllers/passportJwtStrategy")(passport);
 
-app.use("/", indexRouter);
-app.use("/ping", pingRouter);
 app.use("/conversations", conversationRouter);
 app.use("/invitations", passport.authenticate('jwt', { session: false}), invitationRouter);
 app.use("/user", userRouter);
+
+if (process.env.NODE_ENV === 'production') {
+  app.get('/', function (req, res) {
+    res.sendFile(join(__dirname, '../client/build', 'index.html'));
+  });
+  app.get('/*', function (req, res) {
+    res.sendFile(join(__dirname, '../client/build', `${req.url}`));
+  });
+}
 
 //connect to mongodb
 mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true})

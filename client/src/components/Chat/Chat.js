@@ -243,7 +243,7 @@ const Chat = props => {
         socket.emit('room', conversationId);
       });
     }
-    socket = io.connect('http://localhost:3001/chat');
+    socket = io.connect(`${process.env.REACT_APP_SERVER_DOMAIN}/chat`);
   }, [])
 
   useEffect(() => {

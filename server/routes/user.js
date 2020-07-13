@@ -9,7 +9,7 @@ const Invitation = require('../models/invitation');
 
 const registrationValidator = require('../controllers/userRegistrationValidator');
 const loginValidator = require('../controllers/userLoginValidator');
-const secretKey = require('../db-credentials.json');
+//const secretKey = require('../db-credentials.json');
 
 router.post('/register', (req, res) => {
   const {validationErrors, isRegistrationValid} = registrationValidator(req.body);
@@ -60,7 +60,8 @@ router.post('/login', (req, res) => {
                     id: user._id,
                     email: user.email
                   };
-                  jwt.sign(payload, secretKey["secretOrKey"], {
+                  jwt.sign(payload, process.env.SECRET_OR_KEY, {
+                  //                  jwt.sign(payload, secretKey["secretOrKey"], {
                     expiresIn: 86400 //expires in 1 day
                   },
                   (err, token) => {

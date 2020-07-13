@@ -2,7 +2,7 @@ require('dotenv').config();
 const createError = require("http-errors");
 const express = require("express");
 const cors = require('cors')
-const { join } = require("path");
+const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require('mongoose');
@@ -25,11 +25,11 @@ const dbUrl= `mongodb+srv://${dbUsername}:${dbPwd}@cluster0-wkjls.mongodb.net/${
 var app = express();
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(join(__dirname, "build")));
+  app.use(express.static(path.join(__dirname, "build")));
 }
 
 if (process.env.NODE_ENV === 'development') {
-  app.use(express.static(join(__dirname, "public")));
+  app.use(express.static(path.join(__dirname, "public")));
 }
 
 app.use(logger("dev"));
@@ -47,10 +47,10 @@ app.use("/user", userRouter);
 
 if (process.env.NODE_ENV === 'production') {
   app.get('/', function (req, res) {
-    res.sendFile(join(__dirname, '/../client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '/../client/build', 'index.html'));
   });
   app.get('/*', function (req, res) {
-    res.sendFile(join(__dirname, '/../client/build', `${req.url}`));
+    res.sendFile(path.join(__dirname, '/../client/build', `${req.url}`));
   });
 }
 

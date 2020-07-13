@@ -2,7 +2,10 @@
   "name": "server",
   "version": "0.0.0",
   "private": true,
-  "scripts": {
+  "engines": {
+    "node": "14.4"
+  },
+"scripts": {
     "dev": "nodemon ./bin/www",
     "debug": "nodemon  --inspect ./bin/www",
     "test": "NODE_ENV=test ./node_modules/.bin/mocha --exit --timeout 30000"

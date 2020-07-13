@@ -39,7 +39,7 @@ const ChatSummary = () => {
   }
 
   useEffect(() => {
-    socket = io.connect(`http://localhost:3001/chat`);
+    socket = io.connect(`${process.env.REACT_APP_SERVER_DOMAIN}/chat`);
 
     let jwtToken = localStorage.getItem('authToken');
     fetch(`/conversations/user/${user.email}`, {

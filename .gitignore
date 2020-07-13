@@ -22,5 +22,4 @@ yarn-error.log*
 
 
 #TODO add .env to your gitignore
-/server/db-credentials.json
 /server/translation-credentials.json

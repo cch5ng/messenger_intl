@@ -243,7 +243,11 @@ const Chat = props => {
         socket.emit('room', conversationId);
       });
     }
-    socket = io.connect(`${process.env.REACT_APP_SERVER_DOMAIN}/chat`);
+    if (process.env.NODE_ENV === 'development') {
+      socket = io.connect(`http://localhost:3001/chat`);
+    } else if (process.env.NODE_ENV === 'production') {
+      socket = io.connect(`https://messenger-intl.herokuapp.com:3001/chat`);
+    }
   }, [])
 
   useEffect(() => {

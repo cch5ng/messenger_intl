@@ -17,10 +17,9 @@ const userRouter = require("./routes/user");
 const { json, urlencoded } = express;
 
 //initial db setup
-//const dbCredentials = require('./db-credentials.json');
-const dbUsername = process.env.DB_USERNAME; //dbCredentials["dbUsername"];
-const dbPwd = process.env.DB_PASSWORD; //dbCredentials["dbPassword"];
-const dbName = process.env.DB_NAME; //dbCredentials["dbName"];
+const dbUsername = process.env.DB_USERNAME;
+const dbPwd = process.env.DB_PASSWORD;
+const dbName = process.env.DB_NAME;
 const dbUrl= `mongodb+srv://${dbUsername}:${dbPwd}@cluster0-wkjls.mongodb.net/${dbName}?retryWrites=true&w=majority`;
 
 var app = express();

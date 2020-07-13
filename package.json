@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "## Purpose",
   "main": "index.js",
+  "engines": {
+    "node": "14.4"
+  },
   "scripts": {
     "start": "node ./server/bin/www",
     "preinstall": "node preinstall.js",

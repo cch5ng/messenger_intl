@@ -246,7 +246,11 @@ const Chat = props => {
     if (process.env.NODE_ENV === 'development') {
       socket = io.connect(`http://localhost:3001/chat`);
     } else if (process.env.NODE_ENV === 'production') {
-      socket = io.connect(`https://messenger-intl.herokuapp.com:3001/chat`);
+      let options = { secure: true,
+                      reconnect: true,
+                      rejectUnauthorized : false
+      };
+      socket = io.connect(`https://messenger-intl.herokuapp.com:3001/chat`, options;
     }
   }, [])
 

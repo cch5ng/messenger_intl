@@ -2,7 +2,7 @@ require('dotenv').config();
 const createError = require("http-errors");
 const express = require("express");
 const cors = require('cors')
-const path, { join } = require("path");
+const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require('mongoose');
@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  app.use(express.static(join(__dirname, "public")));
+  app.use(express.static(path.join(__dirname, "public")));
 }
 
 app.use(logger("dev"));

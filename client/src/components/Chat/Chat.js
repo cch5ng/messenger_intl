@@ -250,7 +250,7 @@ const Chat = props => {
                       reconnect: true,
                       rejectUnauthorized : false
       };
-      socket = io.connect(`https://messenger-intl.herokuapp.com:3001/chat`, options;
+      socket = io.connect(`https://messenger-intl.herokuapp.com:3001/chat`, options);
     }
   }, [])
 

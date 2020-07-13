@@ -47,10 +47,10 @@ app.use("/user", userRouter);
 
 if (process.env.NODE_ENV === 'production') {
   app.get('/', function (req, res) {
-    res.sendFile(join(__dirname, '../client/build', 'index.html'));
+    res.sendFile(join(__dirname, '/../client/build', 'index.html'));
   });
   app.get('/*', function (req, res) {
-    res.sendFile(join(__dirname, '../client/build', `${req.url}`));
+    res.sendFile(join(__dirname, '/../client/build', `${req.url}`));
   });
 }
 

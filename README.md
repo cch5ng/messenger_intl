@@ -38,7 +38,6 @@ There are 3rd party dependencies:
 
 * Google Translation API
 
-
 These files need to be copied and updated with credentials (like API keys for 3rd party libraries) before a local app can run. Please refer to the documentation from MongoDB, SendGrid, and Google for instructions on how to create developer accounts for those services.
 
 
@@ -93,4 +92,4 @@ npm run start
 
 **Deployment**
 
-
+This app is currently deployed on Heroku. If you want to fork and run that app on Heroku, a number of environment variables need to be set (TODO).

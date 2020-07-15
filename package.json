@@ -7,9 +7,9 @@
     "node": "14.4"
   },
   "scripts": {
-    "start": "./start.sh",
     "preinstall": "node preinstall.js",
     "heroku-postbuild": "cd ./server && npm install && cd ../client && npm install && npm run build && cd ../server ",
+    "start": "node --inspect=9229 ./server/bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

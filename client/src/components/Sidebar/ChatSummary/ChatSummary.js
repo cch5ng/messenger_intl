@@ -59,7 +59,6 @@ const ChatSummary = () => {
       .then(resp => resp.json())
       .then(json => {
         if (json && json.conversations.length) {
-          console.log('calls initConversationsAr')
           initConversationsAr(json.conversations, user.email);
           let conversationId = json.conversations[0]._id.toString();
           history.push(`/conversations/${conversationId}`);

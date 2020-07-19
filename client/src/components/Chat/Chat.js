@@ -290,33 +290,35 @@ const Chat = props => {
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <div className={styles.spacer}>
-          <form noValidate autoComplete="off" >
-            <TextField
-              id="inp_to_emails"
-              value={toEmailAddresses}
-              placeholder="To: email addresses (separated by comma)"
-              variant="outlined"
-              onChange={emailInpChangeHandler}
-              error={toEmailAddressesError.length}
-              helperText={toEmailAddressesError.length ? toEmailAddressesError: ''}
-              fullWidth
-            />
-          </form>
-        </div>
-        <div className={styles.spacer} />
-        <MessageInput
-          userEmail={user}
-          messageInputOnChangeHandler={messageInputOnChangeHandler}
-          messageInputSubmitHandler={newMessageInputSubmitHandler}
-          curMessage={curMessage}
-          error={messageInputError}
-        />
-        <Snackbar open={submitGroupConversationError.length !== 0} autoHideDuration={5000} onClose={ closeAlertHandler }>
-          <Alert onClose={closeAlertHandler} severity="error">
-            {submitGroupConversationError}
-          </Alert>
-        </Snackbar>
+        <main>
+          <div className={styles.spacer}>
+            <form noValidate autoComplete="off" >
+              <TextField
+                id="inp_to_emails"
+                value={toEmailAddresses}
+                placeholder="To: email addresses (separated by comma)"
+                variant="outlined"
+                onChange={emailInpChangeHandler}
+                error={toEmailAddressesError.length}
+                helperText={toEmailAddressesError.length ? toEmailAddressesError: ''}
+                fullWidth
+              />
+            </form>
+          </div>
+          <div className={styles.spacer} />
+          <MessageInput
+            userEmail={user}
+            messageInputOnChangeHandler={messageInputOnChangeHandler}
+            messageInputSubmitHandler={newMessageInputSubmitHandler}
+            curMessage={curMessage}
+            error={messageInputError}
+          />
+          <Snackbar open={submitGroupConversationError.length !== 0} autoHideDuration={5000} onClose={ closeAlertHandler }>
+            <Alert onClose={closeAlertHandler} severity="error">
+              {submitGroupConversationError}
+            </Alert>
+          </Snackbar>
+        </main>
       </div>
     )
   }
@@ -328,9 +330,9 @@ const Chat = props => {
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <div className={styles.spacer}>
-        <Typography variant='p1'>No conversations have been started yet. Click on a contact to start chatting.</Typography>
-        </div>
+        <main className={styles.spacer}>
+          <Typography variant='p1'>No conversations have been started yet. Click on a contact to start chatting.</Typography>
+        </main>
       </div>
     )
   }
@@ -351,19 +353,21 @@ const Chat = props => {
           friendEmails={friendEmails}
           color={color}
         />
-        <MessageDisplay
-          showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
-          userEmail={user.email} 
-          messages={curMessages}
-          color={color}
-        />
-        <MessageInput
-          userEmail={user}
-          messageInputOnChangeHandler={messageInputOnChangeHandler}
-          messageInputSubmitHandler={messageInputSubmitHandler}
-          curMessage={curMessage}
-          error={messageInputError}
-        />
+        <main>
+          <MessageDisplay
+            showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
+            userEmail={user.email} 
+            messages={curMessages}
+            color={color}
+          />
+          <MessageInput
+            userEmail={user}
+            messageInputOnChangeHandler={messageInputOnChangeHandler}
+            messageInputSubmitHandler={messageInputSubmitHandler}
+            curMessage={curMessage}
+            error={messageInputError}
+          />
+        </main>
       </div>
     )
   }

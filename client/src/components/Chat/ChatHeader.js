@@ -102,7 +102,7 @@ const ChatHeader = props => {
   
   if (!friendEmails.length) {
     return (
-      <div className={styles.chatHeaderContainer}>
+      <header className={styles.chatHeaderContainer}>
         <div className={styles.chatHeaderSpacer} />
         <div className={styles.chatHeaderRight}>
           <Typography component="div">
@@ -114,12 +114,12 @@ const ChatHeader = props => {
             </Grid>
           </Typography>
         </div>
-      </div>
+      </header>
     )
   }
 
   return (
-    <div className={styles.chatHeaderContainer}>
+    <header className={styles.chatHeaderContainer}>
       <div className={styles.chatHeaderLeft}>
         {friendEmails.length === 1 && (
           <Fragment>
@@ -147,7 +147,7 @@ const ChatHeader = props => {
           </Grid>
         </Typography>
       </div>
-    </div>
+    </header>
   );
 }
 

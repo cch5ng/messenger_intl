@@ -81,7 +81,7 @@ const SidebarHeader = (props) => {
   }
 
   return (
-    <div className={styles.headerContainer}>
+    <header className={styles.headerContainer}>
       <div className={styles.headerLeft}>
         <Badge 
           anchorOrigin={{ 
@@ -97,7 +97,7 @@ const SidebarHeader = (props) => {
         <Typography variant='h5' className={classes.chatHeaderName}>{email.split('@')[0]}</Typography>      
       </div>
       <div className={styles.headerSpacer} />
-      <div className={styles.headerRight} >
+      <nav className={styles.headerRight} >
         <MoreHorizIcon 
           ref={anchorRef}
           aria-controls={open ? 'menu-list-grow' : undefined}
@@ -105,7 +105,7 @@ const SidebarHeader = (props) => {
           onClick={handleToggle}
           className={classes.moreHorizIcon}
          />
-          <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+        <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
           {({ TransitionProps, placement }) => (
             <Grow
               {...TransitionProps}
@@ -121,8 +121,8 @@ const SidebarHeader = (props) => {
             </Grow>
           )}
         </Popper>
-        </div>
-    </div>
+      </nav>
+    </header>
   )
 }
 

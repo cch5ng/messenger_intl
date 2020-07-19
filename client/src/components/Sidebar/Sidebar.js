@@ -153,7 +153,7 @@ const Sidebar = props => {
     <div>
       <SidebarHeader />
       <div className={classes.sidebarContainer}>
-        <div className={classes.tabsBackground}>
+        <nav className={classes.tabsBackground}>
           <Tabs
             value={value}
             onChange={handleChange}
@@ -167,7 +167,7 @@ const Sidebar = props => {
             <Tab icon={<PersonPinIcon />} label="FRIENDS" />
             <Tab icon={<MailOutlineIcon />} label="INVITES" />
           </Tabs>
-        </div>
+        </nav>
         {value === 0 && (
           <ChatSummary />
         )}

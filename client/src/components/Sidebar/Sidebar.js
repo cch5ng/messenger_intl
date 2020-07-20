@@ -153,7 +153,7 @@ const Sidebar = props => {
     <div>
       <SidebarHeader />
       <div className={classes.sidebarContainer}>
-        <nav className={classes.tabsBackground} aria-labelledby="Main Navigation">
+        <nav className={classes.tabsBackground} aria-label="Main Navigation">
           <Tabs
             value={value}
             onChange={handleChange}

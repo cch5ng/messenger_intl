@@ -102,7 +102,7 @@ const ChatHeader = props => {
   
   if (!friendEmails.length) {
     return (
-      <header className={styles.chatHeaderContainer} aria-labelledby="Chat Header">
+      <header className={styles.chatHeaderContainer} aria-label="Chat Header">
         <div className={styles.chatHeaderSpacer} />
         <div className={styles.chatHeaderRight}>
           <Typography component="div">
@@ -119,7 +119,7 @@ const ChatHeader = props => {
   }
 
   return (
-    <header className={styles.chatHeaderContainer} aria-labelledby="Chat Header">
+    <header className={styles.chatHeaderContainer} aria-label="Chat Header">
       <div className={styles.chatHeaderLeft}>
         {friendEmails.length === 1 && (
           <Fragment>

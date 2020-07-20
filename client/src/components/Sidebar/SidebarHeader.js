@@ -81,7 +81,7 @@ const SidebarHeader = (props) => {
   }
 
   return (
-    <header className={styles.headerContainer} aria-labelledby="Main Header">
+    <header className={styles.headerContainer} aria-label="Main Header">
       <div className={styles.headerLeft}>
         <Badge 
           anchorOrigin={{ 
@@ -97,7 +97,7 @@ const SidebarHeader = (props) => {
         <Typography variant='h5' className={classes.chatHeaderName}>{email.split('@')[0]}</Typography>      
       </div>
       <div className={styles.headerSpacer} />
-      <nav className={styles.headerRight} aria-labelledby="Secondary Navigation">
+      <nav className={styles.headerRight} aria-label="Secondary Navigation">
         <MoreHorizIcon 
           ref={anchorRef}
           aria-controls={open ? 'menu-list-grow' : undefined}

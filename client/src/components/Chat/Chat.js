@@ -294,7 +294,8 @@ const Chat = props => {
           <div className={styles.spacer}>
             <form noValidate autoComplete="off" >
               <TextField
-                id="inp_to_emails"
+                id="group_conversation_member_emails"
+                label="Group conversation member emails (comma-separated)"
                 value={toEmailAddresses}
                 placeholder="To: email addresses (separated by comma)"
                 variant="outlined"

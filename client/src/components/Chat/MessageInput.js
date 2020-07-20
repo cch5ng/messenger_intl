@@ -19,7 +19,9 @@ const MessageInput = (props) => {
 
   return (
     <form className={styles.messageInputContainer} >
-      <TextField name='msg'
+      <TextField name="msg"
+        id="chat_message"
+        label="Chat message"
         error={error.length}
         value={curMessage}
         onChange={messageInputOnChangeHandler}

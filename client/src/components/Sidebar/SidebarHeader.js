@@ -1,7 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import { deepOrange, deepPurple } from '@material-ui/core/colors';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
@@ -32,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
   chatHeaderName: {
     padding: '0 5px',
+    fontSize: '1.2rem',
   },
   paper: {
     marginRight: theme.spacing(2),
@@ -94,7 +94,7 @@ const SidebarHeader = (props) => {
           }}>
           <Avatar className={classes.purple}>{initial}</Avatar>
         </Badge>
-        <Typography variant='h5' className={classes.chatHeaderName}>{email.split('@')[0]}</Typography>      
+        <h1 className={classes.chatHeaderName}>{email.split('@')[0]}</h1>
       </div>
       <div className={styles.headerSpacer} />
       <nav className={styles.headerRight} aria-label="Secondary Navigation">

@@ -290,7 +290,7 @@ const Chat = props => {
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <main>
+        <main aria-labelledby="Chat Region">
           <div className={styles.spacer}>
             <form noValidate autoComplete="off" >
               <TextField
@@ -330,7 +330,7 @@ const Chat = props => {
           switchTranslations={switchTranslations}
           friendEmails={[]}
         />
-        <main className={styles.spacer}>
+        <main className={styles.spacer} aria-labelledby="Chat Region">
           <Typography variant='p1'>No conversations have been started yet. Click on a contact to start chatting.</Typography>
         </main>
       </div>
@@ -353,7 +353,7 @@ const Chat = props => {
           friendEmails={friendEmails}
           color={color}
         />
-        <main>
+        <main aria-labelledby="Chat Region">
           <MessageDisplay
             showMsgInOriginalLanguage = {showMsgInOriginalLanguage}
             userEmail={user.email} 

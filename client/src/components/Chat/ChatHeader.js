@@ -55,7 +55,6 @@ const useStyles = makeStyles((theme) => ({
   },
   chatHeaderName: {
     padding: '0 5px',
-    fontSize: '1.2rem',
   },
 }));
 
@@ -130,11 +129,15 @@ const ChatHeader = props => {
             {!color && (
               <Avatar>{initial}</Avatar>
             )}
-            <h1 className={classes.chatHeaderName}>{friendEmails[0].split('@')[0]}</h1>
+            <Typography className={classes.chatHeaderName} component="h1" variant="h5">
+              {friendEmails[0].split('@')[0]}
+            </Typography>
           </Fragment>
         )}
         {friendEmails.length > 1 && (
-          <h1 className={classes.chatHeaderName}>Group Conversation ({friendEmails.length})</h1>
+          <Typography className={classes.chatHeaderName} component="h1" variant="h5">
+            Group Conversation ({friendEmails.length})
+          </Typography>
         )}
       </div>
       <div className={styles.chatHeaderSpacer} />

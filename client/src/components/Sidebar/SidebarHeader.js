@@ -10,6 +10,7 @@ import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import { Badge } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 
 import {useAuth} from '../../context/auth-context';
 import styles from './Sidebar.module.css';
@@ -31,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
   },
   chatHeaderName: {
     padding: '0 5px',
-    fontSize: '1.2rem',
   },
   paper: {
     marginRight: theme.spacing(2),
@@ -94,7 +94,10 @@ const SidebarHeader = (props) => {
           }}>
           <Avatar className={classes.purple}>{initial}</Avatar>
         </Badge>
-        <h1 className={classes.chatHeaderName}>{email.split('@')[0]}</h1>
+        {/* <h1 className={classes.chatHeaderName}>{email.split('@')[0]}</h1> */}
+        <Typography className={classes.chatHeaderName} component="h1" variant="h5">
+          {email.split('@')[0]}
+        </Typography>
       </div>
       <div className={styles.headerSpacer} />
       <nav className={styles.headerRight} aria-label="Secondary Navigation">

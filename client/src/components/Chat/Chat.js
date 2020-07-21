@@ -165,7 +165,7 @@ const Chat = props => {
   }
 
   const messageInputSubmitHandler = e => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && e.target.value.length > 0) {
       e.preventDefault();
       let message = {
         author_id: user.id,
@@ -296,6 +296,8 @@ const Chat = props => {
               <TextField
                 id="group_conversation_member_emails"
                 label="Group conversation member emails (comma-separated)"
+                required
+                aria-required="true"    
                 value={toEmailAddresses}
                 placeholder="To: email addresses (separated by comma)"
                 variant="outlined"

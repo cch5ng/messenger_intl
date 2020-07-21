@@ -22,6 +22,8 @@ const MessageInput = (props) => {
       <TextField name="msg"
         id="chat_message"
         label="Chat message"
+        required
+        aria-required="true"
         error={error.length}
         value={curMessage}
         onChange={messageInputOnChangeHandler}

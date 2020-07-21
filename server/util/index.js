@@ -3,7 +3,7 @@ const getEmailSendMixedMessage = (sentEmails, unsentEmails) => {
     `Invitations were sent to ${sentEmails.join(', ')}.`:
     '';
   let inviteNotCreatedEmailMessage = unsentEmails.length ?
-    ` Invitations were not sent to ${unsentEmails.join(', ')} because the invitation was already sent, pending, or rejected.`:
+    ` Invitations were not sent to ${unsentEmails.join(', ')} because the invitation was already sent, pending, or rejected. Each conversation group member needs to be friends with every other group member.`:
     '';
   return `${inviteCreatedEmailMessage}${inviteNotCreatedEmailMessage}`;
 }
@@ -14,7 +14,7 @@ const getInviteSendSuccessMessage = (emails) => {
 }
 
 const getInviteNotSentMessage = (emails) => {
-  return `Invitations were not sent to ${emails.join(', ')} because the invitation was already sent, pending, or rejected.`;
+  return `Invitations were not sent to ${emails.join(', ')} because the invitation was already sent, pending, or rejected. Each conversation group member needs to be friends with every other group member.`;
 }
 
 module.exports = {getEmailSendMixedMessage, getInviteSendSuccessMessage, getInviteNotSentMessage};

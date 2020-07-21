@@ -102,7 +102,7 @@ const ChatHeader = props => {
   
   if (!friendEmails.length) {
     return (
-      <div className={styles.chatHeaderContainer}>
+      <header className={styles.chatHeaderContainer} aria-label="Chat Header">
         <div className={styles.chatHeaderSpacer} />
         <div className={styles.chatHeaderRight}>
           <Typography component="div">
@@ -114,12 +114,12 @@ const ChatHeader = props => {
             </Grid>
           </Typography>
         </div>
-      </div>
+      </header>
     )
   }
 
   return (
-    <div className={styles.chatHeaderContainer}>
+    <header className={styles.chatHeaderContainer} aria-label="Chat Header">
       <div className={styles.chatHeaderLeft}>
         {friendEmails.length === 1 && (
           <Fragment>
@@ -129,11 +129,15 @@ const ChatHeader = props => {
             {!color && (
               <Avatar>{initial}</Avatar>
             )}
-            <Typography variant='h5' className={classes.chatHeaderName}>{friendEmails[0].split('@')[0]}</Typography>
+            <Typography className={classes.chatHeaderName} component="h1" variant="h5">
+              {friendEmails[0].split('@')[0]}
+            </Typography>
           </Fragment>
         )}
         {friendEmails.length > 1 && (
-          <Typography variant='h5' className={classes.chatHeaderName}>Group Conversation ({friendEmails.length})</Typography>
+          <Typography className={classes.chatHeaderName} component="h1" variant="h5">
+            Group Conversation ({friendEmails.length})
+          </Typography>
         )}
       </div>
       <div className={styles.chatHeaderSpacer} />
@@ -147,7 +151,7 @@ const ChatHeader = props => {
           </Grid>
         </Typography>
       </div>
-    </div>
+    </header>
   );
 }
 

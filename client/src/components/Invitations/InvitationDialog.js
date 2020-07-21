@@ -223,9 +223,12 @@ export default function InvitationDialog(props) {
           </DialogContentText>
           <TextField
             autoFocus
+            required
+            aria-required="true"
             error={emailErrorMessage.length > 0}
             margin="dense"
-            id="email"
+            id="recipient_email"
+            label="Email"
             type="email"
             variant="outlined"
             value={email}

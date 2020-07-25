@@ -8,8 +8,8 @@ const logger = require("morgan");
 const mongoose = require('mongoose');
 const passport = require("passport");
 
-const indexRouter = require("./routes/index");
-const pingRouter = require("./routes/ping");
+//const indexRouter = require("./routes/index");
+//const pingRouter = require("./routes/ping");
 const conversationRouter = require("./routes/conversation");
 const invitationRouter = require("./routes/invitation");
 const userRouter = require("./routes/user");
@@ -54,6 +54,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+mongoose.set('useFindAndModify', false);
 //connect to mongodb
 mongoose.connect(dbUrl, { useUnifiedTopology: true, useNewUrlParser: true})
         .then(_res => console.log('Successfully connected to Cloud mongodb'))

@@ -6,20 +6,20 @@ const User = require('../models/user');
 
 describe('User API endpoints', () => {
 
-  afterEach((done) => {
-    jest.setTimeout(30000);
+  // afterEach((done) => {
+  //   jest.setTimeout(30000);
 
-    User.findOneAndDelete({"email": "test999@t.com"}, function(err, doc) {
-      if (err) {
-        console.error('err', err);
-        done()
-      }
-      if (doc) {
-        console.log('doc', doc)
-        done()
-      }
-    })
-  });
+  //   User.findOneAndDelete({"email": "test999@t.com"}, function(err, doc) {
+  //     if (err) {
+  //       console.error('err', err);
+  //       done()
+  //     }
+  //     if (doc) {
+  //       console.log('doc', doc)
+  //       done()
+  //     }
+  //   })
+  // });
 
   test('should test POST /register confirmPassword matches password', (done) => {
     request(app)
@@ -59,6 +59,7 @@ describe('User API endpoints', () => {
 
 
   test('should test POST /register able to register successfully', (done) => {
+    jest.setTimeout(30000);
     request(app)
       .post('/user/register')
       .set('Content-Type', 'application/json')
@@ -67,7 +68,19 @@ describe('User API endpoints', () => {
         "confirmPassword": "testPassword10&",
         "language": "english"
       })
-      .expect(201, done)
+      .expect(201)
+      .then(() => {
+        User.findOneAndDelete({"email": "test999@t.com"}, function(err, doc) {
+          if (err) {
+            console.error('err', err);
+            done()
+          }
+          if (doc) {
+            //console.log('doc', doc)
+            done()
+          }
+        })
+      })
   });
 
 

@@ -6,20 +6,20 @@ const User = require('../models/user');
 
 describe('User API endpoints', () => {
 
-  // afterEach((done) => {
-  //   jest.setTimeout(30000);
+  afterAll((done) => {
+    jest.setTimeout(30000);
 
-  //   User.findOneAndDelete({"email": "test999@t.com"}, function(err, doc) {
-  //     if (err) {
-  //       console.error('err', err);
-  //       done()
-  //     }
-  //     if (doc) {
-  //       console.log('doc', doc)
-  //       done()
-  //     }
-  //   })
-  // });
+    User.findOneAndDelete({"email": "test999@t.com"}, function(err, doc) {
+      if (err) {
+        console.error('err', err);
+        done()
+      }
+      if (doc) {
+        //console.log('doc', doc)
+        done()
+      }
+    })
+  });
 
   test('should test POST /register confirmPassword matches password', (done) => {
     request(app)
@@ -45,6 +45,18 @@ describe('User API endpoints', () => {
       .expect(400, done)
   });
 
+  test('should test POST /register valid email', (done) => {
+    request(app)
+      .post('/user/register')
+      .set('Content-Type', 'application/json')
+      .send({"email": "invalid@",
+        "password": "testPassword10&",
+        "confirmPassword": "testPassword",
+        "language": "english"
+      })
+      .expect(400, done)
+  });
+
   test('should test POST /register empty password', (done) => {
     request(app)
       .post('/user/register')
@@ -57,6 +69,17 @@ describe('User API endpoints', () => {
       .expect(400, done)
   });
 
+  test('should test POST /register password length', (done) => {
+    request(app)
+      .post('/user/register')
+      .set('Content-Type', 'application/json')
+      .send({"email": "test999@t.com",
+        "password": "1234",
+        "confirmPassword": "testPassword",
+        "language": "english"
+      })
+      .expect(400, done)
+  });
 
   test('should test POST /register able to register successfully', (done) => {
     jest.setTimeout(30000);
@@ -68,21 +91,7 @@ describe('User API endpoints', () => {
         "confirmPassword": "testPassword10&",
         "language": "english"
       })
-      .expect(201)
-      .then(() => {
-        User.findOneAndDelete({"email": "test999@t.com"}, function(err, doc) {
-          if (err) {
-            console.error('err', err);
-            done()
-          }
-          if (doc) {
-            //console.log('doc', doc)
-            done()
-          }
-        })
-      })
+      .expect(201, done)
   });
 
-
-})
-
+});

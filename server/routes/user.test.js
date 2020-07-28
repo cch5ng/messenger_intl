@@ -81,7 +81,7 @@ describe('User API register endpoint', () => {
   });
 
   test('should test POST /register able to register successfully', (done) => {
-    jest.setTimeout(30000);
+    jest.setTimeout(40000);
     request(app)
       .post('/user/register')
       .set('Content-Type', 'application/json')
@@ -96,13 +96,14 @@ describe('User API register endpoint', () => {
 });
 
 describe('User API login endpoints', () => {
+  let email = 'test1001@t.com';
 
   beforeAll((done) => {
     jest.setTimeout(30000);
     request(app)
     .post('/user/register')
     .set('Content-Type', 'application/json')
-    .send({"email": "test999@t.com",
+    .send({email,
       "password": "testPassword10&",
       "confirmPassword": "testPassword10&",
       "language": "english"
@@ -113,7 +114,7 @@ describe('User API login endpoints', () => {
   afterAll((done) => {
     jest.setTimeout(30000);
 
-    User.findOneAndDelete({"email": "test999@t.com"}, function(err, doc) {
+    User.findOneAndDelete({email}, function(err, doc) {
       if (err) {
         console.error('err', err);
         done()
@@ -128,7 +129,7 @@ describe('User API login endpoints', () => {
     request(app)
       .post('/user/login')
       .set('Content-Type', 'application/json')
-      .send({"email": "test9999@t.com",
+      .send({email,
         "password": "test"
       })
       .expect(404, done)
@@ -158,7 +159,7 @@ describe('User API login endpoints', () => {
     request(app)
       .post('/user/login')
       .set('Content-Type', 'application/json')
-      .send({"email": "test999@t.com",
+      .send({email,
         "password": ""
       })
       .expect(400, done)
@@ -169,7 +170,7 @@ describe('User API login endpoints', () => {
     request(app)
       .post('/user/login')
       .set('Content-Type', 'application/json')
-      .send({"email": "test999@t.com",
+      .send({email,
         "password": "testPassword10&"
       })
       .expect(200)
@@ -177,6 +178,155 @@ describe('User API login endpoints', () => {
         expect(resp.body.token.length).not.toBe(0);
         done();
       })
+  });
+
+});
+
+describe('User API misc endpoints', () => {
+  const email = 'test1002@t.com';
+  let token;
+
+  beforeAll((done) => {
+    jest.setTimeout(30000);
+    request(app)
+    .post('/user/register')
+    .set('Content-Type', 'application/json')
+    .send({email,
+      "password": "testPassword10&",
+      "confirmPassword": "testPassword10&",
+      "language": "english"
+    })
+    .then(resp => {
+      if (resp.statusCode === 201) {
+        request(app)
+        .post('/user/login')
+        .set('Content-Type', 'application/json')
+        .send({email,
+          "password": "testPassword10&"
+        })
+        .then(resp => {
+          if (resp && resp.body && resp.body.token && resp.body.token.length) {
+            token = resp.body.token;
+            done();
+          }
+        })
+      }
+    })
+  })
+
+  afterAll((done) => {
+    jest.setTimeout(30000);
+    User.findOneAndDelete({email}, function(err, doc) {
+      if (err) {
+        console.error('err', err);
+        done()
+      }
+      if (doc) {
+        done()
+      }
+    })
+  });
+
+  test('should test GET /:email/referralId', (done) => {
+    request(app)
+      .get(`/user/${email}/referralId`)
+      .set('Content-Type', 'application/json')
+      .set('Authorization',  `Bearer ${token}`)
+      .send()
+      .expect(200, done)
+  });
+
+  test('should test GET /:email/language', (done) => {
+    request(app)
+      .get(`/user/${email}/language`)
+      .set('Content-Type', 'application/json')
+      .set('Authorization',  `Bearer ${token}`)
+      .send()
+      .expect(200, done)
+  });
+
+});
+
+describe('User API registration with referralId', () => {
+  const email = 'test1003@t.com';
+  const email2 = 'test1004@t.com';
+  let token;
+  let referralId;
+
+  beforeAll((done) => {
+    jest.setTimeout(30000);
+    request(app)
+    .post('/user/register')
+    .set('Content-Type', 'application/json')
+    .send({email,
+      "password": "testPassword10&",
+      "confirmPassword": "testPassword10&",
+      "language": "english"
+    })
+    .then(resp => {
+      if (resp.statusCode === 201) {
+        request(app)
+        .post('/user/login')
+        .set('Content-Type', 'application/json')
+        .send({email,
+          "password": "testPassword10&"
+        })
+        .then(resp => {
+          if (resp && resp.body && resp.body.token && resp.body.token.length) {
+            token = resp.body.token;
+            request(app)
+            .get(`/user/${email}/referralId`)
+            .set('Content-Type', 'application/json')
+            .set('Authorization',  `Bearer ${token}`)
+            .send()
+            .then(resp => {
+              if (resp && resp.body && resp.body.referralId && resp.body.referralId.length) {
+                referralId = resp.body.referralId
+                done();
+              } else {
+                done();
+              }
+            })
+          }
+        })
+      }
+    })
+  })
+
+  afterAll((done) => {
+    jest.setTimeout(50000);
+    User.findOneAndDelete({email}, function(err, doc) {
+      if (err) {
+        console.error('err', err);
+        done()
+      }
+      if (doc) {
+        User.findOneAndDelete({"email": email2}, function(err, doc) {
+          if (err) {
+            console.error('err', err);
+            done()
+          }
+          if (doc) {
+            done()
+          }
+        })
+      }
+    })
+  });
+
+  test('should test POST /register/referral', (done) => {
+    jest.setTimeout(50000);
+    request(app)
+      .post(`/user/register/referral`)
+      .set('Content-Type', 'application/json')
+      .set('Authorization',  `Bearer ${token}`)
+      .send({referralId, 
+        email: email2, 
+        password: '13579000',
+        confirmPassword: '13579000',
+        language: 'english'})
+      .expect(201, done)
+
   });
 
 });

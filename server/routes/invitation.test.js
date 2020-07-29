@@ -2,7 +2,7 @@ let request = require('supertest');
 request('http://127.0.0.1:3001');
 const app = require("../app.js");
 const Invitation = require('../models/invitation');
-const { TestScheduler } = require('jest');
+const User = require('../models/user');
 
 describe('Invitation API create and send invitation', () => {
 
@@ -11,7 +11,7 @@ describe('Invitation API create and send invitation', () => {
     let referralId;
   
     beforeAll((done) => {
-      jest.setTimeout(50000);
+      jest.setTimeout(70000);
       request(app)
       .post('/user/register')
       .set('Content-Type', 'application/json')
@@ -73,7 +73,7 @@ describe('Invitation API create and send invitation', () => {
     });
 
     test('POST should fail for empty recipients array', (done) => {
-      jest.setTimeout(50000);
+      jest.setTimeout(70000);
       request(app)
       .post(`/invitations/user/:email`)
       .set('Content-Type', 'application/json')
@@ -85,7 +85,7 @@ describe('Invitation API create and send invitation', () => {
     })
 
     test('POST should fail for recipients array with invalid email', (done) => {
-      jest.setTimeout(50000);
+      jest.setTimeout(70000);
       request(app)
       .post(`/invitations/user/:email`)
       .set('Content-Type', 'application/json')

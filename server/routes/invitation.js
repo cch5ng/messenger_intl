@@ -160,11 +160,11 @@ router.post("/user/:fromEmail",
                                   return {to_user_email, from_user_email: fromEmail}});
                                 Invitation.insertMany(newInvites, function(err) {
                                   if (err) return console.error(err);
-                                  res.json({ type: "success",
+                                  res.status(200).json({ type: "success",
                                     message: getEmailSendMixedMessage(nonDupeInviteRecipients, dupeInviteRecipients)});
                                 })
                               } else {
-                                res.status(200).json({ type: "error",
+                                res.status(400).json({ type: "error",
                                   message: getInviteNotSentMessage(dupeInviteRecipients)})
                               }
                             } else if (invitations.length === 0) {
@@ -172,7 +172,7 @@ router.post("/user/:fromEmail",
                                 return {to_user_email, from_user_email: fromEmail}});
                               Invitation.insertMany(newInvites, function(err, invitations) {
                                 if (err) return console.error(err);
-                                res.json({ type: "success", 
+                                res.status(200).json({ type: "success", 
                                   message: getInviteSendSuccessMessage(curUserEmails)});
                               })
                             }

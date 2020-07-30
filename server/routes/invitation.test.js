@@ -1,5 +1,6 @@
 let request = require('supertest');
 request('http://127.0.0.1:3001');
+require('dotenv').config();
 const app = require("../app.js");
 const Invitation = require('../models/invitation');
 const User = require('../models/user');
@@ -90,9 +91,10 @@ describe('Invitation API create and send invitation', () => {
 })
 
 describe('Invitation API create and send internal invitation', () => {
-
   const email = 'test1006@t.com';
   const email2 = 'test1007@t.com';
+  const email3 = 'test1008@t.com';
+  const email4 = 'test1009@t.com';
   let token;
   let referralId;
 
@@ -134,7 +136,17 @@ describe('Invitation API create and send internal invitation', () => {
                   "language": "english"
                 })
                 .then(resp => {
-                  done();
+                  request(app)
+                  .post('/user/register')
+                  .set('Content-Type', 'application/json')
+                  .send({email: email3,
+                    "password": "testPassword10&",
+                    "confirmPassword": "testPassword10&",
+                    "language": "english"
+                  })
+                  .then(resp => {
+                    done();
+                  })
                 })
               } else {
                 done();
@@ -147,48 +159,118 @@ describe('Invitation API create and send internal invitation', () => {
   })
 
   afterAll((done) => {
-    jest.setTimeout(50000);
-    User.findOneAndDelete({email}, function(err, doc) {
+    jest.setTimeout(70000);
+    Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) {
       if (err) {
         console.error('err', err);
         done();
       }
       if (doc) {
-        User.findOneAndDelete({email}, function(err, doc) {
+        Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email3}, function(err, doc) { 
           if (err) {
             console.error('err', err);
             done();
           }
           if (doc) {
-            done();        
+            // Invitation.findByIdAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) { 
+            //   if (err) {
+            //     console.error('err', err);
+            //     done();
+            //   }
+            //   if (doc) {
+                User.findOneAndDelete({email}, function(err, doc) {
+                  if (err) {
+                    console.error('err', err);
+                    done();
+                  }
+                  if (doc) {
+                    User.findOneAndDelete({email}, function(err, doc) {
+                      if (err) {
+                        console.error('err', err);
+                        done();
+                      }
+                      if (doc) {
+                        User.findOneAndDelete({email}, function(err, doc) {
+                          if (err) {
+                            console.error('err', err);
+                            done();
+                          }
+                          if (doc) {
+                            done();        
+                          }
+                        })
+                      }
+                    })
+                  }
+                })
+              //}
+            //})
           }
         })
       }
     })
   });
 
-  test('POST should fail for users who are not friends', (done) => {
+  test('POST should pass for users who are not friends (2)', (done) => {
     jest.setTimeout(70000);
     request(app)
-    .post(`/invitations/user/:email`)
+    .post(`/invitations/user/${email}`)
     .set('Content-Type', 'application/json')
     .set('Authorization', `Bearer ${token}`)
     .send({"toEmailAr": [email2],
         referralId
     })
-    .expect(400, done)
+    .expect(200, done)
   })
 
-  test.skip('POST should fail for recipients array with invalid email', (done) => {
+  //passes because email3 does not have an invitation yet but 
+  //email2 already has an invitation so only 1 invite is created
+  test('POST should pass for users who are not friends (3)', (done) => {
     jest.setTimeout(70000);
     request(app)
-    .post(`/invitations/user/:email`)
+    .post(`/invitations/user/${email}`)
     .set('Content-Type', 'application/json')
     .set('Authorization', `Bearer ${token}`)
-    .send({"toEmailAr": ['inv@', 'test@t'],
+    .send({"toEmailAr": [email2, email3],
         referralId
     })
-    .expect(400, done)
+    .expect(200, done)
+  })
+
+  test('POST should pass for friend, email', (done) => {
+    jest.setTimeout(70000);
+    request(app)
+    .post(`/invitations/user/${email}`)
+    .set('Content-Type', 'application/json')
+    .set('Authorization', `Bearer ${token}`)
+    .send({"toEmailAr": [process.env.SENDGRID_FROM_EMAIL],
+        referralId
+    })
+    .expect(200, done)
+  })
+
+  //trying to send invitation to same user 2x should fail
+  //test is failing currently; double check the route logic
+  test('POST should fail for sending invite to user twice', (done) => {
+    jest.setTimeout(70000);
+    request(app)
+    .post(`/invitations/user/${email}`)
+    .set('Content-Type', 'application/json')
+    .set('Authorization', `Bearer ${token}`)
+    .send({"toEmailAr": [email4],
+        referralId
+    })
+    //.expect(200)
+    .then(resp => {
+      request(app)
+      .post(`/invitations/user/${email}`)
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({"toEmailAr": [email4],
+          referralId
+      })
+      .expect(400, done)
+    })
   })
 
 })

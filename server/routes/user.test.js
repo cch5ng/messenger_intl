@@ -2,6 +2,7 @@ let request = require('supertest');
 request('http://127.0.0.1:3001');
 const app = require("../app.js");
 const User = require('../models/user');
+const Invitation = require('../models/invitation');
 
 describe('User API register endpoint', () => {
 
@@ -294,7 +295,7 @@ describe('User API registration with referralId', () => {
   })
 
   afterAll((done) => {
-    jest.setTimeout(50000);
+    jest.setTimeout(70000);
     User.findOneAndDelete({email}, function(err, doc) {
       if (err) {
         console.error('err', err);
@@ -307,7 +308,15 @@ describe('User API registration with referralId', () => {
             done()
           }
           if (doc) {
-            done()
+            Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) {
+              if (err) {
+                console.error('err', err);
+                done();
+              }
+              if (doc) {
+                done();
+              }
+            })
           }
         })
       }

@@ -308,6 +308,7 @@ describe('User API registration with referralId', () => {
             done()
           }
           if (doc) {
+            //not sure why there are two invitations with same from and to user values
             Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) {
               if (err) {
                 console.error('err', err);

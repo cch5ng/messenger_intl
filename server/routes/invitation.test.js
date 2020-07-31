@@ -12,7 +12,7 @@ describe('Invitation API create and send invitation', () => {
     let referralId;
   
     beforeAll((done) => {
-      jest.setTimeout(70000);
+      jest.setTimeout(100000);
       request(app)
       .post('/user/register')
       .set('Content-Type', 'application/json')
@@ -65,7 +65,7 @@ describe('Invitation API create and send invitation', () => {
     });
 
     test('POST should fail for empty recipients array', (done) => {
-      jest.setTimeout(70000);
+      jest.setTimeout(100000);
       request(app)
       .post(`/invitations/user/:email`)
       .set('Content-Type', 'application/json')
@@ -99,7 +99,7 @@ describe('Invitation API create and send internal invitation', () => {
   let referralId;
 
   beforeAll((done) => {
-    jest.setTimeout(70000);
+    jest.setTimeout(100000);
     request(app)
     .post('/user/register')
     .set('Content-Type', 'application/json')
@@ -159,7 +159,7 @@ describe('Invitation API create and send internal invitation', () => {
   })
 
   afterAll((done) => {
-    jest.setTimeout(70000);
+    jest.setTimeout(100000);
     Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) {
       if (err) {
         console.error('err', err);
@@ -172,12 +172,12 @@ describe('Invitation API create and send internal invitation', () => {
             done();
           }
           if (doc) {
-            // Invitation.findByIdAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) { 
-            //   if (err) {
-            //     console.error('err', err);
-            //     done();
-            //   }
-            //   if (doc) {
+            Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email4}, function(err, doc) { 
+              if (err) {
+                console.error('err', err);
+                done();
+              }
+              if (doc) {
                 User.findOneAndDelete({email}, function(err, doc) {
                   if (err) {
                     console.error('err', err);
@@ -203,8 +203,8 @@ describe('Invitation API create and send internal invitation', () => {
                     })
                   }
                 })
-              //}
-            //})
+              }
+            })
           }
         })
       }
@@ -250,7 +250,7 @@ describe('Invitation API create and send internal invitation', () => {
   })
 
   //trying to send invitation to same user 2x should fail
-  //test is failing currently; double check the route logic
+  //test is failing currently (returning 200 not 400); double check the route logic
   test('POST should fail for sending invite to user twice', (done) => {
     jest.setTimeout(70000);
     request(app)

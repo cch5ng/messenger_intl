@@ -56,8 +56,6 @@ router.post("/user/:fromEmail",
                                       to_email_ar: nonCurUserEmails, 
                                       referral_id: referralId})
                             .then(resp => {
-                              console.log('resp', resp)
-
                               if (getSuccessCount(resp) === nonCurUserEmails.length) {
                                 inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
                               }

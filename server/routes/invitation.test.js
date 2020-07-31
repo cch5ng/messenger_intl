@@ -240,38 +240,7 @@ describe('Invitation API create and send internal invitation', () => {
     })
     .expect(200, done)
   })
-
-  //trying to send invitation to same user 2x should fail
-  //test is failing currently (returning 200 not 400); double check the route logic
-  test.skip('POST should fail for sending invite to user twice', (done) => {
-    jest.setTimeout(70000);
-    request(app)
-    .post(`/invitations/user/${email}`)
-    .set('Content-Type', 'application/json')
-    .set('Authorization', `Bearer ${token}`)
-    .send({"toEmailAr": [email4],
-        referralId
-    })
-    //.expect(200)
-    .then(resp => {
-      request(app)
-      .post(`/invitations/user/${email}`)
-      .set('Content-Type', 'application/json')
-      .set('Authorization', `Bearer ${token}`)
-      .send({"toEmailAr": [email4],
-          referralId
-      })
-      .expect(400, done)
-    })
-  })
-
 })
-
-
-
-
-
-
 
 describe('Invitation API create and send internal and external invitation', () => {
   const email = 'test1010@t.com';
@@ -387,5 +356,104 @@ describe('Invitation API create and send internal and external invitation', () =
     })
     .expect(200, done)
   })
+})
 
+describe('Invitation API create and send internal invitation', () => {
+  const email = 'test1015@t.com';
+  const email2 = 'test1016@t.com';
+  let token;
+  let referralId;
+
+  beforeAll((done) => {
+    jest.setTimeout(170000);
+    request(app)
+    .post('/user/register')
+    .set('Content-Type', 'application/json')
+    .send({email,
+      "password": "testPassword10&",
+      "confirmPassword": "testPassword10&",
+      "language": "english"
+    })
+    .then(resp => {
+      if (resp.statusCode === 201) {
+        request(app)
+        .post('/user/login')
+        .set('Content-Type', 'application/json')
+        .send({email,
+          "password": "testPassword10&"
+        })
+        .then(resp => {
+          if (resp && resp.body && resp.body.token && resp.body.token.length) {
+            token = resp.body.token;
+            request(app)
+            .get(`/user/${email}/referralId`)
+            .set('Content-Type', 'application/json')
+            .set('Authorization',  `Bearer ${token}`)
+            .send()
+            .then(resp => {
+              if (resp && resp.body && resp.body.referralId && resp.body.referralId.length) {
+                referralId = resp.body.referralId;
+                request(app)
+                .post('/user/register')
+                .set('Content-Type', 'application/json')
+                .send({email: email2,
+                  "password": "testPassword10&",
+                  "confirmPassword": "testPassword10&",
+                  "language": "english"
+                })
+                .then(resp => {
+                  done();
+                })
+              } else {
+                done();
+              }
+            })
+          }
+        })
+      }
+    })
+  })
+
+  afterAll((done) => {
+    jest.setTimeout(120000);
+    Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) {
+      if (err) {
+        console.error('err', err);
+        done();
+      }
+      User.findOneAndDelete({email}, function(err, doc) {
+        if (err) {
+          console.error('err', err);
+          done();
+        }
+        User.findOneAndDelete({email: email2}, function(err, doc) {
+          if (err) {
+            console.error('err', err);
+            done();
+          }
+        })
+      })
+    })
+  });
+
+  test('POST should pass for combination of registered and unregistered users (4)', (done) => {
+    jest.setTimeout(140000);
+    request(app)
+    .post(`/invitations/user/${email}`)
+    .set('Content-Type', 'application/json')
+    .set('Authorization', `Bearer ${token}`)
+    .send({"toEmailAr": [email2],
+        referralId
+    })
+    .then(resp => {
+      request(app)
+      .post(`/invitations/user/${email}`)
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({"toEmailAr": [email2],
+          referralId
+      })
+      .expect(400, done)
+    })
+  })
 })

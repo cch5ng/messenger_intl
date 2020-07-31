@@ -126,11 +126,12 @@ describe('User API login endpoints', () => {
     })
   });
 
+  //fails returns 401 instead of 404
   test('should test POST /login reject user with no registered', (done) => {
     request(app)
       .post('/user/login')
       .set('Content-Type', 'application/json')
-      .send({email,
+      .send({email: "test98@t.com",
         "password": "test"
       })
       .expect(404, done)

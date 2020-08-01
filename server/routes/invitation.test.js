@@ -846,7 +846,6 @@ describe('Invitation API accept invitation', () => {
     })
   });
 
-  //TODO test is failing with 400 but should pass
   test('POST should pass for accept invitation', (done) => {
     jest.setTimeout(140000);
     request(app)
@@ -863,6 +862,128 @@ describe('Invitation API accept invitation', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({from_email: email})
         .expect(200, done)  
+      })
+  })
+})
+
+describe('Invitation API get contacts', () => {
+  const email = 'test1028@t.com';
+  const email2 = 'test1029@t.com';
+  let token;
+  let referralId;
+
+  beforeAll((done) => {
+    jest.setTimeout(170000);
+    request(app)
+    .post('/user/register')
+    .set('Content-Type', 'application/json')
+    .send({email,
+      "password": "testPassword10&",
+      "confirmPassword": "testPassword10&",
+      "language": "english"
+    })
+    .then(resp => {
+      if (resp.statusCode === 201) {
+        request(app)
+        .post('/user/login')
+        .set('Content-Type', 'application/json')
+        .send({email,
+          "password": "testPassword10&"
+        })
+        .then(resp => {
+          if (resp && resp.body && resp.body.token && resp.body.token.length) {
+            token = resp.body.token;
+            request(app)
+            .get(`/user/${email}/referralId`)
+            .set('Content-Type', 'application/json')
+            .set('Authorization',  `Bearer ${token}`)
+            .send()
+            .then(resp => {
+              if (resp && resp.body && resp.body.referralId && resp.body.referralId.length) {
+                referralId = resp.body.referralId;
+                request(app)
+                .post('/user/register')
+                .set('Content-Type', 'application/json')
+                .send({email: email2,
+                  "password": "testPassword10&",
+                  "confirmPassword": "testPassword10&",
+                  "language": "english"
+                })
+                .then(resp => {
+                  done();
+                })
+              } else {
+                done();
+              }
+            })
+          }
+        })
+      }
+    })
+  })
+
+  afterAll((done) => {
+    jest.setTimeout(120000);
+    Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) {
+      if (err) {
+        console.error('err', err);
+        done();
+      }
+      User.findOneAndDelete({email}, function(err, doc) {
+        if (err) {
+          console.error('err', err);
+          done();
+        }
+        User.findOneAndDelete({email: email2}, function(err, doc) {
+          if (err) {
+            console.error('err', err);
+            done();
+          }
+        })
+      })
+    })
+  });
+
+  test('GET should pass for contacts (no contacts)', (done) => {
+    jest.setTimeout(140000);
+    request(app)
+      .post(`/invitations/user/${email}`)
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({"toEmailAr": [email2],
+        referralId
+      })
+      .then(resp => {
+        request(app)
+        .get(`/invitations/user/${email}/contacts`)
+        .set('Authorization', `Bearer ${token}`)
+        .send()
+        .expect(201, done)  
+      })
+  })
+
+  test('GET should pass for contacts (1 contact)', (done) => {
+    jest.setTimeout(140000);
+    request(app)
+      .post(`/invitations/user/${email}`)
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({"toEmailAr": [email2],
+        referralId
+      })
+      .then(resp => {
+        request(app)
+        .put(`/invitations/user/${email2}/approve`)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', `Bearer ${token}`)
+        .send({from_email: email})
+        .then(resp => {
+          request(app)
+          .get(`/invitations/user/${email}/contacts`)
+          .set('Authorization', `Bearer ${token}`)
+          .send()
+          .expect(201, done)    
+        })
       })
   })
 })

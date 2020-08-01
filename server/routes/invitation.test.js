@@ -850,10 +850,12 @@ describe('Invitation API accept invitation', () => {
   test('POST should pass for accept invitation', (done) => {
     jest.setTimeout(140000);
     request(app)
-      .post(`/invitations/user/${email2}`)
+      .post(`/invitations/user/${email}`)
       .set('Content-Type', 'application/json')
       .set('Authorization', `Bearer ${token}`)
-      .send({from_email: email})
+      .send({"toEmailAr": [email2],
+        referralId
+      })
       .then(resp => {
         request(app)
         .put(`/invitations/user/${email2}/approve`)

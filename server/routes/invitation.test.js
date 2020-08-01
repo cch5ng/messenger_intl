@@ -458,12 +458,7 @@ describe('Invitation API create and send internal invitation', () => {
   })
 })
 
-
-
-
-
-
-describe('Invitation API get invitations sent to user', () => {
+describe('Invitation API get invitations sent from user', () => {
   const email = 'test1020@t.com';
   const email2 = 'test1021@t.com';
   let token;
@@ -562,6 +557,112 @@ describe('Invitation API get invitations sent to user', () => {
     .then(resp => {
       request(app)
       .get(`/invitations/user/${email}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+      .expect(200, done)
+    })
+  })
+})
+
+describe('Invitation API get invitations sent to user', () => {
+  const email = 'test1022@t.com';
+  const email2 = 'test1023@t.com';
+  let token;
+  let referralId;
+
+  beforeAll((done) => {
+    jest.setTimeout(170000);
+    request(app)
+    .post('/user/register')
+    .set('Content-Type', 'application/json')
+    .send({email,
+      "password": "testPassword10&",
+      "confirmPassword": "testPassword10&",
+      "language": "english"
+    })
+    .then(resp => {
+      if (resp.statusCode === 201) {
+        request(app)
+        .post('/user/login')
+        .set('Content-Type', 'application/json')
+        .send({email,
+          "password": "testPassword10&"
+        })
+        .then(resp => {
+          if (resp && resp.body && resp.body.token && resp.body.token.length) {
+            token = resp.body.token;
+            request(app)
+            .get(`/user/${email}/referralId`)
+            .set('Content-Type', 'application/json')
+            .set('Authorization',  `Bearer ${token}`)
+            .send()
+            .then(resp => {
+              if (resp && resp.body && resp.body.referralId && resp.body.referralId.length) {
+                referralId = resp.body.referralId;
+                request(app)
+                .post('/user/register')
+                .set('Content-Type', 'application/json')
+                .send({email: email2,
+                  "password": "testPassword10&",
+                  "confirmPassword": "testPassword10&",
+                  "language": "english"
+                })
+                .then(resp => {
+                  done();
+                })
+              } else {
+                done();
+              }
+            })
+          }
+        })
+      }
+    })
+  })
+
+  afterAll((done) => {
+    jest.setTimeout(120000);
+    Invitation.findOneAndDelete({"from_user_email": email, "to_user_email": email2}, function(err, doc) {
+      if (err) {
+        console.error('err', err);
+        done();
+      }
+      User.findOneAndDelete({email}, function(err, doc) {
+        if (err) {
+          console.error('err', err);
+          done();
+        }
+        User.findOneAndDelete({email: email2}, function(err, doc) {
+          if (err) {
+            console.error('err', err);
+            done();
+          }
+        })
+      })
+    })
+  });
+
+  test('GET should pass for invitation to user (no invitations)', (done) => {
+    jest.setTimeout(140000);
+      request(app)
+      .get(`/invitations/user/requests/${email}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+      .expect(200, done)
+  })
+
+  test('GET should pass for invitation to user (1 invitation)', (done) => {
+    jest.setTimeout(170000);
+    request(app)
+    .post(`/invitations/user/${email}`)
+    .set('Content-Type', 'application/json')
+    .set('Authorization', `Bearer ${token}`)
+    .send({"toEmailAr": [email2],
+        referralId
+    })
+    .then(resp => {
+      request(app)
+      .get(`/invitations/user/requests/${email}`)
       .set('Authorization', `Bearer ${token}`)
       .send()
       .expect(200, done)

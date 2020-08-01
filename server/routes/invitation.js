@@ -295,11 +295,13 @@ router.get("/user/:to_email/contacts",
   }
 );
 
+//JWT check
 //approve the request
 router.put("/user/:to_email/approve", (req, res) => {
   invitationRejectApproveHelper(req,res,'approved');
 });
 
+//JWT check
 //reject the request
 router.put("/user/:to_email/reject", (req, res) => {
   invitationRejectApproveHelper(req,res,'rejected');

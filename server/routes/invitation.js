@@ -202,9 +202,9 @@ router.post("/user/:fromEmail",
     }
 );
 
-// Returns pending invitations that were sent to the given user
+//Returns invitation requests from the user
 router.get("/user/:from_email",
-    //passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     function(req, res, next) {
         const {from_email} = req.params;
 
@@ -224,8 +224,9 @@ router.get("/user/:from_email",
     }
 );
 
-//Returns invitation requests for the user
+// Returns pending invitations that were sent to the given user
 router.get("/user/requests/:to_email",
+    passport.authenticate('jwt', { session: false }),
     function(req, res, next) {
         const {to_email} = req.params;
 
@@ -247,7 +248,7 @@ router.get("/user/requests/:to_email",
 
 //Returns contacts for the current user
 router.get("/user/:to_email/contacts",
-  //passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', { session: false }),
   function(req, res, next) {
     const {to_email} = req.params;
     let contactsLang = {};

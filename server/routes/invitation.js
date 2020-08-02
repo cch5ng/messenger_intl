@@ -274,7 +274,7 @@ router.get("/user/:to_email/contacts",
                 contactsLang[contact] = {language: user[0].language};
               }
               if (idx === contacts.length - 1) {
-                res.status(201).json({type: 'success', contacts: contactsLang});
+                res.status(200).json({type: 'success', contacts: contactsLang});
               }
             }
           })
@@ -285,11 +285,11 @@ router.get("/user/:to_email/contacts",
         if(req.query.q){
           contacts = contacts.filter(contact => contact.includes(req.query.q))
                              .map(filteredContact => filteredContact.split('@')[0]);
-          res.status(201).json({type: 'success', contacts});                          
+          res.status(200).json({type: 'success', contacts});                          
         }
         
       } else {
-        res.status(201).json({type: 'success', message: 'No contacts were found.', contacts: []})
+        res.status(200).json({type: 'success', message: 'No contacts were found.', contacts: []})
       }
     });
   }

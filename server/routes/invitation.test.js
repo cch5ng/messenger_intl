@@ -958,7 +958,7 @@ describe('Invitation API get contacts', () => {
         .get(`/invitations/user/${email}/contacts`)
         .set('Authorization', `Bearer ${token}`)
         .send()
-        .expect(201, done)  
+        .expect(200, done)  
       })
   })
 
@@ -982,7 +982,7 @@ describe('Invitation API get contacts', () => {
           .get(`/invitations/user/${email}/contacts`)
           .set('Authorization', `Bearer ${token}`)
           .send()
-          .expect(201, done)    
+          .expect(200, done)    
         })
       })
   })

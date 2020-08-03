@@ -42,7 +42,7 @@ router.post("/",
             //returned expected # of valid friend pairs
             let invitationsPopulated = invitations.filter(invite => invite.length)
             if (invitationsPopulated.length !== pairsToValidate.length) {
-              return res.json({type: 'error', message: 'The conversation could not be created. All participants need to be friends.'})
+              return res.status(400).json({type: 'error', message: 'The conversation could not be created. All participants need to be friends.'})
             } else {
                 let newChat;
                 //case1 new conversation between 2 people, no message
@@ -114,9 +114,9 @@ router.get("/user/:email",
                     let shortMessages = [convo.messages[convo.messages.length - 1]];
                     convo.messages = shortMessages;
                   })
-                  res.json({ type: "success", conversations})
+                  res.status(200).json({ type: "success", conversations})
                 } else {
-                    res.json({ type: "success", conversations: [], message: "There are no current conversations"})
+                    res.status(200).json({ type: "success", conversations: [], message: "There are no current conversations"})
                 }
             }
         )
@@ -136,7 +136,7 @@ router.get("/:conversation_id",
               conversation,
               message: 'An existing conversation was found.'})
           } else {
-            res.json({type: 'error', message: 'That conversation was not found'})
+            res.status(401).json({type: 'error', message: 'That conversation was not found'})
           }
         }) 
     }

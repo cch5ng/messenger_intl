@@ -115,7 +115,7 @@ router.get("/:fromEmail/language",
 );
 
 router.post('/register/referral',
-  //passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', { session: false }),
   (req, res) => {
   const {validationErrors, isRegistrationValid} = registrationValidator(req.body);
   const {referralId, email, password, language} = req.body;

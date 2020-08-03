@@ -9,36 +9,6 @@ const router = express.Router();
 const invitationRejectApproveHelper = require('../controllers/invitationRejectApproveHelper');
 const {getInviteSendSuccessMessage, getInviteNotSentMessage, getEmailSendMixedMessage} = require("../util");
 
-
-//////
-//helper
-
-// const handleEmailInvitations = ({fromEmail, toEmailAr, referralId, inviteRecipients, dupeInviteRecipients}) => {
-//   console.log('gets here')
-//   if (!inviteRecipients) {
-//   inviteRecipients = []
-//   }
-//   if (!dupeInviteRecipiets) {
-//   dupeInviteRecipients = []
-//   }
-//   sendEmail({from_email: fromEmail, 
-//             to_email_ar: toEmailAr, 
-//             referral_id: referralId})
-//     .then(resp => {
-//       console.log('sendgrid resp', resp)
-//       if (getSuccessCount(resp) === nonCurUserEmails.length) {
-//         inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
-//         res.json({ type: "success", 
-//           message: getEmailSendMixedMessage(inviteRecipients, dupeInviteRecipients)
-//         });
-//       }
-//     })
-//     .catch(err => {
-//         console.error('Sendgrid email invitation sending error:', err)
-//     })
-// }
-
-
 //send an invite to user
 router.post("/user/:fromEmail",
     passport.authenticate('jwt', { session: false }),
@@ -86,8 +56,6 @@ router.post("/user/:fromEmail",
                                       to_email_ar: nonCurUserEmails, 
                                       referral_id: referralId})
                             .then(resp => {
-                              console.log('resp', resp)
-
                               if (getSuccessCount(resp) === nonCurUserEmails.length) {
                                 inviteRecipients = inviteRecipients.concat(nonCurUserEmails);
                               }
@@ -190,11 +158,11 @@ router.post("/user/:fromEmail",
                                   return {to_user_email, from_user_email: fromEmail}});
                                 Invitation.insertMany(newInvites, function(err) {
                                   if (err) return console.error(err);
-                                  res.json({ type: "success",
+                                  res.status(200).json({ type: "success",
                                     message: getEmailSendMixedMessage(nonDupeInviteRecipients, dupeInviteRecipients)});
                                 })
                               } else {
-                                res.status(200).json({ type: "error",
+                                res.status(400).json({ type: "error",
                                   message: getInviteNotSentMessage(dupeInviteRecipients)})
                               }
                             } else if (invitations.length === 0) {
@@ -202,7 +170,7 @@ router.post("/user/:fromEmail",
                                 return {to_user_email, from_user_email: fromEmail}});
                               Invitation.insertMany(newInvites, function(err, invitations) {
                                 if (err) return console.error(err);
-                                res.json({ type: "success", 
+                                res.status(200).json({ type: "success", 
                                   message: getInviteSendSuccessMessage(curUserEmails)});
                               })
                             }
@@ -234,9 +202,9 @@ router.post("/user/:fromEmail",
     }
 );
 
-// Returns pending invitations that were sent to the given user
+//Returns invitation requests from the user
 router.get("/user/:from_email",
-    //passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     function(req, res, next) {
         const {from_email} = req.params;
 
@@ -256,8 +224,9 @@ router.get("/user/:from_email",
     }
 );
 
-//Returns invitation requests for the user
+// Returns pending invitations that were sent to the given user
 router.get("/user/requests/:to_email",
+    passport.authenticate('jwt', { session: false }),
     function(req, res, next) {
         const {to_email} = req.params;
 
@@ -279,7 +248,7 @@ router.get("/user/requests/:to_email",
 
 //Returns contacts for the current user
 router.get("/user/:to_email/contacts",
-  //passport.authenticate('jwt', { session: false }),
+  passport.authenticate('jwt', { session: false }),
   function(req, res, next) {
     const {to_email} = req.params;
     let contactsLang = {};
@@ -305,7 +274,7 @@ router.get("/user/:to_email/contacts",
                 contactsLang[contact] = {language: user[0].language};
               }
               if (idx === contacts.length - 1) {
-                res.status(201).json({type: 'success', contacts: contactsLang});
+                res.status(200).json({type: 'success', contacts: contactsLang});
               }
             }
           })
@@ -316,23 +285,29 @@ router.get("/user/:to_email/contacts",
         if(req.query.q){
           contacts = contacts.filter(contact => contact.includes(req.query.q))
                              .map(filteredContact => filteredContact.split('@')[0]);
-          res.status(201).json({type: 'success', contacts});                          
+          res.status(200).json({type: 'success', contacts});                          
         }
         
       } else {
-        res.status(201).json({type: 'success', message: 'No contacts were found.', contacts: []})
+        res.status(200).json({type: 'success', message: 'No contacts were found.', contacts: []})
       }
     });
   }
 );
 
+//JWT check
 //approve the request
-router.put("/user/:to_email/approve", (req, res) => {
+router.put("/user/:to_email/approve",
+passport.authenticate('jwt', { session: false }),
+(req, res) => {
   invitationRejectApproveHelper(req,res,'approved');
 });
 
+//JWT check
 //reject the request
-router.put("/user/:to_email/reject", (req, res) => {
+router.put("/user/:to_email/reject",
+passport.authenticate('jwt', { session: false }),
+(req, res) => {
   invitationRejectApproveHelper(req,res,'rejected');
 });
 

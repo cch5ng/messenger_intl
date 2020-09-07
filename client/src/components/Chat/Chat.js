@@ -193,12 +193,15 @@ const Chat = props => {
   const getFriendLanguages = () => {
     let friendEmails =  chatType === 'new' ? getEmailAr(toEmailAddresses): getFriendEmail();
     console.log('friendEmails', friendEmails)
+    console.log('emailToLangDict', emailToLangDict)
+    console.log('language', language)
     let friendLanguages = [];
     friendEmails.forEach(email => {
       if (!emailToLangDict[email]) {
         return [];
       }
       let lang = emailToLangDict[email]['language'];
+      console.log('lang', lang)
       if (friendLanguages.indexOf(lang) === -1 && lang !== language) {
         friendLanguages.push(lang);
       }

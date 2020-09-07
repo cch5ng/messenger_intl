@@ -192,6 +192,7 @@ const Chat = props => {
 
   const getFriendLanguages = () => {
     let friendEmails =  chatType === 'new' ? getEmailAr(toEmailAddresses): getFriendEmail();
+    console.log('friendEmails', friendEmails)
     let friendLanguages = [];
     friendEmails.forEach(email => {
       if (!emailToLangDict[email]) {
@@ -202,17 +203,20 @@ const Chat = props => {
         friendLanguages.push(lang);
       }
     });
+    console.log('friendLanguages', friendLanguages)
     return friendLanguages;
   }
 
   const getFriendEmail = () => {
     if (curConversation && curConversation.user_emails) {
       let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
+      console.log('friendEmails', friendEmails)
       return friendEmails;  
     } else if (conversationId) {
       curConversation = getConversationById(conversationId);
       if (curConversation.user_emails) {
         let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
+        console.log('friendEmails', friendEmails)
         return friendEmails;  
       }
     }

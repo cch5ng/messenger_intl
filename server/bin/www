@@ -69,15 +69,11 @@ nsp.on('connection', function(socket){
         })          
       }
     } else if (data.action === 'message') {
-      console.log('data', data)
       let {conversationId, message, userEmails, friendLanguages} = data;
-      let friendLanguageCodes = friendLanguages.map(lang => language_codes[lang]);
-      console.log('friendLanguageCodes', friendLanguageCodes)
-  
+      let friendLanguageCodes = friendLanguages.map(lang => language_codes[lang]);  
       friendLanguageCodes.forEach((code, idx) => {
         getTranslation(message.original_message, code)
           .then(translations => {
-            console.log('translations', translations)
             let language = friendLanguages[idx];
             message.translations = {...message.translations, [language]: translations[0]};
             if (idx === friendLanguages.length - 1) {

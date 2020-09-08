@@ -117,7 +117,6 @@ const Sidebar = props => {
                                 {headers: { Authorization: `Bearer ${authToken}`}});
       if(res.data.contacts.length !== 0){
         let {contacts} = res.data;
-        console.log('contacts', contacts)
         let contactEmails = Object.keys(contacts);
         setFriends(contactEmails);
         updateEmailToLangDict(contacts);
@@ -137,10 +136,6 @@ const Sidebar = props => {
   useEffect(() => {
     loadFriends();
   }, [])
-
-  useEffect(() => {
-    loadFriends(searchQuery);
-  },[searchQuery]);
 
   useEffect(() => {
     loadPendingRequests();

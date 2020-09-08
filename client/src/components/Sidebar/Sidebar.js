@@ -139,10 +139,6 @@ const Sidebar = props => {
   }, [])
 
   useEffect(() => {
-    loadFriends(searchQuery);
-  },[searchQuery]);
-
-  useEffect(() => {
     loadPendingRequests();
   }, [pendingRequests.length]);
   

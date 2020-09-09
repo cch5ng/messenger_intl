@@ -113,7 +113,7 @@ const Sidebar = props => {
   const loadFriends = async(q='') => {
     if(email){
       let authToken = localStorage.getItem('authToken');
-      const res = await axios.get(`/invitations/user/${email}/contacts?q=${q}`, 
+      const res = await axios.get(`/invitations/user/${email}/contacts`, //?q=${q} 
                                 {headers: { Authorization: `Bearer ${authToken}`}});
       if(res.data.contacts.length !== 0){
         let {contacts} = res.data;

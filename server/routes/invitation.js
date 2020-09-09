@@ -282,11 +282,11 @@ router.get("/user/:to_email/contacts",
 
         //TODO TEST if this breaks providing language with contacts
         //if search query provided
-        if(req.query.q){
-          contacts = contacts.filter(contact => contact.includes(req.query.q))
-                             .map(filteredContact => filteredContact.split('@')[0]);
-          res.status(200).json({type: 'success', contacts});                          
-        }
+        // if(req.query.q){
+        //   contacts = contacts.filter(contact => contact.includes(req.query.q))
+        //                      .map(filteredContact => filteredContact.split('@')[0]);
+        //   res.status(200).json({type: 'success', contacts});                          
+        // }
         
       } else {
         res.status(200).json({type: 'success', message: 'No contacts were found.', contacts: []})

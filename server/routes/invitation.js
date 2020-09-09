@@ -266,10 +266,16 @@ router.get("/user/:to_email/contacts",
           return invite.to_user_email === to_email ? invite.from_user_email: invite.to_user_email;
         });
         //retrieve each contact's language
+        console.log('contacts', contacts)
         contacts.forEach((contact, idx) => {
           User.find({email: contact}, 'language', function(err, user) {
             if (err) return console.error('Could not get contact language.', err);
             if (user && user.length) {
+              console.log('user', user)
+              console.log('contact', contact)
+              console.log('user[0].language', user[0].language)
+              console.log('contactsLang', contactsLang)
+
               if (!contactsLang[contact]) {
                 contactsLang[contact] = {language: user[0].language};
               }

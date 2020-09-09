@@ -262,6 +262,7 @@ router.get("/user/:to_email/contacts",
       if (err) return console.error('Contacts could not be retrieved.', err);
       if (invitations && invitations.length) {
         let contacts = [];
+        let returnCount = 0;
         contacts = invitations.map(invite => {
           return invite.to_user_email === to_email ? invite.from_user_email: invite.to_user_email;
         });
@@ -270,16 +271,18 @@ router.get("/user/:to_email/contacts",
         contacts.forEach((contact, idx) => {
           User.find({email: contact}, 'language', function(err, user) {
             if (err) return console.error('Could not get contact language.', err);
+            returnCount += 1;
             if (user && user.length) {
               console.log('user', user)
               console.log('contact', contact)
               console.log('user[0].language', user[0].language)
-              console.log('contactsLang', contactsLang)
 
               if (!contactsLang[contact]) {
                 contactsLang[contact] = {language: user[0].language};
+                console.log('contactsLang', contactsLang)
               }
-              if (idx === contacts.length - 1) {
+              //potentially faulty check
+              if (returnCount === contacts.length - 1) {
                 res.status(200).json({type: 'success', contacts: contactsLang});
               }
             }

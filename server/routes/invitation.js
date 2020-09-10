@@ -280,10 +280,12 @@ router.get("/user/:to_email/contacts",
               if (!contactsLang[contact]) {
                 contactsLang[contact] = {language: user[0].language};
                 console.log('contactsLang', contactsLang)
-              }
-              //potentially faulty check
-              if (returnCount === contacts.length - 1) {
-                res.status(200).json({type: 'success', contacts: contactsLang});
+                console.log('returnCount', returnCount)
+                console.log('contacts.len min 1', contacts.length - 1)
+                //potentially faulty check
+                if (returnCount === contacts.length) {
+                  res.status(200).json({type: 'success', contacts: contactsLang});
+                }
               }
             }
           })

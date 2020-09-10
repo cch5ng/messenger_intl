@@ -129,8 +129,9 @@ const Sidebar = props => {
   }
 
   const searchContacts = async(e) => {
-    setSearchQuery(e.target.value);
-    loadFriends(searchQuery);
+    let query = e.target.value;
+    setSearchQuery(query);
+    loadFriends(query);
   }
 
   useEffect(() => {

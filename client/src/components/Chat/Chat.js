@@ -40,7 +40,6 @@ const Chat = props => {
     setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, 
     getColorForConversationId, curConversation} = useSocket();
   let history = useHistory();
-
   const [toEmailAddresses, setToEmailAddresses] = useState('');
   const [toEmailAddressesError, setToEmailAddressesError] = useState('');
   const [curMessage, setCurMessage] = useState('');
@@ -114,9 +113,9 @@ const Chat = props => {
           translations: {}
         };
         let friendLanguages = getFriendLanguages();
-        if (friendLanguages.length) {
+        let jwtToken = localStorage.getItem('authToken');
+        if (jwtToken && friendLanguages.length) {
           //3 make post request for new conversation (get back id)
-          let jwtToken = localStorage.getItem('authToken');
           let body = { emailsAr, message, friendLanguages };
           fetch('/conversations', {
             method: 'POST',
@@ -126,7 +125,13 @@ const Chat = props => {
             },
             body: JSON.stringify(body)
           })
-            .then(resp => resp.json())
+            .then(resp => {
+              if (resp.status === 401) {
+                logout();
+                return;
+              }
+              return resp.json();
+            })
             .then(json => {
               if (json.type === 'error') {
                 //TODO activate snackbar

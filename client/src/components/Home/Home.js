@@ -1,10 +1,10 @@
 import React from 'react';
-import {useAuthState} from '../../context/auth-context';
+import {useAuth} from '../../context/auth-context';
 import AuthenticatedApp from '../AuthenticatedApp/AuthenticatedApp';
 import UnauthenticatedApp from '../UnauthenticatedApp/UnauthenticatedApp';
 
 function Home() {
-  const {user} = useAuthState()
+  const {user} = useAuth();
   return user ? <AuthenticatedApp /> : <UnauthenticatedApp />
 }
 

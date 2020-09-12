@@ -39,7 +39,7 @@ const useStyles = makeStyles(() => ({
 
 const Sidebar = props => {
   const {user, updateEmailToLangDict} = useAuth();
-  const email = localStorage.getItem('email');
+  const email = user.email;
   const authToken = localStorage.getItem('authToken');
   const [friends, setFriends] = useState([]);
   const [approveInvite, setApproveInvite] = useState('');

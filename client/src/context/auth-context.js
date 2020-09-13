@@ -6,43 +6,25 @@ function AuthProvider({children}) {
   const [state, setState] = React.useState({
     status: 'logged out',
     error: null,
-    user: null,
-    emailToLangDict: {}
+    emailToLangDict: {},
   });
-
-  const [token, setToken] = useState(localStorage.getItem('authToken') ? localStorage.getItem('authToken') : null);
-  const [email, setEmail] = useState(localStorage.getItem('email') ? localStorage.getItem('email'): null);
-  const [user, setUser] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
-
-  //checking for token and email and then accordingly updating the state
-  const getUser = () => {
-    if(token) {
-      setState({status: 'success', error: null, user})
-    }
-  }
+  const [user, setUser] = useState(null);
 
   const logout = () => {
     localStorage.removeItem('authToken');
-    setToken(null);
-    localStorage.removeItem('email');
-    setEmail(null);
-    localStorage.removeItem('user');
     setUser(null);
-    setState({status: 'logged out', error: null, user: null})
+    setState({
+      status: 'logged out',
+      error: null,
+    })
   }
 
   const login = async(formValues) => {
     try {
       const res = await axios.post('/user/login', formValues);
       if(res.data.token) {
-        setState({status:'success', error:null, user: res.data.user});
+        setState({status:'success', error:null});
         localStorage.setItem('authToken', res.data.token);
-        setToken(res.data.token);
-
-        localStorage.setItem('email', res.data.email);
-        setEmail(res.data.email);
-
-        localStorage.setItem('user', JSON.stringify(res.data.user));
         setUser(res.data.user);
       }
     }
@@ -50,10 +32,12 @@ function AuthProvider({children}) {
       const validationError = err.response.data.validationError || null;
       const missingDataError = err.response.data.missingData || null;
       if(validationError){
-        setState({status: 'error', error: validationError, user: null}) 
+        setState({status: 'error', error: validationError});
+        setUser(null)
       }
       else if(missingDataError) {
-        setState({status: 'error', error: missingDataError, user: null})
+        setState({status: 'error', error: missingDataError});
+        setUser(null)
       }
       else {
         console.error(err);
@@ -64,12 +48,8 @@ function AuthProvider({children}) {
   const updateEmailToLangDict = (dict) => {
     setState({...state, emailToLangDict: dict});
   }
-
-  React.useEffect(() => {
-    getUser();
-  }, [token, email, user]);
   
-  let authState = {...state, logout, login, updateEmailToLangDict}
+  let authState = {...state, logout, login, updateEmailToLangDict, user}
 
   /**
    * Provider component is the place where you'd pass a prop called value to, 
@@ -97,20 +77,4 @@ function useAuth() {
   return context;
 }
 
-//is this needed since useAuth is using the context??
-function useAuthState() {
-  const state = React.useContext(AuthContext)
-  const isPending = state.status === 'pending'
-  const isError = state.status === 'error'
-  const isSuccess = state.status === 'success'
-  const isAuthenticated = state.user && isSuccess
-  return {
-    ...state,
-    isPending,
-    isError,
-    isSuccess,
-    isAuthenticated,
-  }
-}
-
-export {AuthProvider, useAuth, useAuthState};
+export {AuthProvider, useAuth};

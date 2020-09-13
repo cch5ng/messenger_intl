@@ -13,7 +13,7 @@ let socket;
 const ChatSummary = () => {
   let history = useHistory();
   const [conversationList, setConversationList] = useState([]);
-  const {user} = useAuth();
+  const {user, logout} = useAuth();
   const {conversationsAr, initConversationsAr, addConversation, getColorForConversationId} = useSocket();
 
   if(socket && user) {
@@ -50,21 +50,29 @@ const ChatSummary = () => {
     }
 
     let jwtToken = localStorage.getItem('authToken');
-    fetch(`/conversations/user/${user.email}`, {
-      headers: {
-        'Authorization': `Bearer ${jwtToken}`,
-        'Content-Type': 'application/json'
-      },
-    })
-      .then(resp => resp.json())
-      .then(json => {
-        if (json && json.conversations.length) {
-          initConversationsAr(json.conversations, user.email);
-          let conversationId = json.conversations[0]._id.toString();
-          history.push(`/conversations/${conversationId}`);
-        }
+    if (jwtToken) {
+      fetch(`/conversations/user/${user.email}`, {
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`,
+          'Content-Type': 'application/json'
+        },
       })
-      .catch(err => console.error('get convos summary err', err))
+        .then(resp => {
+          if (resp.status === 401) {
+            logout();
+            return;
+          }
+          return resp.json();
+        })
+        .then(json => {
+          if (json && json.conversations.length) {
+            initConversationsAr(json.conversations, user.email);
+            let conversationId = json.conversations[0]._id.toString();
+            history.push(`/conversations/${conversationId}`);
+          }
+        })
+        .catch(err => console.error('get convos summary err', err))
+    }
   }, []);
 
   return (

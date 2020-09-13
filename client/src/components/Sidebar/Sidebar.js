@@ -38,8 +38,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Sidebar = props => {
-  const {user, updateEmailToLangDict} = useAuth();
-  const email = localStorage.getItem('email');
+  const {user, updateEmailToLangDict, logout} = useAuth();
+  const email = user.email;
   const authToken = localStorage.getItem('authToken');
   const [friends, setFriends] = useState([]);
   const [approveInvite, setApproveInvite] = useState('');
@@ -88,10 +88,13 @@ const Sidebar = props => {
     if(email){
       const res = await axios.get(`/invitations/user/requests/${email}`, 
                                 {headers: { Authorization: `Bearer ${authToken}`}});
-      if(res.data.invitations && res.data.invitations.length !== 0){
-      setPendingRequests(res.data.invitations);
+      if (res.status === 401) {
+        logout();
+        return;
       }
-      else {
+      if(res.data.invitations && res.data.invitations.length !== 0){
+        setPendingRequests(res.data.invitations);
+      } else {
         setPendingRequests(['No pending invitation requests']);
       }
     }
@@ -101,10 +104,13 @@ const Sidebar = props => {
     if(email){
       const res = await axios.get(`/invitations/user/${email}`, 
                                 {headers: { Authorization: `Bearer ${authToken}`}});
-      if(res.data.invitations && res.data.invitations.length !== 0){
-      setPendingInvites(res.data.invitations);
+      if (res.status === 401) {
+        logout();
+        return;
       }
-      else {
+      if (res.data.invitations && res.data.invitations.length !== 0){
+        setPendingInvites(res.data.invitations);
+      } else {
         setPendingInvites(['No pending invitations']);
       }
     }
@@ -115,13 +121,16 @@ const Sidebar = props => {
       let authToken = localStorage.getItem('authToken');
       const res = await axios.get(`/invitations/user/${email}/contacts`, //?q=${q} 
                                 {headers: { Authorization: `Bearer ${authToken}`}});
-      if(res.data.contacts.length !== 0){
+      if (res.status === 401) {
+        logout();
+        return;
+      }
+      if (res.data.contacts.length !== 0){
         let {contacts} = res.data;
         let contactEmails = Object.keys(contacts);
         setFriends(contactEmails);
         updateEmailToLangDict(contacts);
-      }
-      else {
+      } else {
         setFriends([]);
         updateEmailToLangDict({});
       }

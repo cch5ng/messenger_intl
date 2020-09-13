@@ -68,7 +68,6 @@ export default function Login() {
   
   function submit() {
     authState.login(formValues);
-    
   }
 
   useEffect(() => {
@@ -84,7 +83,6 @@ export default function Login() {
   function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   }
-
 
   return (
     <div>

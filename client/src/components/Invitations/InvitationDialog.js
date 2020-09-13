@@ -107,7 +107,7 @@ export default function InvitationDialog(props) {
   const [sendRequestErrorMessage, setSendRequestErrorMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
   const classes = useStyles();
-  const {user} = useAuth();
+  const {user, logout} = useAuth();
 
   const handleChange = (event) => {
     const {value} = event.target
@@ -162,7 +162,7 @@ export default function InvitationDialog(props) {
         toEmailAr = [email];
       }
 
-      if (user && user.email.length && user.referralId && jwtToken.length) {
+      if (jwtToken && user && user.email.length && user.referralId) {
         let body = {toEmailAr, referralId: user.referralId};
         fetch(`/invitations/user/${user.email}`, {
           method: 'POST',
@@ -172,7 +172,13 @@ export default function InvitationDialog(props) {
           },
           body: JSON.stringify(body)
         })
-          .then(resp => resp.json())
+          .then(resp => {
+            if (resp.status === 401) {
+              logout();
+              return;
+            }
+            return resp.json();
+          })
           .then(json => {
             if (json.type === 'success') {
               setEmail('');

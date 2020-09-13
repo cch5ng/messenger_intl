@@ -34,7 +34,7 @@ const useStyles = makeStyles({
 });
 
 const Friends = props => {
-  const {user} = useAuth();
+  const {user, logout} = useAuth();
   let email = user.email;
   let history = useHistory();
   const classes = useStyles();
@@ -45,7 +45,7 @@ const Friends = props => {
     let emailsAr = [contactEmail, email];
     let body = {emailsAr};
 
-    if (jwtToken.length && emailsAr.length) {
+    if (jwtToken && emailsAr.length) {
       //call API to either create a conversation (or find existing) and get back conversation id
       fetch('/conversations', {
         method: 'POST',
@@ -55,7 +55,13 @@ const Friends = props => {
         },
         body: JSON.stringify(body)
       })
-        .then(resp => resp.json())
+        .then(resp => {
+          if (resp.status === 401) {
+            logout();
+            return;
+          }
+          return resp.json();
+        })
         .then(json => {
           if (json.conversationId) {
             history.push(`/conversations/${json.conversationId}`);

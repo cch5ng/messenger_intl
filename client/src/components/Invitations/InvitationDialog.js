@@ -176,9 +176,8 @@ export default function InvitationDialog(props) {
             if (resp.status === 401) {
               logout();
               return;
-            } else {
-              return resp.json()
             }
+            return resp.json();
           })
           .then(json => {
             if (json.type === 'success') {

@@ -6,7 +6,7 @@ This is a Messenger copy project with an additional message translation feature.
 
 ## Demo
 
-The project is currently hosted at:
+The project is currently hosted at: https://messenger-intl.herokuapp.com/
 
 These are the features:
 
@@ -20,11 +20,20 @@ These are the features:
 
 * Ability to view conversation message in native language (translated) or the friend's language (original).
 
+## (User) Run the App
+
+These items require setup before you can use the app to chat.
+
+* At least 2 users need to be registered with different language preference (if you want to try language translation).
+* One user should send an invitation to the second user to connect as friends.
+* The second user should accept the friend invitation.
+* Afterward either user can initiate a chat by clicking on their friend's avatar from the Contacts list.
+
 ## Known Limitations
 
 **TODO**
 
-## Run the App
+## (Developer) Run the App
 
 These are instructions to download and run the application locally.
 

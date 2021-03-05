@@ -27,7 +27,8 @@ These items require setup before you can use the app to chat.
 * At least 2 users need to be registered with different language preference (if you want to try language translation).
 * One user should send an invitation to the second user to connect as friends.
 * The second user should accept the friend invitation.
-* Afterward either user can initiate a chat by clicking on their friend's avatar from the Contacts list.
+* Afterward either user can initiate a two-person chat by clicking on their friend's avatar from the Friends list.
+* To start a group chat, from the Chats tab, click the pencil icon. Enter the email addresses of the people to chat with (comma-separated). Enter the chat message (bottom) and click the Enter/Return key.
 
 ## Known Limitations
 

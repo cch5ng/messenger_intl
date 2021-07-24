@@ -214,6 +214,8 @@ export default function SignUp(props) {
                           helperText= { formErrors.confirmPassword || null}
                         />
                       </Grid>
+
+                    {process.env.REACT_APP_FF_CLIENT_MESSAGE_TRANSLATION === true && (
                       <Grid item xs={12}>
                         <FormControl className={classes.formControl}>
                           <InputLabel classes = {{ root: classes.selectRoot }} shrink id="demo-simple-select-placeholder-label-label">
@@ -237,6 +239,7 @@ export default function SignUp(props) {
                           </Select>
                         </FormControl>
                       </Grid>
+                    )}
                     </Grid>
                     <Button
                       type="submit"

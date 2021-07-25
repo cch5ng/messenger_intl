@@ -11,7 +11,10 @@ var app = require("../app");
 var http = require("http");
 const {saveMessageToConversation, getUidFromEmail} = require('../util/socket_db');
 const {language_codes} = require('../util/languages');
-const {getTranslation} = require('../util/translate_helpers');
+
+if (process.env.FF_MESSAGE_TRANSLATION === 'true') {
+  const {getTranslation} = require('../util/translate_helpers');
+}
 
 /**
  * Get port from environment and store in Express.
@@ -70,24 +73,32 @@ nsp.on('connection', function(socket){
       }
     } else if (data.action === 'message') {
       let {conversationId, message, userEmails, friendLanguages} = data;
-      let friendLanguageCodes = friendLanguages.map(lang => language_codes[lang]);  
-      friendLanguageCodes.forEach((code, idx) => {
-        getTranslation(message.original_message, code)
-          .then(translations => {
-            let language = friendLanguages[idx];
-            message.translations = {...message.translations, [language]: translations[0]};
-            if (idx === friendLanguages.length - 1) {
-              const updated_on = Date.now();
-              socket.broadcast.emit(conversationId, data);
-              saveMessageToConversation({message, updated_on, conversationId});
-            }
-          })
-          .catch(err => {
-            //save untranslated message
-            saveMessageToConversation({message, conversationId});
-            console.error('Translation API error', err);
-          })
-      })  
+
+      if (process.env.FF_MESSAGE_TRANSLATION === 'true') {
+        let friendLanguageCodes = friendLanguages.map(lang => language_codes[lang]);  
+        friendLanguageCodes.forEach((code, idx) => {
+          getTranslation(message.original_message, code)
+            .then(translations => {
+              let language = friendLanguages[idx];
+              message.translations = {...message.translations, [language]: translations[0]};
+              if (idx === friendLanguages.length - 1) {
+                const updated_on = Date.now();
+                socket.broadcast.emit(conversationId, data);
+                saveMessageToConversation({message, updated_on, conversationId});
+              }
+            })
+            .catch(err => {
+              //save untranslated message
+              saveMessageToConversation({message, conversationId});
+              console.error('Translation API error', err);
+            })
+        })  
+      } else {
+        console.log('server gets here FF detection')
+        const updated_on = Date.now();
+        socket.broadcast.emit(conversationId, data);
+        saveMessageToConversation({message, updated_on, conversationId});
+      }
     }
   });
 

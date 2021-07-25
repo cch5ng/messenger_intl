@@ -100,6 +100,14 @@ const ChatHeader = props => {
   let initial = friendEmails && friendEmails.length === 1 ? friendEmails[0][0].toUpperCase() : '';
   let email = friendEmails && friendEmails.length === 1 ? friendEmails[0] : '';
   
+  if (process.env.REACT_APP_FF_CLIENT_MESSAGE_TRANSLATION === 'false') {
+    return (
+      <header className={styles.chatHeaderContainer} aria-label="Chat Header">
+        <div className={styles.chatHeaderSpacer} />
+      </header>
+    );
+  }
+
   if (!friendEmails.length) {
     return (
       <header className={styles.chatHeaderContainer} aria-label="Chat Header">

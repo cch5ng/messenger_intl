@@ -11,6 +11,15 @@ const sendEmail = ({from_email, to_email_ar, referral_id}) => {
   return sgMail.send(messages);
 }
 
+const sendEmailForPasswordChange = ({to_email, password_url_id}) => {
+  let message =
+    {to: `${to_email}`,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: 'World messenger password change',
+    text: `Here is the link to update your password. If you have not made this request, please ignore this message. http://localhost:3000/password_change/${password_url_id}`,}
+  return sgMail.send(message);
+}
+
 const getSuccessCount = (resp) => {
   let successCount = 0;
   resp.forEach(res => {
@@ -19,4 +28,4 @@ const getSuccessCount = (resp) => {
   return successCount;
 }
 
-module.exports = {sendEmail, getSuccessCount};
+module.exports = {sendEmail, getSuccessCount, sendEmailForPasswordChange};

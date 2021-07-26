@@ -162,4 +162,32 @@ router.post('/register/referral',
       });
 });
 
+router.post('/passwordChangeEmail',
+  passport.authenticate('jwt', { session: false }),
+  function(req, res, next) {
+    const {email} = req.body;    
+    const query = {email: email};
+    const update = {
+      $set: {
+        password_change_expiration_date_time: new Date() + (24 * 60 * 60 * 1000)
+      }
+    }
+    const options = { returnNewDocument: true };
+
+    return User.findOneAndUpdate(query, update, options)
+      .then(updatedDocument => {
+        if(updatedDocument) {
+          const {password_change_url_id} = updatedDocument;
+          console.log(`Successfully updated document: ${updatedDocument}.`)
+
+          //TODO make the sendgrid email request
+        } else {
+          console.log("No document matches the provided query.")
+        }
+        return updatedDocument
+      })
+      .catch(err => console.error(`Failed to find and update document: ${err}`))
+  }
+)
+
 module.exports = router;

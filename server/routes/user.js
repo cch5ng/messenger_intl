@@ -9,6 +9,7 @@ const Invitation = require('../models/invitation');
 
 const registrationValidator = require('../controllers/userRegistrationValidator');
 const loginValidator = require('../controllers/userLoginValidator');
+const {sendEmailForPasswordChange} = require('../util/sendgrid_helpers');
 
 router.post('/register', (req, res) => {
   const {validationErrors, isRegistrationValid} = registrationValidator(req.body);
@@ -177,10 +178,17 @@ router.post('/passwordChangeEmail',
     return User.findOneAndUpdate(query, update, options)
       .then(updatedDocument => {
         if(updatedDocument) {
-          const {password_change_url_id} = updatedDocument;
-          console.log(`Successfully updated document: ${updatedDocument}.`)
-
-          //TODO make the sendgrid email request
+          const {password_change_url_id, email} = updatedDocument;
+          sendEmailForPasswordChange({email, password_change_url_id})
+            .then(resp => console.log('sendgrid resp', resp))
+            .catch(err => {
+              console.error('Sendgrid password change sending error:', err)
+              if (err.response) {
+                const {message, code, response} = err;
+                const {headers, body} = response;                          
+                console.error(body);
+              }
+            })
         } else {
           console.log("No document matches the provided query.")
         }

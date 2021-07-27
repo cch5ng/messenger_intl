@@ -166,11 +166,13 @@ router.post('/register/referral',
 router.post('/passwordChangeEmail',
   passport.authenticate('jwt', { session: false }),
   function(req, res, next) {
+    let today = new Date();
+    today.setDate(today.getDate() + 1);
     const {email} = req.body;    
     const query = {email: email};
     const update = {
       $set: {
-        password_change_expiration_date_time: new Date() + (24 * 60 * 60 * 1000)
+        password_change_expiration_date_time: today
       }
     }
     const options = { returnNewDocument: true };
@@ -180,7 +182,13 @@ router.post('/passwordChangeEmail',
         if(updatedDocument) {
           const {password_change_url_id, email} = updatedDocument;
           sendEmailForPasswordChange({email, password_change_url_id})
-            .then(resp => console.log('sendgrid resp', resp))
+            .then(resp => {
+              if (resp[0].statusCode === 202) {
+                res.status(201).json({type: 'success', message: `An email with password reset link was sent.`})
+              } else {
+                res.status(200).json({type: 'error', message: `An email to reset the password could not be delivered. Please check the email spelling and try again.`})
+              }
+            })
             .catch(err => {
               console.error('Sendgrid password change sending error:', err)
               if (err.response) {
@@ -190,12 +198,61 @@ router.post('/passwordChangeEmail',
               }
             })
         } else {
-          console.log("No document matches the provided query.")
+          res.status(400).json({type: 'error', message: `That email address could not be found.`})
         }
-        return updatedDocument
       })
       .catch(err => console.error(`Failed to find and update document: ${err}`))
   }
 )
+
+router.put('/passwordChange/:password_change_url_id',
+  passport.authenticate('jwt', { session: false }),
+  function(req, res, next) {
+    const {password, passwordConfirm} = req.body;
+    const {password_change_url_id} = req.params;
+
+    User.findOne({password_change_url_id: password_change_url_id})
+      .then(user => {
+        if (user) {
+          const {password_change_expiration_date_time} = user;
+          let expirationDate = new Date(password_change_expiration_date_time);
+          let curDate = new Date();
+
+          if (curDate < expirationDate) {
+            //need to verify that password link has not expired
+            //then can update the password
+            bcrypt.genSalt(12, (err, salt) => {
+              bcrypt.hash(password, salt, (err, hash) => {
+                if(err) throw err;
+                const query = {password_change_url_id: password_change_url_id};
+                const update = {
+                  $set: {
+                    password: hash
+                  }
+                }
+                const options = { returnNewDocument: true };
+    
+                return User.findOneAndUpdate(query, update, options)
+                  .then(updatedDocument => {
+                    if (updatedDocument) {
+                      res.status(201).json({type: 'success', message: `The password was changed successfully.`})
+                    }
+                  })
+                  .catch(err => console.error(`Failed to find and update document: ${err}`))    
+              })
+            })
+          } else {
+            res.status(200).json({type: 'error', message: `The link to change the password has expired. Please request another password change link.`})
+          }
+        } else {
+          res.status(200).json({type: 'error', message: `The user could not be found.`})
+        }
+
+      })
+      .catch(err => console.error(`Failed to update the password: ${err}`))
+
+  }
+)
+
 
 module.exports = router;

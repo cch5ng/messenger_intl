@@ -17,7 +17,7 @@ const sendEmailForPasswordChange = ({email, password_change_url_id}) => {
     {to: `${email}`,
     from: process.env.SENDGRID_FROM_EMAIL,
     subject: 'World messenger password change',
-    text: `Here is the link to update your password. If you have not made this request, please ignore this message. http://localhost:3000/password_change/${password_change_url_id}`,}
+    text: `Here is the link to update your password. This link will expire in 24 hours. If you have not made this request, please ignore this message. http://localhost:3000/password_change/${password_change_url_id}`,}
   return sgMail.send(message);
 }
 

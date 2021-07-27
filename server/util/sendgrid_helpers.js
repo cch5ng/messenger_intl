@@ -1,3 +1,4 @@
+require('dotenv').config();
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -11,12 +12,12 @@ const sendEmail = ({from_email, to_email_ar, referral_id}) => {
   return sgMail.send(messages);
 }
 
-const sendEmailForPasswordChange = ({to_email, password_url_id}) => {
+const sendEmailForPasswordChange = ({email, password_change_url_id}) => {
   let message =
-    {to: `${to_email}`,
+    {to: `${email}`,
     from: process.env.SENDGRID_FROM_EMAIL,
     subject: 'World messenger password change',
-    text: `Here is the link to update your password. If you have not made this request, please ignore this message. http://localhost:3000/password_change/${password_url_id}`,}
+    text: `Here is the link to update your password. If you have not made this request, please ignore this message. http://localhost:3000/password_change/${password_change_url_id}`,}
   return sgMail.send(message);
 }
 

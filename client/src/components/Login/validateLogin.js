@@ -56,4 +56,4 @@ const validatePasswordForPasswordChange = formValues => {
   return formErrors;
 };
 
-export default validateLogin;
+export {validateLogin, validateEmailForPasswordChange, validatePasswordForPasswordChange};

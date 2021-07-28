@@ -57,7 +57,6 @@ const useStyles = makeStyles((theme) => ({
   adornmentStyle: {
     color: theme.palette.primary.main
   }
-
 }));
 
 export default function Login() {
@@ -146,14 +145,6 @@ export default function Login() {
                       type="password"
                       id="password"
                       autoComplete="current-password"
-                      InputProps = {{ 
-                        endAdornment: <InputAdornment position='end'>
-                          <Typography className={classes.adornmentStyle}>
-                           Forgot? 
-                           </Typography>
-                          </InputAdornment>,
-                        classes: {root: classes.textFieldSelectLabel}
-                      }}
                       InputLabelProps = {{ 
                         classes: {root: classes.textFieldSelectLabel} 
                       }}
@@ -163,6 +154,14 @@ export default function Login() {
                       helperText= { formErrors.password || null}
                     />
                   </Grid>
+                  <Grid item xs={12}>
+                    <Link to="/passwordChangeRequest">
+                      <Typography className={classes.adornmentStyle}>
+                        Forgot? 
+                      </Typography>
+                    </Link>
+                  </Grid>
+
                 </Grid>
                 <Button
                   type="submit"
@@ -185,3 +184,16 @@ export default function Login() {
 </div>
   );
 }
+
+/*
+InputProps = {{ 
+                        endAdornment: <InputAdornment position='end'>
+                          <Link to="/passwordChangeRequest">
+                            <Typography className={classes.adornmentStyle}>
+                              Forgot? 
+                            </Typography>
+                          </Link>
+                          </InputAdornment>,
+                        classes: {root: classes.textFieldSelectLabel}
+                      }}
+*/

@@ -7,7 +7,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 
 import useForm from '../../custom-hooks/useForm';
-import validate from '../Login/validateLogin';
+import {validateLogin} from '../Login/validateLogin';
 import { useAuth } from '../../context/auth-context';
 
 const useStyles = makeStyles((theme) => ({
@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
 const PasswordChangeRequest = () => {
 
   const classes = useStyles();
-  const { handleChange, handleSubmit, formValues, formErrors } = useForm(submit, validate);
+  const { handleChange, handleSubmit, formValues, formErrors } = useForm(submit, validateLogin);
   const [errorAlertMsg, setErrorAlertMsg] = useState('');
   const authState = useAuth();
 

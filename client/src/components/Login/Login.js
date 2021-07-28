@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import UnauthenticatedSidebar from '../UnauthenticatedSidebar/UnauthenticatedSidebar';
 import useForm from '../../custom-hooks/useForm';
-import validate from './validateLogin';
+import {validateLogin} from './validateLogin';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import { useAuth } from '../../context/auth-context';
@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login() {
   const classes = useStyles();
-  const { handleChange, handleSubmit, formValues, formErrors } = useForm(submit, validate);
+  const { handleChange, handleSubmit, formValues, formErrors } = useForm(submit, validateLogin);
   const [errorAlertMsg, setErrorAlertMsg] = useState('');
   const authState = useAuth();
   

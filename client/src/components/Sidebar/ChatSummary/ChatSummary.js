@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import { useHistory } from "react-router-dom";
 import io from 'socket.io-client';
 import CreateOutlinedIcon from '@material-ui/icons/CreateOutlined';
@@ -12,7 +12,6 @@ let socket;
 
 const ChatSummary = () => {
   let history = useHistory();
-  const [conversationList, setConversationList] = useState([]);
   const {user, logout} = useAuth();
   const {conversationsAr, initConversationsAr, addConversation, getColorForConversationId} = useSocket();
 

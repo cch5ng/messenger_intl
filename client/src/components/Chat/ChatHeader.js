@@ -1,4 +1,4 @@
-import React, {useState, Fragment} from 'react';
+import React, {Fragment} from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
@@ -98,7 +98,6 @@ const ChatHeader = props => {
   const classes = useStyles();
 
   let initial = friendEmails && friendEmails.length === 1 ? friendEmails[0][0].toUpperCase() : '';
-  let email = friendEmails && friendEmails.length === 1 ? friendEmails[0] : '';
   
   if (process.env.REACT_APP_FF_CLIENT_MESSAGE_TRANSLATION === 'false') {
     return (

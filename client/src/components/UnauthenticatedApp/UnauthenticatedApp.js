@@ -17,13 +17,13 @@ const UnauthenticatedApp = () => {
     <MuiThemeProvider theme={theme}>
       <Router>
         <Switch>
-          <Route exact path="/" component={Login} />
+          <Route exact path="/join/:referralId" component={Signup} />
           <Route exact path="/signup" component={Signup} />
           <Route exact path="/login" component={Login} />
-          <Route path="/join/:referralId" component={Signup} />
-          <Route path="/conversations">
+          <Route exact path="/conversations">
             <Redirect to="/" />
           </Route>
+          <Route exact path="/" component={Login} />
         </Switch>
       </Router>
     </MuiThemeProvider>

@@ -203,8 +203,10 @@ export default function InvitationDialog(props) {
   }
 
   const getReferralUrl = () => {
-    if (user && user.referralId)
-    return `${process.env.REACT_APP_SERVER_DOMAIN}/join/${user.referralId}`
+    if (user && user.referralId) {
+      let domain = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_SERVER_DOMAIN: `http://localhost:3000`;
+      return `${domain}/join/${user.referralId}`;  
+    }
   }
 
   return (

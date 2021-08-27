@@ -1,14 +1,10 @@
 import React from 'react';
 import {useHistory} from 'react-router-dom';
-import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import userPlaceholderImg from '../../../assets/user-placeholder.png';
 import InvitationDialog from '../../Invitations/InvitationDialog';
-import SearchIcon from '@material-ui/icons/Search';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import {useAuth} from '../../../context/auth-context';
 import { makeStyles, Badge } from '@material-ui/core';
 
@@ -38,7 +34,7 @@ const Friends = props => {
   let email = user.email;
   let history = useHistory();
   const classes = useStyles();
-  const {friends, searchContacts} = props;
+  const {friends} = props;
 
   const contactClickHandler = (contactEmail) => {
     let jwtToken = localStorage.getItem('authToken');

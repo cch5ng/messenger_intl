@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames/bind';
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import pink from '@material-ui/core/colors/pink';

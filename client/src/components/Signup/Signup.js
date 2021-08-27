@@ -9,7 +9,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -85,8 +84,10 @@ export default function SignUp(props) {
     if (!props.match.params.referralId) {
       try{
         const resp = await axios.post('/user/register', formValues);
-        setSuccessAlertMsg(true);
-        setRedirect('/login');
+        if (resp) {
+          setSuccessAlertMsg(true);
+          setRedirect('/login');  
+        }
       }
       catch(err){
         err.response.data.email ? setErrorAlertMsg(err.response.data.email) : console.error(err.response);
@@ -96,8 +97,10 @@ export default function SignUp(props) {
       const {referralId} = props.match.params;
       try{
         const resp = await axios.post('/user/register/referral', {...formValues, referralId});
-        setSuccessAlertMsg(true);
-        setRedirect('/login');
+        if (resp) {
+          setSuccessAlertMsg(true);
+          setRedirect('/login');  
+        }
       }
       catch(err){
         err.response.data.email ? setErrorAlertMsg(err.response.data.email) : console.error(err.response);

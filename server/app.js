@@ -25,11 +25,11 @@ const dbUrl= `mongodb+srv://${dbUsername}:${dbPwd}@cluster0-wkjls.mongodb.net/${
 var app = express();
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "/build")));
+  app.use(express.static(path.join(__dirname, "../client/build")));
 }
 
 if (process.env.NODE_ENV === 'development') {
-  app.use(express.static(path.join(__dirname, "/public")));
+  app.use(express.static(path.join(__dirname, "../client/public")));
 }
 
 app.use(logger("dev"));
@@ -46,15 +46,9 @@ app.use("/invitations", passport.authenticate('jwt', { session: false}), invitat
 app.use("/user", userRouter);
 
 if (process.env.NODE_ENV === 'production') {
-  app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, '/../client/build', 'index.html'));
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
   });
-  app.get('/join/*', function (req, res) {
-    res.sendFile(path.join(__dirname, '/../client/build', 'index.html'));
-  });
-  // app.get('/*', function (req, res) {
-  //   res.sendFile(path.join(__dirname, '/../client/build', `${req.url}`));
-  // });
 }
 
 mongoose.set('useFindAndModify', false);

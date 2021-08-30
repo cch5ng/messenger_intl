@@ -48,9 +48,12 @@ function AuthProvider({children}) {
     }
   }
 
-  const updateEmailToLangDict = (dict) => {
-    setState({...state, emailToLangDict: dict});
-  }
+  const updateEmailToLangDict = useCallback(
+    (dict) => {
+      setState({...state, emailToLangDict: dict});
+    },
+    [state]
+  )
   
   let authState = {...state, logout, login, updateEmailToLangDict, user}
 

@@ -164,10 +164,9 @@ const Sidebar = props => {
           updateEmailToLangDict({});
         }
       }
-    }
-  
+    }  
     loadFriends();
-  }, [email])
+  }, [email, logout, updateEmailToLangDict])
 
   useEffect(() => {
     const loadPendingRequests = async() => {
@@ -187,7 +186,7 @@ const Sidebar = props => {
     }  
 
     loadPendingRequests();
-  }, [pendingRequests.length, email, authToken]);
+  }, [pendingRequests.length, email, authToken, logout]);
   
   useEffect(() => {
     const loadPendingInvites = async() => {
@@ -207,7 +206,7 @@ const Sidebar = props => {
     }
 
     loadPendingInvites();
-  }, [pendingInvites.length, email, authToken]);
+  }, [pendingInvites.length, email, authToken, logout]);
 
   return (
     <div>

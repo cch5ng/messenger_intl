@@ -72,7 +72,7 @@ const ChatSummary = () => {
         })
         .catch(err => console.error('get convos summary err', err))
     }
-  }, []);
+  }, [history, logout, user.email, initConversationsAr]);
 
   return (
     <div className={styles.chat_summary_container}>

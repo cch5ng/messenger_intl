@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import clsx from 'clsx';
-import {theme} from "../../themes/theme";
+//import {theme} from "../../themes/theme";
 import Button from '@material-ui/core/Button';
 import FilledInput from '@material-ui/core/FilledInput';
 import TextField from '@material-ui/core/TextField';
@@ -12,7 +12,7 @@ import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
+//import Container from '@material-ui/core/Container';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -129,7 +129,7 @@ export default function InvitationDialog(props) {
   const handleClickCopyBtn = (ev) => {
     ev.preventDefault();
     navigator.permissions.query({name: "clipboard-write"}).then(result => {
-      if (result.state == "granted" || result.state == "prompt") {
+      if (result.state === "granted" || result.state === "prompt") {
         if (navigator.clipboard) {
           let url = getReferralUrl();
           navigator.clipboard.writeText(url).then(function() {
@@ -293,6 +293,11 @@ export default function InvitationDialog(props) {
         <Snackbar open = {submitError.length !== 0} autoHideDuration={5000} onClose = { closeAlertHandler }>
           <Alert onClose={closeAlertHandler} severity="error">
             {submitError}
+          </Alert>
+        </Snackbar>
+        <Snackbar open = {sendRequestErrorMessage.length !== 0} autoHideDuration={5000} onClose = { closeAlertHandler }>
+          <Alert onClose={closeAlertHandler} severity="error">
+            {sendRequestErrorMessage}
           </Alert>
         </Snackbar>
 

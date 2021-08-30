@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import Grid from '@material-ui/core/Grid';
+//import Grid from '@material-ui/core/Grid';
 
 import Message from './Message';
 import {useAuth} from '../../context/auth-context';
@@ -10,11 +10,12 @@ const MessageDisplay = props => {
   const {messages, color} = props;
   const [messagesEnd, setMessagesEnd] = useState(null);
 
-  const scrollToBottom = () => {
-    messagesEnd.scrollIntoView({ behavior: "smooth" });
-  }
 
   useEffect(() => {
+    const scrollToBottom = () => {
+      messagesEnd.scrollIntoView({ behavior: "smooth" });
+    }
+  
     if (messagesEnd) {
       scrollToBottom();
     }

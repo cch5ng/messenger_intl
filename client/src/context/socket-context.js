@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 //import io from 'socket.io-client';
 
 const avatarColors = [
@@ -118,17 +118,20 @@ function SocketProvider({children}) {
     }
   }
 
-  const updateCurConversation = (conversation) => {
-    setCurConversation(conversation);
-    let id = conversation._id;
-    setConversationsDict({
-      ...conversationsDict,
-      [id]: {
-        ...conversationsDict[id],
-        ...conversation
-      }
-    })
-  }
+  const updateCurConversation = useCallback(
+    (conversation) => {
+      setCurConversation(conversation);
+      let id = conversation._id;
+      setConversationsDict({
+        ...conversationsDict,
+        [id]: {
+          ...conversationsDict[id],
+          ...conversation
+        }
+      })
+    },
+    []
+  )
 
   const getColorForConversationId = (conversationId) => {
     return conversationsColorsDict[conversationId] ? conversationsColorsDict[conversationId] : null;

@@ -283,7 +283,7 @@ const Chat = props => {
       logout();
     }
 
-  }, [conversationId]);
+  }, [conversationId, logout, updateCurConversation]);
   
   if (chatType === 'new') {
     return (

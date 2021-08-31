@@ -267,11 +267,11 @@ const Chat = props => {
         }
       })
         .then(resp => {
-          if (resp.status === 401) {
-            logout();
-          } else {
+          //if (resp.status === 401) {
+            //logout();
+          //} else {
             return resp.json();
-          }
+          //}
         })
         .then(json => {
           if (json && json.type === 'success') {
@@ -283,7 +283,7 @@ const Chat = props => {
       logout();
     }
 
-  }, [conversationId, logout, updateCurConversation]);
+  }, [conversationId ]); //updateCurConversation logout 
   
   if (chatType === 'new') {
     return (

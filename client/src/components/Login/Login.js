@@ -62,13 +62,19 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login() {
   const classes = useStyles();
-  const { handleChange, handleSubmit, formValues, formErrors } = useForm(submit, validate);
+  const { handleChange, handleSubmit, formValues, formErrors } = useForm(validate);
   const [errorAlertMsg, setErrorAlertMsg] = useState('');
   const authState = useAuth();
   
   function submit() {
     authState.login(formValues);
   }
+
+  function handleFormSubmit(ev) {
+    ev.preventDefault();
+    handleSubmit(submit);
+  }
+
 
   useEffect(() => {
     if(authState.error){
@@ -86,17 +92,11 @@ export default function Login() {
 
   return (
     <div>
-    <Grid container>
-        <Grid
-            item xs={4}
-            direction='row'
-        >
+    <Grid container direction='row'>
+        <Grid item xs={4} >
             <UnauthenticatedSidebar/>
         </Grid>
-        <Grid
-            item xs={8}
-            direction='row' >
-              
+        <Grid item xs={8} >
           <Container className={classes.mainContainer} component="main" maxWidth="xs">
             <CssBaseline />
             <Grid container justify='flex-end'>
@@ -115,7 +115,7 @@ export default function Login() {
               <Typography className={classes.welcomeHeading} component="h2" variant="h4">
                 Welcome Back!
               </Typography>
-              <form onSubmit= { handleSubmit } className={classes.form} noValidate>
+              <form onSubmit= { handleFormSubmit } className={classes.form} noValidate>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextField

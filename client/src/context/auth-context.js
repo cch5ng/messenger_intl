@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import axios from 'axios';
 
 const AuthContext = React.createContext([{}, () => {}]);
@@ -10,14 +10,17 @@ function AuthProvider({children}) {
   });
   const [user, setUser] = useState(null);
 
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    setUser(null);
-    setState({
-      status: 'logged out',
-      error: null,
-    })
-  }
+  const logout = useCallback(
+    () => {
+      localStorage.removeItem('authToken');
+      setUser(null);
+      setState({
+        status: 'logged out',
+        error: null,
+      })
+    },
+    []
+  )
 
   const login = async(formValues) => {
     try {
@@ -45,9 +48,12 @@ function AuthProvider({children}) {
     }
   }
 
-  const updateEmailToLangDict = (dict) => {
-    setState({...state, emailToLangDict: dict});
-  }
+  const updateEmailToLangDict = useCallback(
+    (dict) => {
+      setState({...state, emailToLangDict: dict});
+    },
+    [state]
+  )
   
   let authState = {...state, logout, login, updateEmailToLangDict, user}
 

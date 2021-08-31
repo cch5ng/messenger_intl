@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import Contacts from './Contacts/Contacts';
+//import Contacts from './Contacts/Contacts';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
@@ -45,7 +45,7 @@ const Sidebar = props => {
   const [approveInvite, setApproveInvite] = useState('');
   const [pendingRequests, setPendingRequests] = useState([]);
   const [pendingInvites, setPendingInvites] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  //const [searchQuery, setSearchQuery] = useState('');
   const [value, setValue] = useState(0);
   const classes = useStyles();
 
@@ -137,23 +137,78 @@ const Sidebar = props => {
     }
   }
 
-  const searchContacts = async(e) => {
-    let query = e.target.value;
-    setSearchQuery(query);
-    loadFriends(query);
-  }
+  // const searchContacts = async(e) => {
+  //   let query = e.target.value;
+  //   setSearchQuery(query);
+  //   loadFriends(query);
+  // }
+
+  //BUG infinite loop, related to updateEmailToLangDict?
+  useEffect(() => {
+    const loadFriends = async(q='') => {
+//      if(email){
+        let authToken = localStorage.getItem('authToken');
+        const res = await axios.get(`/invitations/user/${email}/contacts`, //?q=${q} 
+                                  {headers: { Authorization: `Bearer ${authToken}`}});
+        // if (res.status === 401) {
+        //   logout();
+        //   return;
+        // }
+        if (res.data.contacts.length !== 0){
+          let {contacts} = res.data;
+          let contactEmails = Object.keys(contacts);
+          setFriends(contactEmails);
+          updateEmailToLangDict(contacts);
+        } else {
+          setFriends([]);
+          updateEmailToLangDict({});
+        }
+      //}
+    }  
+    if (email) {
+      loadFriends();
+    }
+  }, [email]) //logout, updateEmailToLangDict
 
   useEffect(() => {
-    loadFriends();
-  }, [])
+    const loadPendingRequests = async() => {
+      if(email){
+        const res = await axios.get(`/invitations/user/requests/${email}`, 
+                                  {headers: { Authorization: `Bearer ${authToken}`}});
+        // if (res.status === 401) {
+        //   logout();
+        //   return;
+        // }
+        if(res.data.invitations && res.data.invitations.length !== 0){
+          setPendingRequests(res.data.invitations);
+        } else {
+          setPendingRequests(['No pending invitation requests']);
+        }
+      }
+    }  
 
-  useEffect(() => {
     loadPendingRequests();
-  }, [pendingRequests.length]);
+  }, [pendingRequests.length, email, authToken]);//logout
   
   useEffect(() => {
+    const loadPendingInvites = async() => {
+      if(email){
+        const res = await axios.get(`/invitations/user/${email}`, 
+                                  {headers: { Authorization: `Bearer ${authToken}`}});
+        // if (res.status === 401) {
+        //   logout();
+        //   return;
+        // }
+        if (res.data.invitations && res.data.invitations.length !== 0){
+          setPendingInvites(res.data.invitations);
+        } else {
+          setPendingInvites(['No pending invitations']);
+        }
+      }
+    }
+
     loadPendingInvites();
-  }, [pendingInvites.length]);
+  }, [pendingInvites.length, email, authToken ]); //logout
 
   return (
     <div>
@@ -184,7 +239,7 @@ const Sidebar = props => {
             selectContact={props.selectContact}
             loadPendingInvites = {loadPendingInvites}
             friends={friends}
-            searchContacts={searchContacts}
+            // searchContacts={searchContacts}
           />
         )}
         {value === 2 && (

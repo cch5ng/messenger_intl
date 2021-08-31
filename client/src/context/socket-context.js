@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 //import io from 'socket.io-client';
 
 const avatarColors = [
@@ -15,16 +15,19 @@ const SocketContext = React.createContext([{}, () => {}])
 function SocketProvider({children}) {
   const [conversationsDict, setConversationsDict] = useState({});
   const [conversationsAr, setConversationsAr] = useState([]);
-  const [curConversationId, setCurConversationId] = useState(null);
+  //const [curConversationId, setCurConversationId] = useState(null);
   const [curConversation, setCurConversation] = useState({});
   const [conversationsColorsDict, setConversationsColorsDict] = useState({});
 
-  const initConversationsAr = (conversations, userEmail) => {
-    if (conversations.length) {
-      setConversationsAr(conversations);
-      initConversationsDict(conversations);  
-    }
-  }
+  const initConversationsAr = useCallback(
+    (conversations, userEmail) => {
+      if (conversations.length) {
+        setConversationsAr(conversations);
+        initConversationsDict(conversations);  
+      }
+    },
+    []
+  )
 
   const initConversationsDict = (convoAr) => {
     if (convoAr.length) {
@@ -86,9 +89,9 @@ function SocketProvider({children}) {
     return {};
   }
 
-  const setConversationId = (conversationId) => {
-    setCurConversationId(conversationId);
-  }
+  // const setConversationId = (conversationId) => {
+  //   setCurConversationId(conversationId);
+  // }
 
   const addConversationColor = ({conversationId, color}) => {
     setConversationsColorsDict({conversationsColorsDict, conversationId: color})
@@ -118,17 +121,20 @@ function SocketProvider({children}) {
     }
   }
 
-  const updateCurConversation = (conversation) => {
-    setCurConversation(conversation);
-    let id = conversation._id;
-    setConversationsDict({
-      ...conversationsDict,
-      [id]: {
-        ...conversationsDict[id],
-        ...conversation
-      }
-    })
-  }
+  const updateCurConversation = useCallback(
+    (conversation) => {
+      setCurConversation(conversation);
+      let id = conversation._id;
+      setConversationsDict({
+        ...conversationsDict,
+        [id]: {
+          ...conversationsDict[id],
+          ...conversation
+        }
+      })
+    },
+    [conversationsDict]
+  )
 
   const getColorForConversationId = (conversationId) => {
     return conversationsColorsDict[conversationId] ? conversationsColorsDict[conversationId] : null;
@@ -140,7 +146,6 @@ function SocketProvider({children}) {
       Object.keys(conversationsDict).forEach(id => {
         convosAr.push(conversationsDict[id]);
       })
-      let orderedAr = [];
       convosAr.sort((a, b) => {
         let date_a = Date.parse(a.updated_on);
         let date_b = Date.parse(b.updated_on);
@@ -156,7 +161,7 @@ function SocketProvider({children}) {
         setConversationsColorsDict(colorsDict);
       }  
     }
-  }, [conversationsDict]);
+  }, [conversationsDict, conversationsColorsDict]);
 
   const socketShare = {
     conversationsAr,
@@ -165,7 +170,7 @@ function SocketProvider({children}) {
     addMessageToConversation, 
     initConversationsAr,
     initConversationsDict,
-    curConversationId,
+    //curConversationId,
     addConversationColor,
     getConversationColorById,
     addConversation,

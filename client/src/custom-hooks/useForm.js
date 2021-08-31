@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-
-const useForm = (submitCallback, validate) => {
+const useForm = (validate) => {
   const [formValues, setFormValues] = useState({ email: '', password: '', confirmPassword: '', language: 'english'});
   const [formErrors, setFormErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleChange = event => {
     const { name, value} = event.target;
@@ -14,17 +12,14 @@ const useForm = (submitCallback, validate) => {
     });
   };
 
-  const handleSubmit = event => {
-    event.preventDefault();
-    setFormErrors(validate(formValues));
-    setIsSubmitting(true);
-  }
-
-  useEffect(() => {
-    if(Object.keys(formErrors).length === 0 && isSubmitting) {
+  const handleSubmit = submitCallback => {
+    let errors = validate(formValues)
+    if (!Object.keys(errors).length) {
       submitCallback();
+    } else {
+      setFormErrors(errors);
     }
-  }, [formErrors]);
+  }
 
   return {
     handleChange,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import { deepOrange, deepPurple } from '@material-ui/core/colors';
 import pink from '@material-ui/core/colors/pink';
@@ -12,14 +12,14 @@ import green from '@material-ui/core/colors/green';
 import {useAuth} from '../../../context/auth-context';
 import styles from './ChatSummary.module.css';
 
-const avatarColors = [
-  'pink',
-  'indigo',
-  'amber',
-  'teal',
-  'red',
-  'green'
-]
+// const avatarColors = [
+//   'pink',
+//   'indigo',
+//   'amber',
+//   'teal',
+//   'red',
+//   'green'
+// ]
 
 const useStyles = makeStyles((theme) => ({
   pink: {
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const ChatSummaryItem = (props) => {
-  const {conversation, idx, handleChatClick, color} = props;
+  const {conversation, handleChatClick, color} = props;
   const {user} = useAuth();
   const classes = useStyles();
   let lastMessage = conversation.messages && conversation.messages.length ? conversation.messages[conversation.messages.length - 1] : '';

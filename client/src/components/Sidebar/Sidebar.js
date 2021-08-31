@@ -143,17 +143,17 @@ const Sidebar = props => {
   //   loadFriends(query);
   // }
 
+  //BUG infinite loop, related to updateEmailToLangDict?
   useEffect(() => {
-
     const loadFriends = async(q='') => {
-      if(email){
+//      if(email){
         let authToken = localStorage.getItem('authToken');
         const res = await axios.get(`/invitations/user/${email}/contacts`, //?q=${q} 
                                   {headers: { Authorization: `Bearer ${authToken}`}});
-        if (res.status === 401) {
-          logout();
-          return;
-        }
+        // if (res.status === 401) {
+        //   logout();
+        //   return;
+        // }
         if (res.data.contacts.length !== 0){
           let {contacts} = res.data;
           let contactEmails = Object.keys(contacts);
@@ -163,10 +163,12 @@ const Sidebar = props => {
           setFriends([]);
           updateEmailToLangDict({});
         }
-      }
+      //}
     }  
-    loadFriends();
-  }, [email, logout, updateEmailToLangDict])
+    if (email) {
+      loadFriends();
+    }
+  }, [email]) //logout, updateEmailToLangDict
 
   useEffect(() => {
     const loadPendingRequests = async() => {

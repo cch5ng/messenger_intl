@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import { useParams, Link, useHistory } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import io from 'socket.io-client';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -36,16 +34,15 @@ const Chat = props => {
   const {user, emailToLangDict, logout} = useAuth();
   const {language} = user;
   const userEmail = user.email;
-  const {addConversation, addMessageToConversation, initConversationsDict, getConversationById,
-    setAllConversationMessages, conversationsAr, conversationsDict, updateCurConversation, 
-    getColorForConversationId, curConversation} = useSocket();
+  const {addConversation, addMessageToConversation, getConversationById,
+    updateCurConversation, getColorForConversationId, curConversation} = useSocket();
   let history = useHistory();
   const [toEmailAddresses, setToEmailAddresses] = useState('');
   const [toEmailAddressesError, setToEmailAddressesError] = useState('');
   const [curMessage, setCurMessage] = useState('');
-  const [chatUserEmails, setChatUserEmails] = useState([]);
+  //const [chatUserEmails, setChatUserEmails] = useState([]);
   const [messageInputError, setMessageInputError] = useState('');
-  const [languageError, setLanguageError] = useState('');
+  //const [languageError, setLanguageError] = useState('');
   const [showMsgInOriginalLanguage, setShowMsgInOriginalLanguage] = useState(false);
   const [submitGroupConversationError, setSubmitGroupConversationError] = useState('');
   let curMessages = curConversation && curConversation.messages ? curConversation.messages : [];
@@ -63,8 +60,8 @@ const Chat = props => {
 
   const sendGroupChatInitMessage = ({from_email, message, conversationId, user_emails, action, created_on, updated_on}) => {
     socket.send({message, conversationId, user_emails, action, from_email, created_on, updated_on});
-    let conversation = {messages: [message], _id: conversationId, user_emails,
-      created_on, updated_on};
+    //let conversation = {messages: [message], _id: conversationId, user_emails,
+    //  created_on, updated_on};
   }
 
   const closeAlertHandler = () => {
@@ -180,7 +177,7 @@ const Chat = props => {
         created_on: Date.now(),
         translations: {}
       };
-      let conversation = getConversationById(conversationId);
+      //let conversation = getConversationById(conversationId);
       sendChatMessage({
         from_email: user.email,
         message,
@@ -215,10 +212,10 @@ const Chat = props => {
       let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
       return friendEmails;  
     } else if (conversationId) {
-      curConversation = getConversationById(conversationId);
-      if (curConversation.user_emails) {
-        let friendEmails = curConversation.user_emails.filter(email => email !== user.email);
-        return friendEmails;  
+      let curConversation2 = getConversationById(conversationId);
+      if (curConversation2.user_emails) {
+        let friendEmails = curConversation2.user_emails.filter(email => email !== user.email);
+        return friendEmails;
       }
     }
     return [];
@@ -257,7 +254,7 @@ const Chat = props => {
       };
       socket = io.connect(`https://messenger-intl.herokuapp.com:443/chat`, options);
     }
-  }, [])
+  }, [conversationId]);
 
   useEffect(() => {
     let jwtToken = localStorage.getItem('authToken');
@@ -270,11 +267,11 @@ const Chat = props => {
         }
       })
         .then(resp => {
-          if (resp.status === 401) {
-            logout();
-          } else {
+          //if (resp.status === 401) {
+            //logout();
+          //} else {
             return resp.json();
-          }
+          //}
         })
         .then(json => {
           if (json && json.type === 'success') {
@@ -286,7 +283,7 @@ const Chat = props => {
       logout();
     }
 
-  }, [conversationId]);
+  }, [conversationId ]); //updateCurConversation logout 
   
   if (chatType === 'new') {
     return (

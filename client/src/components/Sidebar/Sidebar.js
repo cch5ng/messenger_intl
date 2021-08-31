@@ -175,10 +175,10 @@ const Sidebar = props => {
       if(email){
         const res = await axios.get(`/invitations/user/requests/${email}`, 
                                   {headers: { Authorization: `Bearer ${authToken}`}});
-        if (res.status === 401) {
-          logout();
-          return;
-        }
+        // if (res.status === 401) {
+        //   logout();
+        //   return;
+        // }
         if(res.data.invitations && res.data.invitations.length !== 0){
           setPendingRequests(res.data.invitations);
         } else {
@@ -188,17 +188,17 @@ const Sidebar = props => {
     }  
 
     loadPendingRequests();
-  }, [pendingRequests.length, email, authToken, logout]);
+  }, [pendingRequests.length, email, authToken]);//logout
   
   useEffect(() => {
     const loadPendingInvites = async() => {
       if(email){
         const res = await axios.get(`/invitations/user/${email}`, 
                                   {headers: { Authorization: `Bearer ${authToken}`}});
-        if (res.status === 401) {
-          logout();
-          return;
-        }
+        // if (res.status === 401) {
+        //   logout();
+        //   return;
+        // }
         if (res.data.invitations && res.data.invitations.length !== 0){
           setPendingInvites(res.data.invitations);
         } else {
@@ -208,7 +208,7 @@ const Sidebar = props => {
     }
 
     loadPendingInvites();
-  }, [pendingInvites.length, email, authToken, logout]);
+  }, [pendingInvites.length, email, authToken ]); //logout
 
   return (
     <div>

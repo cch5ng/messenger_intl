@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; //, useCallback
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -75,37 +75,43 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp(props) {
   const classes = useStyles();
-  const { handleChange, handleSubmit, formValues, formErrors  } = useForm(submit, validate);
   const [successAlertMsg, setSuccessAlertMsg] = useState(false);
   const [errorAlertMsg, setErrorAlertMsg] = useState('');
   const [redirect, setRedirect] = useState(null);
 
+  const { handleChange, handleSubmit, formValues, formErrors  } = useForm(validate);
+
   async function submit() {
-    if (!props.match.params.referralId) {
-      try{
-        const resp = await axios.post('/user/register', formValues);
-        if (resp) {
-          setSuccessAlertMsg(true);
-          setRedirect('/login');  
+      if (!props.match.params.referralId) {
+        try{
+          const resp = await axios.post('/user/register', formValues);
+          if (resp) {
+            setSuccessAlertMsg(true);
+            setRedirect('/login');  
+          }
+        }
+        catch(err){
+          err.response.data.email ? setErrorAlertMsg(err.response.data.email) : console.error(err.response);
+        }  
+      }
+      if (props.match.params.referralId) {
+        const {referralId} = props.match.params;
+        try{
+          const resp = await axios.post('/user/register/referral', {...formValues, referralId});
+          if (resp) {
+            setSuccessAlertMsg(true);
+            setRedirect('/login');  
+          }
+        }
+        catch(err){
+          err.response.data.email ? setErrorAlertMsg(err.response.data.email) : console.error(err.response);
         }
       }
-      catch(err){
-        err.response.data.email ? setErrorAlertMsg(err.response.data.email) : console.error(err.response);
-      }  
-    }
-    if (props.match.params.referralId) {
-      const {referralId} = props.match.params;
-      try{
-        const resp = await axios.post('/user/register/referral', {...formValues, referralId});
-        if (resp) {
-          setSuccessAlertMsg(true);
-          setRedirect('/login');  
-        }
-      }
-      catch(err){
-        err.response.data.email ? setErrorAlertMsg(err.response.data.email) : console.error(err.response);
-      }
-    }
+  }
+
+  function handleFormSubmit(ev) {
+    ev.preventDefault();
+    handleSubmit(submit);
   }
 
   function closeAlertHandler() {
@@ -152,7 +158,7 @@ export default function SignUp(props) {
                   <Typography className={classes.createAccountHeading} component="h2" variant="h4">
                     Create an account
                   </Typography>
-                  <form onSubmit={ handleSubmit } className={classes.form} noValidate>
+                  <form onSubmit={ handleFormSubmit } className={classes.form} noValidate>
                     <Grid container spacing={2}>
                       <Grid item xs={12}>
                         <TextField

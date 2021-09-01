@@ -18,7 +18,7 @@ These are the features:
 
 * Ability to start a conversation with connected friends.
 
-* Ability to view conversation message in native language (translated) or the friend's language (original).
+* (disabled) Ability to view conversation message in native language (translated) or the friend's language (original).
 
 ## (User) Run the App
 

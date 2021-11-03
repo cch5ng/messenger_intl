@@ -17,7 +17,7 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
     "socket.io-client": "^2.3.0",
-    "validator": "^13.0.0"
+    "validator": "^13.7.0"
   },
   "scripts": {
     "start": "react-scripts start",
